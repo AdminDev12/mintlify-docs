@@ -1,0 +1,209 @@
+---
+title: "Authentication"
+description: "Learn how to authenticate with the Exterview API using required headers and base URLs"
+---
+
+## Overview
+
+All API requests to Exterview require authentication using two methods combined:
+1. **API Key** - Organization-specific identifier
+2. **Bearer Token** - User-specific authorization token
+
+Both must be included in every request to access the API endpoints.
+
+## Required Headers
+
+Every API request must include the following three headers:
+
+<ParamField header="x-api-key" type="string" required>
+  Your organization-specific API key. Contact your administrator to obtain this key.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token in the format: `Bearer YOUR_TOKEN`
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  Request content type: `application/json` or `multipart/form-data` (for file uploads)
+</ParamField>
+
+## Base URLs
+
+Exterview provides two environments for API access:
+
+### Production
+```
+https://api.exterview.ai/graphql
+```
+Use this for production applications and live data.
+
+### Sandbox
+```
+https://sandbox-api.exterview.ai/graphql
+```
+Use this for testing and development purposes.
+
+## Quick Start Example
+
+Here's a complete example showing how to authenticate and make your first API request:
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "query { interviews { id title } }"}'
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    query: 'query { interviews { id title } }'
+  })
+});
+
+const data = await response.json();
+console.log(data);
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = {"query": "query { interviews { id title } }"}
+
+response = requests.post(url, headers=headers, json=query)
+print(response.json())
+```
+
+</CodeGroup>
+
+## Getting Your Credentials
+
+### API Key
+Your organization's API key is available in the Exterview dashboard:
+1. Log in to your Exterview account
+2. Navigate to **Settings** → **API Keys**
+3. Copy your organization's API key
+
+<Warning>
+Keep your API key secure and never commit it to version control. Use environment variables to store sensitive credentials.
+</Warning>
+
+### Bearer Token
+The Bearer token is generated when you authenticate:
+1. Use your Exterview credentials to log in
+2. The authentication response includes your Bearer token
+3. Include this token in all subsequent API requests
+
+<Info>
+Bearer tokens typically expire after a certain period. Implement token refresh logic in your application to handle expiration.
+</Info>
+
+## Authentication Errors
+
+| Status Code | Error | Description |
+|-------------|-------|-------------|
+| 400 | Bad Request | Missing required headers or invalid format |
+| 401 | Unauthorized | Invalid or missing API key or Bearer token |
+| 403 | Forbidden | API key lacks required permissions for this operation |
+
+### Example Error Responses
+
+<CodeGroup>
+
+```json 401 Unauthorized
+{
+  "error": "Missing or invalid API key or token"
+}
+```
+
+```json 403 Forbidden
+{
+  "error": "API key lacks required permissions",
+  "details": "Your API key does not have access to this endpoint"
+}
+```
+
+```json 400 Bad Request
+{
+  "error": "Missing required headers",
+  "details": "x-api-key header is required"
+}
+```
+
+</CodeGroup>
+
+## Security Best Practices
+
+<AccordionGroup>
+  <Accordion title="Use Environment Variables">
+    Never hardcode API keys or tokens in your source code. Use environment variables:
+    
+    ```bash
+    export EXTERVIEW_API_KEY="your_api_key"
+    export EXTERVIEW_BEARER_TOKEN="your_token"
+    ```
+  </Accordion>
+
+  <Accordion title="Rotate Credentials Regularly">
+    Rotate your API keys and tokens periodically to maintain security:
+    - API keys: Every 90 days
+    - Bearer tokens: Implement automatic refresh
+  </Accordion>
+
+  <Accordion title="Use HTTPS Only">
+    Always use HTTPS (not HTTP) when making API requests to ensure your credentials are encrypted in transit.
+  </Accordion>
+
+  <Accordion title="Restrict API Key Permissions">
+    Configure your API key with the minimum required permissions for your use case. Avoid using admin-level keys for routine operations.
+  </Accordion>
+</AccordionGroup>
+
+## Testing Your Authentication
+
+Use this simple query to verify your authentication is working correctly:
+
+```graphql
+query {
+  __typename
+}
+```
+
+If authentication is successful, you'll receive:
+
+```json
+{
+  "data": {
+    "__typename": "Query"
+  }
+}
+```
+
+<Check>
+**Authentication Successful!** You're now ready to start using the Exterview API. Check out the [API Reference](/api-reference/jobs/create-job) to explore available endpoints.
+</Check>
+
+
+## Need Help?
+
+Having trouble with authentication? Here are some resources:
+
+- **Documentation**: Check our [API Reference](/api-reference/jobs/create-job) for detailed endpoint information
+- **Support**: Contact support@exterview.ai
+- **Status**: Check system status at status.exterview.ai

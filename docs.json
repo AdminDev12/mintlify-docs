@@ -1,14 +1,16 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
+  "theme": "aspen",
   "name": "Exterview API Docs",
   "logo": {
-    "light": "/logo/Logo-White.svg",
+    "light": "/logo/Logo-Black.svg",
     "dark": "/logo/Logo-White.svg"
   },
   "favicon": "/favicon.svg",
   "colors": {
-    "primary": "#0D9373"
+    "primary": "#0072f5",
+    "light": "#604aff",
+    "dark": "#0052cc"
   },
   "navigation": {
     "tabs": [
@@ -21,7 +23,35 @@
       },
       {
         "tab": "API reference",
-        "openapi": "/api-reference/openapi.json"
+        "pages": [
+          {
+            "group": "Jobs",
+            "pages": [
+              "api-reference/jobs/create-job",
+              "api-reference/jobs/list-jobs"
+            ]
+          },
+          {
+            "group": "Candidates",
+            "pages": [
+              "api-reference/candidates/bulk-upload",
+              "api-reference/candidates/list-candidates"
+            ]
+          },
+          {
+            "group": "Interviews",
+            "pages": [
+              "api-reference/interviews/assign-interviewer"
+            ]
+          },
+          {
+            "group": "Reports",
+            "pages": [
+              "api-reference/reports/get-leaderboard",
+              "api-reference/reports/interview-report"
+            ]
+          }
+        ]
       }
     ]
   }

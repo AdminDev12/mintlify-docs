@@ -1,0 +1,243 @@
+---
+title: "Get Interview Report"
+api: "POST /graphql"
+description: "Retrieve detailed interview report including feedback, questions, transcription, and video playback"
+---
+
+## Overview
+
+Get comprehensive interview report data for a specific candidate, including AI feedback, interview questions and answers, full transcription, and video playback link.
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query getCanInterviewRpt($input: GetQuestionsInput!) {
+  getCanInterviewRpt(input: $input) {
+    feedback
+    questions
+    transcription
+    videoPlaybackLink
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="candidateId" type="string" required>
+  Database ID of the candidate
+</ParamField>
+
+<ParamField body="interviewerId" type="string" required>
+  Database ID of the interviewer
+</ParamField>
+
+<ParamField body="jobId" type="string" required>
+  Database ID of the job
+</ParamField>
+
+<ParamField body="uId" type="string" required>
+  Candidate's unique identifier (e.g., CAN-6E75E9)
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query getCanInterviewRpt($input: GetQuestionsInput!) { getCanInterviewRpt(input: $input) { feedback questions transcription videoPlaybackLink } }",
+    "variables": {
+      "input": {
+        "candidateId": "68f8a4876e6926d93568c8b9",
+        "interviewerId": "68c2b5630f282c4b149f0321",
+        "jobId": "68c42431b9f38f8c24fbc91f",
+        "uId": "CAN-6E75E9"
+      }
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query getCanInterviewRpt($input: GetQuestionsInput!) {
+    getCanInterviewRpt(input: $input) {
+      feedback
+      questions
+      transcription
+      videoPlaybackLink
+    }
+  }
+`;
+
+const variables = {
+  input: {
+    candidateId: "68f8a4876e6926d93568c8b9",
+    interviewerId: "68c2b5630f282c4b149f0321",
+    jobId: "68c42431b9f38f8c24fbc91f",
+    uId: "CAN-6E75E9"
+  }
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query getCanInterviewRpt($input: GetQuestionsInput!) {
+  getCanInterviewRpt(input: $input) {
+    feedback
+    questions
+    transcription
+    videoPlaybackLink
+  }
+}
+"""
+
+variables = {
+    "input": {
+        "candidateId": "68f8a4876e6926d93568c8b9",
+        "interviewerId": "68c2b5630f282c4b149f0321",
+        "jobId": "68c42431b9f38f8c24fbc91f",
+        "uId": "CAN-6E75E9"
+    }
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="getCanInterviewRpt" type="object">
+      <Expandable title="getCanInterviewRpt properties">
+        <ResponseField name="feedback" type="string">
+          Overall AI-generated feedback and assessment of the candidate's interview performance
+        </ResponseField>
+        
+        <ResponseField name="questions" type="array">
+          Array of interview questions with candidate answers
+          
+          <Expandable title="Question Object">
+            <ResponseField name="question" type="string">
+              The interview question asked
+            </ResponseField>
+            
+            <ResponseField name="candidateAnswer" type="string">
+              The candidate's response
+            </ResponseField>
+            
+            <ResponseField name="qId" type="string">
+              Unique question identifier
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        
+        <ResponseField name="transcription" type="object">
+          Transcription metadata
+          
+          <Expandable title="Transcription Object">
+            <ResponseField name="id" type="string">
+              Transcription unique identifier
+            </ResponseField>
+            
+            <ResponseField name="status" type="string">
+              Processing status (e.g., "completed", "processing")
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        
+        <ResponseField name="videoPlaybackLink" type="string">
+          URL to access the interview video recording
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "getCanInterviewRpt": {
+      "feedback": "Overall strong technical understanding with room for improvement in communication clarity.",
+      "questions": [
+        {
+          "question": "Explain React's virtual DOM",
+          "candidateAnswer": "Virtual DOM is a lightweight copy...",
+          "qId": "QES-75BEFF"
+        }
+      ],
+      "transcription": {
+        "id": "trans-123",
+        "status": "completed"
+      },
+      "videoPlaybackLink": "https://exterview.ai/playback/interview-123"
+    }
+  }
+}
+```
+
+```json 404 Not Found
+{
+  "errors": [
+    {
+      "message": "Interview report not found",
+      "extensions": {
+        "code": "NOT_FOUND"
+      }
+    }
+  ]
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>

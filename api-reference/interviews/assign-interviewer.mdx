@@ -1,0 +1,228 @@
+---
+title: "Assign Interviewer"
+api: "POST /graphql"
+description: "Assign an interviewer to a candidate and schedule an interview"
+---
+
+## Overview
+
+Schedule an interview by assigning an interviewer to a candidate with a specific date and time.
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Mutation
+
+```graphql
+mutation assignInterviewer($input: AssignInterviewerInput!) {
+  assignInterviewer(input: $input) {
+    message
+    result {
+      acknowledged
+      insertedId
+      _id
+    }
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="candidateId" type="string" required>
+  Unique identifier of the candidate
+</ParamField>
+
+<ParamField body="interviewerId" type="string" required>
+  Unique identifier of the interviewer
+</ParamField>
+
+<ParamField body="dateAndTime" type="string" required>
+  Interview date and time in ISO 8601 format (UTC)
+</ParamField>
+
+<ParamField body="status" type="string" required>
+  Interview status (typically "Scheduled")
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "mutation assignInterviewer($input: AssignInterviewerInput!) { assignInterviewer(input: $input) { message result { acknowledged insertedId _id } } }",
+    "variables": {
+      "input": {
+        "candidateId": "C100",
+        "interviewerId": "I99",
+        "dateAndTime": "2025-10-22T18:45:00.000Z",
+        "status": "Scheduled"
+      }
+    }
+  }'
+```
+
+```javascript JavaScript
+const mutation = `
+  mutation assignInterviewer($input: AssignInterviewerInput!) {
+    assignInterviewer(input: $input) {
+      message
+      result {
+        acknowledged
+        insertedId
+        _id
+      }
+    }
+  }
+`;
+
+const variables = {
+  input: {
+    candidateId: "C100",
+    interviewerId: "I99",
+    dateAndTime: "2025-10-22T18:45:00.000Z",
+    status: "Scheduled"
+  }
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query: mutation, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+from datetime import datetime, timezone
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+mutation = """
+mutation assignInterviewer($input: AssignInterviewerInput!) {
+  assignInterviewer(input: $input) {
+    message
+    result {
+      acknowledged
+      insertedId
+      _id
+    }
+  }
+}
+"""
+
+# Schedule interview for specific date/time
+interview_time = datetime(2025, 10, 22, 18, 45, 0, tzinfo=timezone.utc)
+
+variables = {
+    "input": {
+        "candidateId": "C100",
+        "interviewerId": "I99",
+        "dateAndTime": interview_time.isoformat(),
+        "status": "Scheduled"
+    }
+}
+
+response = requests.post(url, headers=headers, json={"query": mutation, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="assignInterviewer" type="object">
+      <Expandable title="assignInterviewer properties">
+        <ResponseField name="message" type="string">
+          Success or error message
+        </ResponseField>
+        
+        <ResponseField name="result" type="object">
+          Database operation result
+          
+          <Expandable title="result properties">
+            <ResponseField name="acknowledged" type="boolean">
+              Whether the operation was acknowledged
+            </ResponseField>
+            
+            <ResponseField name="insertedId" type="string">
+              ID of the created interview record
+            </ResponseField>
+            
+            <ResponseField name="_id" type="string">
+              Database ID of the interview
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "assignInterviewer": {
+      "message": "Interview scheduled successfully",
+      "result": {
+        "acknowledged": true,
+        "insertedId": "68e8fd74d5aa0cdd7f206c34",
+        "_id": "68e8fd74d5aa0cdd7f206c34"
+      }
+    }
+  }
+}
+```
+
+```json 409 Conflict
+{
+  "errors": [
+    {
+      "message": "Time slot conflict: Interviewer already has an interview scheduled at this time",
+      "extensions": {
+        "code": "CONFLICT"
+      }
+    }
+  ]
+}
+```
+
+```json 404 Not Found
+{
+  "errors": [
+    {
+      "message": "Candidate or Interviewer not found",
+      "extensions": {
+        "code": "NOT_FOUND"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>

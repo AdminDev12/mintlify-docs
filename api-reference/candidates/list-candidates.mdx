@@ -1,0 +1,278 @@
+---
+title: "List Candidates"
+api: "POST /graphql"
+description: "Retrieve a paginated list of candidates with filtering and search"
+---
+
+## Overview
+
+Retrieve candidates for a specific job and organization with support for pagination, search, and status filtering.
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query getCandidates($input: GetCandidatesInput!) {
+  getCandidates(input: $input) {
+    candidate {
+      _id
+      uId
+      fullName
+      emailAddress
+      phoneNumber
+      resumeScore
+      skillsFound
+      status
+      createdAt
+    }
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="organizationId" type="string" required>
+  Filter candidates by organization
+</ParamField>
+
+<ParamField body="jobId" type="string" required>
+  Filter candidates by job ID
+</ParamField>
+
+<ParamField body="pageNumber" type="integer" default={1}>
+  Page number (1-based indexing)
+</ParamField>
+
+<ParamField body="pageSize" type="integer" default={10}>
+  Number of items per page
+</ParamField>
+
+<ParamField body="search" type="string">
+  Search term for candidate name or email
+</ParamField>
+
+<ParamField body="status" type="string">
+  Filter by candidate status (e.g., "Active", "Rejected", "Hired")
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query getCandidates($input: GetCandidatesInput!) { getCandidates(input: $input) { candidate { _id uId fullName emailAddress phoneNumber resumeScore skillsFound status createdAt } } }",
+    "variables": {
+      "input": {
+        "organizationId": "ORG45",
+        "jobId": "JOB-123",
+        "pageNumber": 1,
+        "pageSize": 10,
+        "search": "meera",
+        "status": "Active"
+      }
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query getCandidates($input: GetCandidatesInput!) {
+    getCandidates(input: $input) {
+      candidate {
+        _id
+        uId
+        fullName
+        emailAddress
+        phoneNumber
+        resumeScore
+        skillsFound
+        status
+        createdAt
+      }
+    }
+  }
+`;
+
+const variables = {
+  input: {
+    organizationId: "ORG45",
+    jobId: "JOB-123",
+    pageNumber: 1,
+    pageSize: 10,
+    search: "meera",
+    status: "Active"
+  }
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query getCandidates($input: GetCandidatesInput!) {
+  getCandidates(input: $input) {
+    candidate {
+      _id
+      uId
+      fullName
+      emailAddress
+      phoneNumber
+      resumeScore
+      skillsFound
+      status
+      createdAt
+    }
+  }
+}
+"""
+
+variables = {
+    "input": {
+        "organizationId": "ORG45",
+        "jobId": "JOB-123",
+        "pageNumber": 1,
+        "pageSize": 10,
+        "search": "meera",
+        "status": "Active"
+    }
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="getCandidates" type="object">
+      <Expandable title="getCandidates properties">
+        <ResponseField name="candidate" type="object">
+          Candidate information
+          
+          <Expandable title="Candidate Object">
+            <ResponseField name="_id" type="string">
+              Database identifier
+            </ResponseField>
+            
+            <ResponseField name="uId" type="string">
+              Candidate unique ID (e.g., CAN-6E75E9)
+            </ResponseField>
+            
+            <ResponseField name="fullName" type="string">
+              Candidate's full name
+            </ResponseField>
+            
+            <ResponseField name="emailAddress" type="string">
+              Email address
+            </ResponseField>
+            
+            <ResponseField name="phoneNumber" type="string">
+              Phone number
+            </ResponseField>
+            
+            <ResponseField name="resumeScore" type="number">
+              Resume match score (0-100)
+            </ResponseField>
+            
+            <ResponseField name="skillsFound" type="array">
+              Array of skills identified from resume
+            </ResponseField>
+            
+            <ResponseField name="status" type="string">
+              Current candidate status
+            </ResponseField>
+            
+            <ResponseField name="createdAt" type="string">
+              ISO 8601 timestamp of creation
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "getCandidates": {
+      "candidate": {
+        "_id": "68f8a4876e6926d93568c8b9",
+        "uId": "CAN-6E75E9",
+        "fullName": "Meera Iyer",
+        "emailAddress": "meera.iyer@yopmail.com",
+        "phoneNumber": "7676446714",
+        "resumeScore": 54.0,
+        "skillsFound": ["TypeScript", "Express.js", "MongoDB"],
+        "status": null,
+        "createdAt": "2025-10-22T09:31:51.371Z"
+      }
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+```json 404 Not Found
+{
+  "errors": [
+    {
+      "message": "Job not found",
+      "extensions": {
+        "code": "NOT_FOUND"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>

@@ -1,0 +1,255 @@
+---
+title: "List Jobs"
+api: "POST /graphql"
+description: "Retrieve a paginated list of jobs with filtering options"
+---
+
+## Overview
+
+Retrieve jobs for a specific organization and recruiter with support for pagination, search, and draft filtering.
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query getJobs($input: getJobsInput!) {
+  getJobs(input: $input) {
+    jobs {
+      _id
+      title
+      jobDescription
+      skills
+      recruiterId
+      recruiterName
+      organizationId
+    }
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="organizationId" type="string" required>
+  Filter jobs by organization
+</ParamField>
+
+<ParamField body="recruiterId" type="string" required>
+  Filter jobs by recruiter
+</ParamField>
+
+<ParamField body="userType" type="string" required>
+  User role (Admin/Recruiter)
+</ParamField>
+
+<ParamField body="pageNum" type="integer" default={1}>
+  Page number (1-based indexing)
+</ParamField>
+
+<ParamField body="perPage" type="integer" default={20}>
+  Items per page (maximum: 100)
+</ParamField>
+
+<ParamField body="search" type="string">
+  Search term for job title or description
+</ParamField>
+
+<ParamField body="drafts" type="boolean" default={false}>
+  Include draft jobs in results
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query getJobs($input: getJobsInput!) { getJobs(input: $input) { jobs { _id title jobDescription skills recruiterId recruiterName organizationId } } }",
+    "variables": {
+      "input": {
+        "organizationId": "68a595060754e2425",
+        "recruiterId": "68a5b11168f3d6ccd1a",
+        "userType": "Admin",
+        "drafts": false,
+        "perPage": 10,
+        "pageNum": 1
+      }
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query getJobs($input: getJobsInput!) {
+    getJobs(input: $input) {
+      jobs {
+        _id
+        title
+        jobDescription
+        skills
+        recruiterId
+        recruiterName
+        organizationId
+      }
+    }
+  }
+`;
+
+const variables = {
+  input: {
+    organizationId: "68a595060754e2425",
+    recruiterId: "68a5b11168f3d6ccd1a",
+    userType: "Admin",
+    drafts: false,
+    perPage: 10,
+    pageNum: 1
+  }
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query getJobs($input: getJobsInput!) {
+  getJobs(input: $input) {
+    jobs {
+      _id
+      title
+      jobDescription
+      skills
+      recruiterId
+      recruiterName
+      organizationId
+    }
+  }
+}
+"""
+
+variables = {
+    "input": {
+        "organizationId": "68a595060754e2425",
+        "recruiterId": "68a5b11168f3d6ccd1a",
+        "userType": "Admin",
+        "drafts": False,
+        "perPage": 10,
+        "pageNum": 1
+    }
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="getJobs" type="object">
+      <Expandable title="getJobs properties">
+        <ResponseField name="jobs" type="array">
+          Array of job objects
+          
+          <Expandable title="Job Object">
+            <ResponseField name="_id" type="string">
+              Unique job identifier
+            </ResponseField>
+            
+            <ResponseField name="title" type="string">
+              Job title
+            </ResponseField>
+            
+            <ResponseField name="jobDescription" type="string">
+              Full job description
+            </ResponseField>
+            
+            <ResponseField name="skills" type="array">
+              Array of required skills
+            </ResponseField>
+            
+            <ResponseField name="recruiterId" type="string">
+              Associated recruiter ID
+            </ResponseField>
+            
+            <ResponseField name="recruiterName" type="string">
+              Name of the recruiter
+            </ResponseField>
+            
+            <ResponseField name="organizationId" type="string">
+              Organization identifier
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "getJobs": {
+      "jobs": [
+        {
+          "_id": "68c42431b9f38f8c24fbc91f",
+          "title": "Senior Backend Engineer",
+          "jobDescription": "Build scalable microservices...",
+          "skills": ["Go", "Kubernetes", "PostgreSQL"],
+          "recruiterId": "recr_7f3a21",
+          "recruiterName": "Alex Doe",
+          "organizationId": "ORG45"
+        }
+      ]
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>

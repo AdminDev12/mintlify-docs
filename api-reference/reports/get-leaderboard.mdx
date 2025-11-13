@@ -1,0 +1,204 @@
+---
+title: "Get Leaderboard"
+api: "POST /graphql"
+description: "Retrieve candidate rankings and scores for a specific job"
+---
+
+## Overview
+
+Get a ranked leaderboard of candidates for a job, sorted by their scores. Supports both AI-generated and manual scoring.
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query getLeaderboard($input: InputTypeLeaderBoard!) {
+  getLeaderboard(input: $input) {
+    rows {
+      name
+      value
+    }
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="jobId" type="string" required>
+  Unique identifier of the job
+</ParamField>
+
+<ParamField body="organizationId" type="string" required>
+  Organization identifier
+</ParamField>
+
+<ParamField body="leaderboardtype" type="string" required>
+  Type of leaderboard: "ai" for AI-generated scores or "manual" for manual reviewer scores
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query getLeaderboard($input: InputTypeLeaderBoard!) { getLeaderboard(input: $input) { rows { name value } } }",
+    "variables": {
+      "input": {
+        "jobId": "68c42431b9f38f8c24fbc91f",
+        "leaderboardtype": "ai",
+        "organizationId": "68a5bac35f995060754e2425"
+      }
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query getLeaderboard($input: InputTypeLeaderBoard!) {
+    getLeaderboard(input: $input) {
+      rows {
+        name
+        value
+      }
+    }
+  }
+`;
+
+const variables = {
+  input: {
+    jobId: "68c42431b9f38f8c24fbc91f",
+    leaderboardtype: "ai", // or "manual"
+    organizationId: "68a5bac35f995060754e2425"
+  }
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query getLeaderboard($input: InputTypeLeaderBoard!) {
+  getLeaderboard(input: $input) {
+    rows {
+      name
+      value
+    }
+  }
+}
+"""
+
+variables = {
+    "input": {
+        "jobId": "68c42431b9f38f8c24fbc91f",
+        "leaderboardtype": "ai",  # or "manual"
+        "organizationId": "68a5bac35f995060754e2425"
+    }
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="getLeaderboard" type="object">
+      <Expandable title="getLeaderboard properties">
+        <ResponseField name="rows" type="array">
+          Array of leaderboard entries, sorted by score (descending)
+          
+          <Expandable title="Leaderboard Row">
+            <ResponseField name="name" type="string">
+              Candidate's full name
+            </ResponseField>
+            
+            <ResponseField name="value" type="number">
+              Candidate's score (0-100)
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "getLeaderboard": {
+      "rows": [
+        { "name": "Manav Gupta", "value": 87.5 },
+        { "name": "Rakesh", "value": 79.0 },
+        { "name": "Priya Sharma", "value": 76.5 },
+        { "name": "Arjun Patel", "value": 72.0 },
+        { "name": "Sneha Kumar", "value": 68.5 }
+      ]
+    }
+  }
+}
+```
+
+```json 404 Not Found
+{
+  "errors": [
+    {
+      "message": "Job not found",
+      "extensions": {
+        "code": "NOT_FOUND"
+      }
+    }
+  ]
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>

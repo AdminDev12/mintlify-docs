@@ -1,0 +1,18 @@
+/* Exterview Logo Styling - Make Logo Bigger */
+
+/* Target the logo image */
+nav img[alt="logo"],
+.mintlify-logo img,
+header img[alt="logo"] {
+  height: 100px !important;
+  width: auto !important;
+  max-height: 100px !important;
+}
+
+/* Adjust logo container */
+.mintlify-logo,
+.logo-container {
+  height: 100px !important;
+  display: flex !important;
+  align-items: center !important;
+}

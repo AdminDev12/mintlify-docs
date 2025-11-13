@@ -1,90 +1,263 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
+    "title": "Exterview ATS Integration API",
+    "description": "API for integrating with Exterview's Applicant Tracking System, enabling job management, candidate operations, interview scheduling, and reporting capabilities.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Exterview API Support",
+      "url": "https://exterview.ai"
     },
-    "version": "1.0.0"
+    "license": {
+      "name": "Proprietary"
+    }
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://api.exterview.ai",
+      "description": "Production server"
+    },
+    {
+      "url": "https://sandbox-api.exterview.ai",
+      "description": "Sandbox server"
     }
   ],
   "security": [
     {
-      "bearerAuth": []
+      "ApiKeyAuth": [],
+      "BearerAuth": []
     }
   ],
   "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
+    "/addJobByFile": {
+      "post": {
+        "summary": "Create Job",
+        "description": "Add a job posting by uploading a file or providing a prompt",
+        "operationId": "createJob",
+        "tags": ["Jobs"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["recfiles", "recruiterId", "organizationId"],
+                "properties": {
+                  "recfiles": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Job definition file (CSV/XLSX/JSON)"
+                  },
+                  "recruiterId": {
+                    "type": "string",
+                    "description": "Recruiter's unique identifier"
+                  },
+                  "organizationId": {
+                    "type": "string",
+                    "description": "Organization identifier"
+                  },
+                  "prompt": {
+                    "type": "string",
+                    "description": "Additional parsing instructions"
+                  }
+                }
+              }
             }
           }
-        ],
+        },
         "responses": {
-          "200": {
-            "description": "Plant response",
+          "201": {
+            "description": "Job(s) created successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/CreateJobResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid file or missing required fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Duplicate job",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/graphql": {
+      "post": {
+        "summary": "GraphQL Endpoint",
+        "description": "Main GraphQL endpoint for queries and mutations",
+        "operationId": "graphql",
+        "tags": ["GraphQL"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["query"],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "GraphQL query or mutation"
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "Variables for the GraphQL query"
+                  },
+                  "operationName": {
+                    "type": "string",
+                    "description": "Operation name if multiple operations in query"
+                  }
+                }
+              },
+              "examples": {
+                "getJobs": {
+                  "summary": "List Jobs",
+                  "value": {
+                    "query": "query getJobs($input: getJobsInput!) { getJobs(input: $input) { jobs { _id title jobDescription skills recruiterId recruiterName organizationId } } }",
+                    "variables": {
+                      "input": {
+                        "organizationId": "68a595060754e2425",
+                        "recruiterId": "68a5b11168f3d6ccd1a",
+                        "userType": "Admin",
+                        "drafts": false,
+                        "perPage": 10,
+                        "pageNum": 1
+                      }
+                    }
+                  }
+                },
+                "getCandidates": {
+                  "summary": "List Candidates",
+                  "value": {
+                    "query": "query getCandidates($input: GetCandidatesInput!) { getCandidates(input: $input) { candidate { _id uId fullName emailAddress phoneNumber resumeScore skillsFound status createdAt } } }",
+                    "variables": {
+                      "input": {
+                        "organizationId": "ORG45",
+                        "jobId": "JOB-123",
+                        "pageNumber": 1,
+                        "pageSize": 10
+                      }
+                    }
+                  }
+                },
+                "assignInterviewer": {
+                  "summary": "Schedule Interview",
+                  "value": {
+                    "query": "mutation assignInterviewer($input: AssignInterviewerInput!) { assignInterviewer(input: $input) { message result { acknowledged insertedId _id } } }",
+                    "variables": {
+                      "input": {
+                        "candidateId": "C100",
+                        "interviewerId": "I99",
+                        "dateAndTime": "2025-10-22T18:45:00.000Z",
+                        "status": "Scheduled"
+                      }
+                    }
+                  }
+                },
+                "getLeaderboard": {
+                  "summary": "Get Leaderboard",
+                  "value": {
+                    "query": "query getLeaderboard($input: InputTypeLeaderBoard!) { getLeaderboard(input: $input) { rows { name value } } }",
+                    "variables": {
+                      "input": {
+                        "jobId": "68c42431b9f38f8c24fbc91f",
+                        "leaderboardtype": "ai",
+                        "organizationId": "68a5bac35f995060754e2425"
+                      }
+                    }
+                  }
+                },
+                "getCanInterviewRpt": {
+                  "summary": "Get Interview Report",
+                  "value": {
+                    "query": "query getCanInterviewRpt($input: GetQuestionsInput!) { getCanInterviewRpt(input: $input) { feedback questions transcription videoPlaybackLink } }",
+                    "variables": {
+                      "input": {
+                        "candidateId": "68f8a4876e6926d93568c8b9",
+                        "interviewerId": "68c2b5630f282c4b149f0321",
+                        "jobId": "68c42431b9f38f8c24fbc91f",
+                        "uId": "CAN-6E75E9"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Query or mutation result"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/GraphQLError"
+                      }
+                    }
                   }
                 }
               }
             }
           },
           "400": {
-            "description": "Unexpected error",
+            "description": "Bad request - Invalid GraphQL query",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/GraphQLError"
                 }
               }
             }
           },
-          "400": {
-            "description": "unexpected error",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -96,28 +269,67 @@
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
+    "/bulk-upload-resumes": {
+      "post": {
+        "summary": "Bulk Upload Candidates",
+        "description": "Upload multiple candidate resumes with automated parsing and scoring",
+        "operationId": "bulkUploadResumes",
+        "tags": ["Candidates"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["files", "jobId", "recruiterId", "organizationId", "userType", "resumeScoreBreakdown"],
+                "properties": {
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    },
+                    "description": "Resume files (PDF/DOC/DOCX)"
+                  },
+                  "jobId": {
+                    "type": "string",
+                    "description": "Job ID to associate candidates"
+                  },
+                  "recruiterId": {
+                    "type": "string",
+                    "description": "Recruiter's unique ID"
+                  },
+                  "organizationId": {
+                    "type": "string",
+                    "description": "Organization's unique ID"
+                  },
+                  "userType": {
+                    "type": "string",
+                    "enum": ["Admin", "Recruiter"],
+                    "description": "User role"
+                  },
+                  "resumeScoreBreakdown": {
+                    "type": "string",
+                    "description": "JSON string with scoring criteria"
+                  }
+                }
+              }
             }
           }
-        ],
+        },
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
+          "200": {
+            "description": "Candidates created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkUploadResponse"
+                }
+              }
+            }
           },
           "400": {
-            "description": "unexpected error",
+            "description": "Invalid file format or missing fields",
             "content": {
               "application/json": {
                 "schema": {
@@ -125,93 +337,231 @@
                 }
               }
             }
-          }
-        }
-      }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
-      "post": {
-        "description": "Information about a new plant added to the store",
-        "requestBody": {
-          "description": "Plant added to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
               }
             }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
           }
         }
       }
     }
   },
   "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key",
+        "description": "Organization-specific API key"
+      },
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Bearer token for authentication"
+      }
+    },
     "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
+      "Job": {
         "type": "object",
         "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
+          "job_unique_id": {
+            "type": "string",
+            "description": "Unique identifier for the job"
           },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
+          "job_title": {
+            "type": "string",
+            "description": "Title of the job position"
+          },
+          "job_code": {
+            "type": "string",
+            "description": "Internal job reference code"
+          },
+          "department": {
+            "type": "string",
+            "description": "Department or team"
+          },
+          "location": {
+            "type": "string",
+            "description": "Job location"
+          },
+          "employment_type": {
+            "type": "string",
+            "enum": ["Full-time", "Part-time", "Contract", "Internship"],
+            "description": "Type of employment"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp"
           }
         }
       },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
+      "CreateJobResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "description": "1 for success, 0 for failure"
           },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
+          "message": {
+            "type": "string",
+            "description": "Response message"
+          },
+          "jobs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Job"
+            }
+          }
+        }
+      },
+      "Candidate": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Database ID"
+          },
+          "uId": {
+            "type": "string",
+            "description": "Candidate unique ID"
+          },
+          "fullName": {
+            "type": "string",
+            "description": "Candidate's full name"
+          },
+          "emailAddress": {
+            "type": "string",
+            "format": "email",
+            "description": "Email address"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "Phone number"
+          },
+          "resumeScore": {
+            "type": "number",
+            "format": "float",
+            "description": "Resume match score"
+          },
+          "skillsFound": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Skills identified in resume"
+          },
+          "status": {
+            "type": "string",
+            "nullable": true,
+            "description": "Candidate status"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          }
+        }
+      },
+      "BulkUploadResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "description": "1 for success, 0 for failure"
+          },
+          "message": {
+            "type": "string",
+            "description": "Response message"
+          },
+          "created": {
+            "type": "integer",
+            "description": "Number of candidates created"
+          },
+          "duplicates": {
+            "type": "integer",
+            "description": "Number of duplicates skipped"
+          },
+          "skipped": {
+            "type": "integer",
+            "description": "Number of resumes skipped"
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "candidate_unique_id": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "jobId": {
+                  "type": "string"
+                }
               }
             }
           }
-        ]
+        }
       },
       "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
         "type": "object",
         "properties": {
-          "error": {
+          "status": {
             "type": "integer",
-            "format": "int32"
+            "description": "0 for error"
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "description": "Error message"
+          },
+          "error": {
+            "type": "string",
+            "description": "Error type"
+          }
+        }
+      },
+      "GraphQLError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Error message"
+          },
+          "extensions": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Error code"
+              }
+            }
           }
         }
       }
-    },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
-      }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "Jobs",
+      "description": "Job management operations"
+    },
+    {
+      "name": "Candidates",
+      "description": "Candidate management operations"
+    },
+    {
+      "name": "GraphQL",
+      "description": "GraphQL queries and mutations for interviews, reports, and more"
+    }
+  ]
 }

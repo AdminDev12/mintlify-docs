@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "aspen",
+  "theme": "mint",
   "name": "Exterview API Docs",
   "logo": {
     "light": "/logo/Logo-Black.svg",
@@ -15,15 +15,15 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Getting started",
-        "pages": [
-          "getting-started/introduction",
-          "getting-started/authentication"
-        ]
-      },
-      {
         "tab": "API reference",
         "pages": [
+          {
+            "group": "Getting started",
+            "pages": [
+              "api-reference/getting-started/introduction",
+              "api-reference/getting-started/authentication"
+            ]
+          },
           {
             "group": "Jobs",
             "pages": [

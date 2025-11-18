@@ -15,15 +15,26 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "API reference",
+        "tab": "Documentation",
         "pages": [
           {
             "group": "Getting started",
             "pages": [
-              "api-reference/getting-started/introduction",
-              "api-reference/getting-started/authentication"
+              "Documentation/getting-started/introduction",
+              "Documentation/getting-started/authentication"
             ]
           },
+          {
+            "group": "Changelog",
+            "pages": [
+              "Documentation/changelog"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API reference",
+        "pages": [
           {
             "group": "Jobs",
             "pages": [

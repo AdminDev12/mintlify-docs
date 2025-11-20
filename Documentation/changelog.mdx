@@ -1,242 +1,132 @@
 ---
 title: "Changelog"
-description: "Product updates and release notes"
+description: "Feature rollouts, enhancements, and bug fixes"
 ---
 
 <AccordionGroup>
 
-<Accordion title="Foundation & Outreach (March → May 2025)" defaultOpen>
+<Accordion title="August 2025 — Feature Rollouts, Enhancements & Bug Fixes" icon="wrench" defaultOpen>
 
-## March 2025
+**1. AI Interview Verdict Added to Reports**
 
-**Release Notes**
+A post-interview report is now generated for all AI interviews, clearly showing whether a candidate is
 
-1. Launched multi-tenant setup with full org structure, roles, and SSO.
-2. Activated ATS integration framework with Darwinbox.
-3. Introduced AI JD parsing for instant skill extraction.
-4. Added role insight generation for consistent interview questions.
-5. Enabled qualification bar recommendations using GPT-5.
-6. Released candidate-friendly job summary generator.
-7. Improved tenant billing and subscription configuration.
-8. Stabilized tenant onboarding and admin experience.
-9. Added recruiter and hiring manager management controls.
-10. Fully enabled L0→pipeline readiness.
+**"Recommended"** or **"Rejected."**
 
----
+**2. AI Voice Not Audible in Recordings**
 
-## April 2025
+If the AI voice is not audible during screen sharing, please ensure that
 
-**Release Notes**
+**system audio sharing is enabled**. This resolves the issue.
 
-1. Released multi-channel outreach across Email, SMS, WhatsApp.
-2. Added improved job creation flow with faster parsing.
-3. Activated auto-generated outreach content for candidate invites.
-4. Improved outreach deliverability and sender reputation settings.
-5. Enabled recruiter-side personalization for outreach workflows.
-6. Delivered qualification bar tuning for multi-role hiring.
-7. Delivered advanced job summary refinements for candidates.
-8. Added job-based auto-tagging for pipeline organization.
-9. Introduced structured JD-based screening questions.
-10. Improved ATS job-sync and duplicate detection.
+**3. Human Interview Report Visibility Issue is Fixed**
 
----
+Previously, when the **Human Interview** toggle was switched off, interview reports for candidates who had completed their human interview were not visible. This issue has now been **fixed**, and reports remain visible regardless of toggle changes.
 
-## May 2025
+**4. Meaning of "Not Available" Status**
 
-**Release Notes**
+The status **"Not Available"** in the interview report indicates that the system could not generate a verdict due to the **benchmark settings** configured on the job description page.
 
-1. L0 resume parsing upgraded for accuracy and skill mapping.
-2. Launched IVR auto-call workflow for rapid candidate activation.
-3. Introduced resume-to-profile enrichment capability.
-4. Enabled pipeline routing for IVR-origin candidates.
-5. Activated preliminary fraud checks on resume formats.
-6. Added consolidated candidate profile page.
-7. Improved compatibility for multi-page resumes.
-8. Increased parsing speed by optimising extraction engine.
-9. Enhanced routing logic between L0→L1.
-10. Strengthened stability across resume and IVR flows.
+**5. Subtitles Support Added**
+
+Subtitles are now available during AI interviews for both:
+
+• **AI Voice**
+
+• **AI Avatar**
+
+This enhancement improves accessibility and clarity during the interview.
 
 </Accordion>
 
-<Accordion title="AI Interviews & Scoring (June → August 2025)" defaultOpen>
+<Accordion title="September 2025 — What's New & What's Improved" icon="sparkles" defaultOpen>
 
-## June 2025
+**1. AI Interview Deadline Modification Process Clarified**
 
-**Release Notes**
+Recruiters requested guidance on updating AI interview deadlines for existing candidates.
+A clear workflow has now been implemented:
+**Job → Actions → Edit Job → Update Deadline**. 
+Changes apply to all pending candidates.
 
-1. Released JD Match Score for precise candidate-job matching.
-2. Added auto-shortlist rules for immediate top-tier identification.
-3. Activated auto-reject filters for obvious mismatches.
-4. Enabled candidate gap analysis on profile pages.
-5. Improved duplicate profile detection in L0 pipeline.
-6. Added real-time scoring adjustments based on resumetric patterns.
-7. Enhanced experience for high-volume resume uploads.
-8. Improved performance for L0→L1 transitions.
-9. Updated AI scoring weights using internal calibration data.
-10. Better visibility into resume insights across recruiters.
+**2. AI Interview Invite Threshold Configuration Added**
 
----
+AI invites were being sent inconsistently.
 
-## July 2025
+The system now sends AI interview invites **only to candidates scoring above the benchmark threshold.**
 
-**Release Notes**
+This ensures improved quality control and candidate filtering.
 
-1. Launched L2 Voice Interview Agent for full automated interviews.
-2. Added adaptive questioning for deeper role competency checks.
-3. Enabled AI-driven rubric scoring for L2.
-4. Released full interview transcript engine with speaker accuracy.
-5. Added interview replay and highlight extraction.
-6. Launched immediate scoring summaries for recruiters.
-7. Reduced L2 interview latency significantly.
-8. Improved noise cancellation across sessions.
-9. Activated L2→Leaderboard data pipeline.
-10. Stabilized voice model handovers and session management.
+**3. AI Interview Status Now Visible in Candidates Section**
 
----
+The AI interview status was missing from the Candidates tab.
 
-## August 2025
+This has been addressed, and statuses are now fully visible in **Job Details → Candidates**.
 
-**Release Notes**
+**4. Bulk Parsing & AI Interview Sending Issues Fixed**
 
-1. Released L3 Avatar Interviews powered by Tavus.
-2. Enabled async conversational avatar for scalable interviews.
-3. Auto-generated transcripts and behavioural analysis.
-4. Added body-language and delivery metrics for avatar sessions.
-5. Activated competency scoring for L3 data.
-6. Enhanced recruiter view for reviewing avatar clips quickly.
-7. Improved processing time for avatar responses.
-8. Integrated L3 scoring into leaderboard engine.
-9. Added fallback detection for repeated answers.
-10. Stabilized Tavus link generation and session handling.
+Users faced issues when sending AI interviews or uploading multiple files.
+
+Enhancements include:
+
+- Support for **docx, pdf, and text** files
+- Bulk upload limit increased to **20 files**
+
+These changes stabilize the interview sending workflow.
 
 </Accordion>
 
-<Accordion title="Human Interviews & Analytics (September → November 2025)" defaultOpen>
+<Accordion title="October 2025 — What's New & What's Improved" icon="rocket" defaultOpen>
 
-## September 2025
+**1. Screening Questions Edit Feature Added**
 
-**Release Notes**
+Recruiters can now modify screening questions even after job creation using the **Edit Job** option.
 
-1. Released L4 Human Interview Room via Video SDK.
-2. Activated Ambient Interview Agent for coaching & bias reduction.
-3. Added coverage tracking to avoid question repetition.
-4. Auto-generated full structured summaries post-interview.
-5. Improved transcript quality with speaker-level tagging.
-6. Enabled real-time interviewer performance suggestions.
-7. Integrated L4 scoring into leaderboard.
-8. Added recording stabilization & backup modes.
-9. Delivered improved UX for multi-panel interviews.
-10. Added human-interview compliance flagging.
+**2. Recommended Section Logic Updated**
 
----
+Candidates scoring above 70% were not moving into the Recommended section.
 
-## October 2025
+The process has been improved:
 
-**Release Notes**
+- An eligibility column (yes/no) has been added
+- Movement now depends on the **human interview verdict**
 
-1. Released Leaderboard Score Fusion (L1→L4 + assessments).
-2. Enabled multi-candidate comparison for decision-making.
-3. Added radar visualizations for competency distribution.
-4. Activated AI-powered hiring recommendations.
-5. Improved rubric alignment scoring.
-6. Added breakdown insights for interview performance.
-7. Enhanced multi-role leaderboard organization.
-8. Optimized leaderboard load performance.
-9. Improved explanations for scoring variations.
-10. Enabled scoring history across interview stages.
+**3. Organizer Interview Link Access Enabled**
 
----
+Organizers/recruiters were not receiving interview join links.
 
-## November 2025
+This issue has been fixed, organizers now consistently receive links for candidate coordination.
 
-**Release Notes**
+**4. Candidate Interview Link Access Issue Resolved**
 
-1. Released Weekly Pipeline Snapshot for leadership visibility.
-2. Added full L0→L4 funnel analytics.
-3. Launched L1 Voice Intent Screening.
-4. Released Intent Reasoning Summaries for L1.
-5. Activated Liveness Detection across video flows.
-6. Added Lip Sync & deepfake detection.
-7. Enabled Tab Switch monitoring for assessments.
-8. Increased trust & safety accuracy across flows.
-9. Accelerated analytics queries for weekly dashboards.
-10. Stabilized identity verification workflows.
+Some candidates were unable to join interviews through their email links.
+
+Email join links have been stabilized and now function reliably.
 
 </Accordion>
 
-</AccordionGroup>
+<Accordion title="November 2025 — New Features, Improvements & Fixes" icon="star" defaultOpen>
 
----
+**1. Job Dashboard Interview Visibility Enhanced**
 
-## Upcoming Releases
+Scheduled and completed interviews were not visible in the job dashboard.
 
-<AccordionGroup>
+New **Job Profile KPIs** now provide visibility into interview workflow at a glance.
 
-<Accordion title="December 2025  Technical Assessments & Compliance" defaultOpen>
+**2. Cross-Organization Jobs & Candidates Visibility Implemented**
 
-**Planned Release Notes**
+Recruiters could previously see only their own jobs and candidates.
 
-1. We will launch our full Technical Assessment Engine with a secure code editor and sandbox.
-2. Automated scoring, plagiarism checks, and AI explanations will go live for coding tests.
-3. SpringVerify and EQUAL background checks will be fully integrated into the pipeline.
-4. A new BGV status and alerts center will help recruiters monitor verification progress.
-5. The Offer Generation Agent will be released for instant, AI-assisted offer creation.
-6. Scrut GRC integration will activate SOC2, DPDP, and compliance automation for all tenants.
-7. Salary Benchmark Suggestions will be added to help teams make fair and competitive offers.
-8. Multi-step outreach sequences will go live with automated Day 1, Day 3, Day 7 follow-ups.
-9. AI nurture campaigns will start re-engaging cold and old candidate pools automatically.
-10. Candidate database enrichment will be enabled to fill missing details at scale.
+We now provide **full organization-wide visibility**, allowing all recruiters to access all jobs and candidates across the company.
 
-</Accordion>
+**3. Candidate Email Join Link Reliability Improved**
 
-<Accordion title="January 2026  Policy Compliance & Reports" defaultOpen>
+Connectivity issues prevented some candidates from joining interviews via email links.
 
-**Planned Release Notes**
+A patch has been deployed to ensure all email links are reliable and accessible.
 
-1. The Policy Orientation Agent will go live to deliver mandatory company policies pre-joining.
-2. A new Data Security Compliance Agent will walk candidates through security expectations.
-3. NDA and confidentiality signing flows will be added before candidates join the company.
-4. Predefined hiring reports will be launched for quick leadership insights.
-5. Weekly snapshot email reports will go out automatically to recruiters and managers.
-6. Hiring Velocity Metrics will be added to show where the pipeline is slowing down.
-7. Unified candidate identity resolution will merge duplicates from ATS, uploads, and outreach.
-8. Resume fraud detection will be introduced for spotting manipulated documents.
-9. Persona-based personalization will improve outreach tone and context for different candidate groups.
-10. HRMS sync improvements will make policy and compliance data available across systems.
+**4. Additional Bulk Parsing & Interview Sending Stability Updates**
 
-</Accordion>
-
-<Accordion title="February 2026  Advanced Analytics & Search" defaultOpen>
-
-**Planned Release Notes**
-
-1. The Custom Report Builder will be launched for creating personalized analytics views.
-2. HRMS Sync & Export Engine will go live for Workday, SAP, Darwinbox, and SuccessFactors.
-3. Capacity and no-show dashboards will reveal interviewer load and candidate reliability.
-4. Nearfit recommendations will surface strong alternatives for mismatched candidates.
-5. The Customer Account Health Dashboard will show adoption, SLAs, and usage in real time.
-6. Bias Detection Logs will be added to increase transparency in AI scoring.
-7. AI Audit Trails will track every decision, tool call, and agent action across the platform.
-8. Global candidate search will go live with multi-source profile discovery.
-9. Natural language search will allow queries like "Find React devs with fintech experience."
-10. Expert affinity matching will help identify domain-specific high performers.
-
-</Accordion>
-
-<Accordion title="March 2026  Exit Interviews & Marketplace" defaultOpen>
-
-**Planned Release Notes**
-
-1. The AI Exit Interview Agent will be launched for fully automated exit conversations.
-2. Human Exit Interviews with ambient AI support will give HR real-time coaching and prompts.
-3. Exit reason classification will help identify patterns in employee departures.
-4. Attrition insights will show trends across roles, managers, and departments.
-5. HRMS write-back will sync exit videos, summaries, and insights automatically.
-6. The lifecycle feedback loop will start improving hiring rubrics using real exit data.
-7. The Interviewer Marketplace will launch with full KYC and payout workflows.
-8. AI tools for interviewers will improve fairness, consistency, and quality during live assessments.
-9. Internal talent mobility features will help companies redeploy employees into new roles.
-10. The Agent Governance Center will go live to monitor agent health, logs, and performance.
+Additional performance improvements were made to ensure smoother operation for sending AI interview invites and bulk resume parsing.
 
 </Accordion>
 

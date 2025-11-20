@@ -1,0 +1,148 @@
+---
+title: "Bias Features"
+description: "Comprehensive bias detection and fairness monitoring system"
+---
+
+## Key Metrics Dashboard
+
+<CardGroup cols={3}>
+
+<Card title="% Interviews Audited" icon="magnifying-glass-chart">
+
+Displays the proportion of total interviews that have undergone automated or manual bias auditing.
+
+</Card>
+
+<Card title="Flag Rate" icon="flag">
+
+Indicates the percentage of interviews that have triggered one or more bias-related alerts.
+
+</Card>
+
+<Card title="Actions Closed" icon="circle-check">
+
+Shows the number of bias-related cases that have been reviewed and resolved.
+
+</Card>
+
+</CardGroup>
+
+---
+
+## Adverse-Impact Matrix (AIM)
+
+**Section Title:** Adverse-Impact Matrix
+
+**Description:** Evaluates fairness across recruitment stages by comparing selection outcomes between demographic groups.
+
+### Controls
+
+* **Weighted:** Toggle to apply weighted calculations based on group size.
+* **Show n:** Toggle to display sample sizes for each group.
+* **Suppress &lt;N:** Input setting to hide values with insufficient sample sizes.
+
+### Table Row Titles
+
+* Screening
+* AI Interview
+* Human Review
+* Offer
+
+### Legend Description
+
+Explains the meaning of matrix color indicators that represent fairness thresholds for comparing demographic groups.
+
+---
+
+## Parity & Drift Timeline
+
+**Section Title:** Parity & Drift Timeline
+
+**Description:** A line chart that visualizes fairness trends over time, tracking changes in parity and potential scoring drift.
+
+### Controls
+
+* **Metric Dropdown:** Selects the fairness metric to display.
+* **Time Period Dropdown:** Defines whether the chart displays daily, weekly, or monthly intervals.
+* **Date Range Selector:** Allows viewing trends within a specific time window.
+* **Reference Lines:** Indicates target fairness levels and watch thresholds.
+
+---
+
+## Interviews (Audit/Investigation) Table
+
+**Section Title:** Interviews Audit Table
+
+**Description:** A review table listing interviews that triggered bias checks, with expandable details for deeper investigation.
+
+### Table Controls
+
+* **Export Button:** Allows downloading audit data.
+* **Search Bar:** Search interviews by ID, role, or flags.
+* **Filter Button:** Apply advanced filtering options.
+
+
+
+<AccordionGroup>
+
+<Accordion title="Interview ID" icon="hashtag">
+
+- Identifier assigned to the interview under review.
+
+</Accordion>
+
+<Accordion title="Role / Stage" icon="briefcase">
+
+- Specifies the job role and recruitment stage where the interview took place.
+
+</Accordion>
+
+<Accordion title="Decision + Score" icon="chart-line">
+
+- Displays the outcome of the interview and the evaluation score assigned.
+
+</Accordion>
+
+<Accordion title="Bias Score" icon="scale-unbalanced">
+
+- Shows the bias risk level detected for this interview.
+
+</Accordion>
+
+<Accordion title="Flags" icon="flag">
+
+- Lists the bias-related alerts triggered during the evaluation.
+
+</Accordion>
+
+<Accordion title="Reasoning (Expandable)" icon="message-lines">
+
+- Detailed narrative explaining why the interview was flagged, displayed when expanded.
+
+</Accordion>
+
+<Accordion title="Protected Attribute" icon="shield">
+
+- Indicates whether demographic attributes were considered during the audit.
+
+</Accordion>
+
+<Accordion title="Model / Rubric" icon="code">
+
+- Shows which model version and evaluation rubric were used.
+
+</Accordion>
+
+<Accordion title="Reviewer & Actions" icon="user-check">
+
+- Displays reviewer information and available action buttons such as assignment or re-interview.
+
+</Accordion>
+
+<Accordion title="Timestamp" icon="clock">
+
+- Indicates when the interview was evaluated or flagged.
+
+</Accordion>
+
+</AccordionGroup>

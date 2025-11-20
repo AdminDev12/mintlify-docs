@@ -21,13 +21,19 @@
             "group": "Getting started",
             "pages": [
               "Documentation/getting-started/introduction",
-              "Documentation/getting-started/authentication"
+              "Documentation/getting-started/authentication",
+              "Documentation/getting-started/aboutexterview",
+              "Documentation/getting-started/howitworks"
             ]
           },
           {
-            "group": "Changelog",
+            "group": "Product Updates",
             "pages": [
-              "Documentation/changelog"
+              "Documentation/productroadmap",
+              "Documentation/changelog",
+              "Documentation/biasfeatures",
+              "Documentation/modelusage",
+              "Documentation/faqs"
             ]
           }
         ]

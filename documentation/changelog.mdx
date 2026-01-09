@@ -4,6 +4,101 @@ description: "Feature rollouts, enhancements, and bug fixes"
 ---
 
 <AccordionGroup>
+<Accordion title="January 2026 — New Updates, Features, Improvements & Infrastructure" defaultOpen={false} icon="notes" iconType="regular">
+    ## 1.  Core Platform & State Management
+
+    Significant improvements were made to ensure clarity and consistency across platform states:
+
+    - Clear differentiation between **loading, error, empty, and mutation states**
+    - Introduced a **global reusable empty state component** with consistent messaging
+    - Synced scores across all UI views to eliminate mismatches
+
+    ## 2. Profile & Account Enhancements
+
+    User personalization and onboarding experience have been improved:
+
+    - Profile image upload enabled by clicking anywhere on the avatar placeholder
+    - Mandatory **Terms & Conditions acceptance** enforced after onboarding
+    - Auto-created **sample data** for new accounts (1 job, 1 candidate, 1 interview)
+
+    ## 3. Job Creation & Management
+
+    The job creation and publishing experience has been streamlined and made more robust:
+
+    - Job tabs renamed to **Published, Drafts, and All**
+    - Enforced job publish rules  publishing is blocked if **Location, Work Mode, or CTC** is missing
+    - Visual grouping added in job creation for:
+      - AI screening configuration
+      - Scheduling
+      - Publishing
+    - Defined a standardized **score schema** (Resume, AI, Human, Cumulative)
+    - Fixed score reduction issues when editing jobs post interview completion
+
+    ## 4. Resume Upload & Candidate Intake
+
+    Resume handling and upload workflows were enhanced for better usability:
+
+    - New inline **drag-and-drop resume upload component**
+    - Upload processing loader added within the same component
+    - Resume and video upload size validation enforced via **S3**
+    - Email extraction from resumes to trigger **shortlist notifications**
+
+    ## 5. Interview Experience & Scheduling
+
+    Interview flows were simplified to reduce friction for both recruiters and candidates:
+
+    - Scheduling flow simplified by removing date selection
+    - **Instant Interview** option enabled
+    - Designed clear **Shortlisted** and **Rejected** candidate states
+    - Prevented interview start when credits are unavailable or missed
+
+    ## 6. Credits & Billing Stability
+
+    Multiple fixes were applied to ensure accurate credit usage and recovery:
+
+    - Fixed credit deduction issues blocking interview start
+    - Credits are now released when interviews **fail or are canceled**
+    - Credit usage percentage overlay added to the header for visibility
+
+    ## 7. Voice & AI Enhancements
+
+    AI interview experience received major voice and intelligence upgrades:
+
+    - Voice selection option added in Settings
+    - **ElevenLabs integration** enabled for intent screening agent
+    - Improved AI flow consistency to reduce repeated or skipped questions
+
+    ## 8. UI & UX Improvements
+
+    Platform-wide visual and usability refinements were rolled out:
+
+    - Careers page layout improved with a clean **2-column responsive structure**
+    - Removed legacy split layouts and outdated guideline screens
+    - Improved UI spacing across careers and dashboard views
+    - Dark theme fixes applied for better readability
+
+    ## 9. Platform, APIs & Enterprise Readiness
+
+    Enterprise scalability and backend reliability were significantly strengthened:
+
+    - Customer-layer APIs introduced for organization-level access
+    - Auto Scaling Groups configured to avoid cold starts
+    - ASG Warm Pools enabled for faster instance readiness
+    - Baseline capacity set to handle **30–40% peak load**
+    - ALB health checks optimized for faster failover
+    - CPU and memory-based service auto-scaling enabled
+
+    ## 10. Known Issues
+
+    - Ongoing stabilization based on feedback from **SR, NIT, and Darwinbox teams**
+    - Minor AI flow and transcript consistency improvements are still in progress
+
+    ## 11. Upcoming
+
+    - Further enterprise-grade stability improvements
+    - Enhanced AI interview state management
+    - Expanded reporting and monitoring capabilities.
+  </Accordion>
   <Accordion title="December 2025 — Innovations, Upgrades, and Corrections" defaultOpen icon="gift">
     **1. Careers Page & Job Apply**
 
@@ -233,99 +328,5 @@ description: "Feature rollouts, enhancements, and bug fixes"
 
     This enhancement improves accessibility and clarity during the interview.
   </Accordion>
-  <Accordion title="January 2026 — New Updates, Features, Improvements & Infrastructure" defaultOpen={false} icon="notes" iconType="regular">
-    ## 1.  Core Platform & State Management
-
-    Significant improvements were made to ensure clarity and consistency across platform states:
-
-    - Clear differentiation between **loading, error, empty, and mutation states**
-    - Introduced a **global reusable empty state component** with consistent messaging
-    - Synced scores across all UI views to eliminate mismatches
-
-    ## 2. Profile & Account Enhancements
-
-    User personalization and onboarding experience have been improved:
-
-    - Profile image upload enabled by clicking anywhere on the avatar placeholder
-    - Mandatory **Terms & Conditions acceptance** enforced after onboarding
-    - Auto-created **sample data** for new accounts (1 job, 1 candidate, 1 interview)
-
-    ## 3. Job Creation & Management
-
-    The job creation and publishing experience has been streamlined and made more robust:
-
-    - Job tabs renamed to **Published, Drafts, and All**
-    - Enforced job publish rules  publishing is blocked if **Location, Work Mode, or CTC** is missing
-    - Visual grouping added in job creation for:
-      - AI screening configuration
-      - Scheduling
-      - Publishing
-    - Defined a standardized **score schema** (Resume, AI, Human, Cumulative)
-    - Fixed score reduction issues when editing jobs post interview completion
-
-    ## 4. Resume Upload & Candidate Intake
-
-    Resume handling and upload workflows were enhanced for better usability:
-
-    - New inline **drag-and-drop resume upload component**
-    - Upload processing loader added within the same component
-    - Resume and video upload size validation enforced via **S3**
-    - Email extraction from resumes to trigger **shortlist notifications**
-
-    ## 5. Interview Experience & Scheduling
-
-    Interview flows were simplified to reduce friction for both recruiters and candidates:
-
-    - Scheduling flow simplified by removing date selection
-    - **Instant Interview** option enabled
-    - Designed clear **Shortlisted** and **Rejected** candidate states
-    - Prevented interview start when credits are unavailable or missed
-
-    ## 6. Credits & Billing Stability
-
-    Multiple fixes were applied to ensure accurate credit usage and recovery:
-
-    - Fixed credit deduction issues blocking interview start
-    - Credits are now released when interviews **fail or are canceled**
-    - Credit usage percentage overlay added to the header for visibility
-
-    ## 7. Voice & AI Enhancements
-
-    AI interview experience received major voice and intelligence upgrades:
-
-    - Voice selection option added in Settings
-    - **ElevenLabs integration** enabled for intent screening agent
-    - Improved AI flow consistency to reduce repeated or skipped questions
-
-    ## 8. UI & UX Improvements
-
-    Platform-wide visual and usability refinements were rolled out:
-
-    - Careers page layout improved with a clean **2-column responsive structure**
-    - Removed legacy split layouts and outdated guideline screens
-    - Improved UI spacing across careers and dashboard views
-    - Dark theme fixes applied for better readability
-
-    ## 9. Platform, APIs & Enterprise Readiness
-
-    Enterprise scalability and backend reliability were significantly strengthened:
-
-    - Customer-layer APIs introduced for organization-level access
-    - Auto Scaling Groups configured to avoid cold starts
-    - ASG Warm Pools enabled for faster instance readiness
-    - Baseline capacity set to handle **30–40% peak load**
-    - ALB health checks optimized for faster failover
-    - CPU and memory-based service auto-scaling enabled
-
-    ## 10. Known Issues
-
-    - Ongoing stabilization based on feedback from **SR, NIT, and Darwinbox teams**
-    - Minor AI flow and transcript consistency improvements are still in progress
-
-    ## 11. Upcoming
-
-    - Further enterprise-grade stability improvements
-    - Enhanced AI interview state management
-    - Expanded reporting and monitoring capabilities.
-  </Accordion>
+  
 </AccordionGroup>

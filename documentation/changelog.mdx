@@ -2,7 +2,92 @@
 title: "Changelog"
 description: "Feature rollouts, enhancements, and bug fixes"
 ---
+<Accordion title="January 2026 (Week-2) — Weekly Platform Enhancements, Security & Improvements" icon="calendar-week">
+    ### 1. Dashboard & Platform Visibility
 
+    Key improvements were made to enhance clarity and system visibility across the platform:
+
+    - Added a **job selection empty state** before displaying the sourcing funnel on the dashboard
+    - Introduced **observability dashboards** to monitor signups, interviews, and system failures
+    - Enabled **alerts for error rates, latency, and queue depth**
+    - Identified and tracked all backend services involved in **signup, interviews, and credit usage**
+
+    ### 2. Customer & Account Structure
+
+    The platform now supports stronger customer-level organization:
+
+    - Introduced **Customers as a parent entity**
+    - Enabled each customer to **own multiple jobs**
+    - Added filters to **view jobs, candidates, and reports by customer**
+    - Jobs are now **dynamically loaded based on the selected customer**
+
+    ### 3. Job & Candidate Experience Enhancements
+
+    Multiple improvements were made to simplify hiring workflows:
+
+    - Limited candidate outcomes to **Shortlisted or Rejected**
+    - Displayed a **simple rejection message** without detailed scores
+    - Added **integrity check popups** to improve candidate experience
+    - Enabled **Kanban-style job detail view** for better tracking
+    - Added **Copy Link** and **View Report** quick actions
+
+    ### 4. Location & Configuration Improvements
+
+    Job location setup is now more flexible and user-friendly:
+
+    - Enabled selection of **multiple cities** (e.g., Hyderabad, Bangalore, Others) without requiring a pin code
+    - Introduced **Country → State → City configuration** for structured location management
+
+    ### 5. Communication & Scheduling
+
+    Interview communication has been improved for better coordination:
+
+    - Added **calendar reminders** for interviews
+    - Enabled **email confirmation notifications**
+
+    ### 6. UI & UX Enhancements
+
+    Several visual and interaction improvements were rolled out across the platform:
+
+    - Replaced default job tables with a **card-based job view**
+    - Replaced default candidate tables with a **card-based candidate view**
+    - Updated **global navigation tabs to pill-style design**
+    - Enabled upload and display of **1–2 company images** in job descriptions
+
+    ### 7. Security & Platform Hardening
+
+    Security and data protection were strengthened across the application:
+
+    - Implemented **OTP lock** after repeated failed attempts
+    - Sanitized **all user-provided inputs**
+    - Escaped dynamic content and applied **Content Security Policy (CSP)**
+
+    ### 8. Integrations & Event Tracking
+
+    Enterprise integrations now offer deeper visibility and traceability:
+
+    - Added **Darwinbox event logs** for all tenant events
+    - Enabled users to **view a clear event trail** when clicking on each Darwinbox event, displayed in simple, non-technical language
+
+    ### 9. Infrastructure & Reliability
+
+    Platform reliability and monitoring were further strengthened:
+
+    - Improved error detection with real-time alerts
+    - Enhanced backend monitoring to proactively identify system bottlenecks
+    - Increased operational visibility across critical workflows
+
+    ### 10. Known Issues
+
+    - Some monitoring and alert thresholds are being fine-tuned
+    - Minor UI alignment improvements are still in progress
+
+    ### 11. Upcoming
+
+    - Advanced reporting and analytics dashboards
+    - Further enterprise-grade scalability enhancements
+    - Continued UX simplification across recruiter and candidate flows.
+  </Accordion>
 <AccordionGroup>
   <Accordion title="January 2026 (Week-1) — New Updates, Features, Improvements & Infrastructure" defaultOpen={false} icon="notes" iconType="regular">
     ## 1.  Core Platform & State Management
@@ -328,90 +413,5 @@ description: "Feature rollouts, enhancements, and bug fixes"
 
     This enhancement improves accessibility and clarity during the interview.
   </Accordion>
-  <Accordion title="January 2026 (Week-2) — Weekly Platform Enhancements, Security & Improvements" icon="calendar-week">
-    ### 1. Dashboard & Platform Visibility
-
-    Key improvements were made to enhance clarity and system visibility across the platform:
-
-    - Added a **job selection empty state** before displaying the sourcing funnel on the dashboard
-    - Introduced **observability dashboards** to monitor signups, interviews, and system failures
-    - Enabled **alerts for error rates, latency, and queue depth**
-    - Identified and tracked all backend services involved in **signup, interviews, and credit usage**
-
-    ### 2. Customer & Account Structure
-
-    The platform now supports stronger customer-level organization:
-
-    - Introduced **Customers as a parent entity**
-    - Enabled each customer to **own multiple jobs**
-    - Added filters to **view jobs, candidates, and reports by customer**
-    - Jobs are now **dynamically loaded based on the selected customer**
-
-    ### 3. Job & Candidate Experience Enhancements
-
-    Multiple improvements were made to simplify hiring workflows:
-
-    - Limited candidate outcomes to **Shortlisted or Rejected**
-    - Displayed a **simple rejection message** without detailed scores
-    - Added **integrity check popups** to improve candidate experience
-    - Enabled **Kanban-style job detail view** for better tracking
-    - Added **Copy Link** and **View Report** quick actions
-
-    ### 4. Location & Configuration Improvements
-
-    Job location setup is now more flexible and user-friendly:
-
-    - Enabled selection of **multiple cities** (e.g., Hyderabad, Bangalore, Others) without requiring a pin code
-    - Introduced **Country → State → City configuration** for structured location management
-
-    ### 5. Communication & Scheduling
-
-    Interview communication has been improved for better coordination:
-
-    - Added **calendar reminders** for interviews
-    - Enabled **email confirmation notifications**
-
-    ### 6. UI & UX Enhancements
-
-    Several visual and interaction improvements were rolled out across the platform:
-
-    - Replaced default job tables with a **card-based job view**
-    - Replaced default candidate tables with a **card-based candidate view**
-    - Updated **global navigation tabs to pill-style design**
-    - Enabled upload and display of **1–2 company images** in job descriptions
-
-    ### 7. Security & Platform Hardening
-
-    Security and data protection were strengthened across the application:
-
-    - Implemented **OTP lock** after repeated failed attempts
-    - Sanitized **all user-provided inputs**
-    - Escaped dynamic content and applied **Content Security Policy (CSP)**
-
-    ### 8. Integrations & Event Tracking
-
-    Enterprise integrations now offer deeper visibility and traceability:
-
-    - Added **Darwinbox event logs** for all tenant events
-    - Enabled users to **view a clear event trail** when clicking on each Darwinbox event, displayed in simple, non-technical language
-
-    ### 9. Infrastructure & Reliability
-
-    Platform reliability and monitoring were further strengthened:
-
-    - Improved error detection with real-time alerts
-    - Enhanced backend monitoring to proactively identify system bottlenecks
-    - Increased operational visibility across critical workflows
-
-    ### 10. Known Issues
-
-    - Some monitoring and alert thresholds are being fine-tuned
-    - Minor UI alignment improvements are still in progress
-
-    ### 11. Upcoming
-
-    - Advanced reporting and analytics dashboards
-    - Further enterprise-grade scalability enhancements
-    - Continued UX simplification across recruiter and candidate flows.
-  </Accordion>
+  
 </AccordionGroup>

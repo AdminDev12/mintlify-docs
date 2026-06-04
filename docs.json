@@ -29,8 +29,7 @@
           {
             "group": "Product Updates",
             "pages": [
-              "documentation/productroadmap",
-              "documentation/changelog",
+              "documentation/productupdates",
               "documentation/biasfeatures",
               "documentation/modelusage",
               "documentation/faqs"

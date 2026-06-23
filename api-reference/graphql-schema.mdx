@@ -1,0 +1,59 @@
+---
+title: "GraphQL schema"
+description: "Single additive-only GraphQL endpoint — schema overview and exploration."
+---
+
+## Who this is for
+
+Developers integrating with the Exterview API.
+
+## Endpoint
+
+Exterview exposes a **single additive-only GraphQL endpoint**:
+
+```
+POST https://api.exterview.ai/graphql
+```
+
+Sandbox: `https://sandbox-api.exterview.ai/graphql`
+
+## Additive-only guarantee
+
+The Exterview API follows an additive-only versioning model:
+
+- New fields and operations are added without breaking existing clients
+- No breaking changes without advance notice and a documented deprecation timeline
+- See [Versioning & deprecation policy](/api-reference/versioning-deprecation)
+
+<Note>
+API reference is being validated against the live GraphQL schema to prevent drift. Auto-generation from schema is planned per ADR-001.
+</Note>
+
+## Schema exploration
+
+Use introspection to explore the current schema:
+
+```bash
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "{ __schema { queryType { name } mutationType { name } } }"}'
+```
+
+## Related documentation
+
+<CardGroup cols={2}>
+  <Card title="Queries" icon="magnifying-glass" href="/api-reference/queries">
+    Available query operations.
+  </Card>
+  <Card title="Mutations" icon="pen" href="/api-reference/mutations">
+    Available mutation operations.
+  </Card>
+  <Card title="Authentication" icon="key" href="/api-reference/auth">
+    Required headers and credentials.
+  </Card>
+  <Card title="REST endpoints" icon="file" href="/api-reference/jobs/create-job">
+  File upload and legacy REST operations.
+  </Card>
+</CardGroup>

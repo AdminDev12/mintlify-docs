@@ -1,0 +1,48 @@
+---
+title: "Multi-tenancy & data isolation"
+description: "Per-tenant partitioning, strict data boundaries, and no cross-tenant model bleed."
+---
+
+## Who this is for
+
+Enterprise security teams, architects, and procurement reviewers evaluating data isolation guarantees.
+
+## Isolation model
+
+Every Exterview customer operates in a **dedicated tenant** with strict partitioning:
+
+- **Data** — Candidate, evaluation, and configuration data is isolated per tenant
+- **Models** — Compounding artifacts and model versions are tenant-scoped
+- **Configuration** — Rubrics, roles, and access policies are tenant-specific
+- **Audit logs** — Actions are logged within the tenant boundary
+
+## No cross-tenant bleed
+
+Exterview enforces isolation at multiple layers:
+
+1. **Storage partitioning** — Tenant data is logically and physically separated
+2. **Orchestration boundaries** — Smaya enforces tenant context for every agent invocation
+3. **Compounding isolation** — Offline learning pipelines operate on single-tenant data only
+4. **Access control** — RBAC policies are scoped to the tenant
+
+<Warning>
+No evaluation data, model artifacts, or compounding signals cross tenant boundaries. This is a platform guarantee, not a configuration option.
+</Warning>
+
+## Residency alignment
+
+Data residency options (IND / US / EU) are configured per tenant and align with Azure region deployment. See [Platform coverage & residency](/trust-compliance/platform-coverage-residency) for the residency map.
+
+## Related documentation
+
+<CardGroup cols={2}>
+  <Card title="Per-tenant compounding" icon="layer-group" href="/concepts/per-tenant-compounding">
+    How tenant-scoped learning works.
+  </Card>
+  <Card title="Security overview" icon="shield" href="/trust-compliance/security-overview">
+    Architecture-level security controls.
+  </Card>
+  <Card title="Privacy" icon="lock" href="/trust-compliance/privacy">
+    DPDP and GDPR posture.
+  </Card>
+</CardGroup>

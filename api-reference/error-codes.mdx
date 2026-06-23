@@ -1,0 +1,56 @@
+---
+title: "Error codes"
+description: "HTTP status codes, GraphQL errors, and resolution guidance."
+---
+
+## Who this is for
+
+Developers implementing error handling in Exterview integrations.
+
+## HTTP status codes
+
+| Status | Meaning | Common cause |
+|--------|---------|--------------|
+| 400 | Bad Request | Missing required headers, invalid request format |
+| 401 | Unauthorized | Invalid or missing API key or Bearer token |
+| 403 | Forbidden | API key lacks required permissions |
+| 404 | Not Found | Resource does not exist |
+| 429 | Too Many Requests | Rate limit exceeded |
+| 500 | Internal Server Error | Platform error — retry with backoff |
+
+## Authentication errors
+
+| Error | Description | Resolution |
+|-------|-------------|------------|
+| Missing or invalid API key or token | Credentials not recognized | Verify `x-api-key` and `Authorization` headers |
+| API key lacks required permissions | Insufficient scope | Contact admin to update API key permissions |
+| Missing required headers | Required header absent | Ensure `Content-Type` and auth headers are set |
+
+See [Authentication](/api-reference/auth) for examples.
+
+## GraphQL errors
+
+GraphQL responses include an `errors` array when operations fail:
+
+```json
+{
+  "errors": [
+    {
+      "message": "Resource not found",
+      "extensions": {
+        "code": "NOT_FOUND"
+      }
+    }
+  ],
+  "data": null
+}
+```
+
+## Retry guidance
+
+| Error type | Retry? |
+|------------|--------|
+| 401 / 403 | No — fix credentials or permissions |
+| 400 | No — fix request format |
+| 429 | Yes — after backoff per [Rate limits](/api-reference/rate-limits) |
+| 500 | Yes — with exponential backoff |

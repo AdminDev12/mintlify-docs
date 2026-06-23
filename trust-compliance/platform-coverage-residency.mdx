@@ -1,0 +1,55 @@
+---
+title: "Platform coverage & residency"
+description: "Supported languages, regions, data residency map, and cross-border transfer handling."
+---
+
+## Who this is for
+
+Enterprise buyers in regulated verticals (BFSI, Pharma, Healthcare) evaluating geographic and language coverage.
+
+<Note>
+This page requires Compliance sign-off. Region mappings must match production Azure deployment.
+</Note>
+
+## Supported regions
+
+| Region | Code | Azure region | Status |
+|--------|------|-------------|--------|
+| India | IND | *Azure region TBD* | Available |
+| United States | US | *Azure region TBD* | Available |
+| European Union | EU | *Azure region TBD* | Available |
+
+## Data residency map
+
+| Data type | Stored in tenant region | Cross-border transfer |
+|-----------|------------------------|----------------------|
+| Candidate PII | Yes | Only with explicit configuration and safeguards |
+| Evaluation results | Yes | Same as candidate PII |
+| Audit logs | Yes | Same as candidate PII |
+| Model artifacts (compounding) | Yes — per-tenant | Never cross-tenant; region-scoped |
+
+## Supported languages
+
+Languages are listed separately by capability:
+
+### Evaluation languages
+
+*List to be confirmed by Product — evaluation/assessment language support*
+
+### Voice interview languages
+
+*List to be confirmed by Product — voice agent language support*
+
+### UI languages
+
+*List to be confirmed by Product — platform UI localization*
+
+## Cross-border transfers
+
+Cross-border data transfers, when required, are handled with appropriate safeguards consistent with GDPR and DPDP requirements. Contact compliance@exterview.ai for transfer impact assessments.
+
+## Related documentation
+
+<Card title="Multi-tenancy & data isolation" icon="building" href="/concepts/multi-tenancy-data-isolation">
+  Per-tenant partitioning guarantees.
+</Card>

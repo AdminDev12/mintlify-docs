@@ -1,0 +1,40 @@
+---
+title: "Roles & access (RBAC)"
+description: "Configure role-based access control for admins, recruiters, and interviewers."
+---
+
+## Who this is for
+
+Platform admins configuring team permissions.
+
+## Default roles
+
+| Role | Access |
+|------|--------|
+| **Super Admin** | Full organization configuration, billing, compliance settings, and user management |
+| **Recruiter** | Job/evaluation management, candidate operations, report review |
+| **Interviewer** | Assigned candidate dashboard, structured feedback submission, agent report review |
+
+## Configuration steps
+
+<Steps>
+  <Step title="Navigate to user management">
+    Open workspace settings and select **Users**.
+  </Step>
+  <Step title="Invite users">
+    Add team members by email and assign a role.
+  </Step>
+  <Step title="Configure SSO (optional)">
+    For enterprise identity integration, see [SSO / SCIM](/integrations/sso-scim).
+  </Step>
+</Steps>
+
+## SSO and SCIM
+
+Enterprise customers can integrate Microsoft Entra ID and other supported IdPs. See [SSO / SCIM](/integrations/sso-scim) for current availability.
+
+## Next steps
+
+<Card title="Tenant setup" icon="building" href="/guides/tenant-setup">
+  Complete initial organization configuration.
+</Card>

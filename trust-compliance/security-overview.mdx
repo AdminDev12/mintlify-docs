@@ -1,0 +1,51 @@
+---
+title: "Security overview"
+description: "Architecture-level security controls — encryption, access control, and audit logging."
+---
+
+## Who this is for
+
+Enterprise security teams and procurement reviewers conducting diligence.
+
+<Note>
+Trust & Compliance content requires Compliance/GRC sign-off before publish. Status labels reflect current posture.
+</Note>
+
+## Security controls
+
+### Encryption
+
+- **In transit** — TLS 1.2+ for all API and UI traffic
+- **At rest** — AES-256 encryption for stored data in Azure
+
+### Access control
+
+- Role-based access control (RBAC) per tenant
+- API key and Bearer token authentication for programmatic access
+- SSO via SAML/OIDC for enterprise identity (see [SSO / SCIM](/integrations/sso-scim))
+
+### Audit logging
+
+- Granular audit log of every platform action
+- Filterable by user, action, and date range
+- Retention policies configurable per region
+
+### Infrastructure
+
+- Azure-native deployment with regional data residency
+- Per-tenant data partitioning — see [Multi-tenancy & data isolation](/concepts/multi-tenancy-data-isolation)
+
+## Requesting security documentation
+
+SOC 2 and ISO reports are available via gated request — not as public downloads. See [Certifications](/trust-compliance/certifications).
+
+## Related documentation
+
+<CardGroup cols={2}>
+  <Card title="Certifications" icon="certificate" href="/trust-compliance/certifications">
+    SOC 2, ISO 27001, ISO 42001 status.
+  </Card>
+  <Card title="Privacy" icon="lock" href="/trust-compliance/privacy">
+    DPDP and GDPR posture.
+  </Card>
+</CardGroup>

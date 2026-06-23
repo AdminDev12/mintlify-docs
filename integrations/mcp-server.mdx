@@ -1,0 +1,58 @@
+---
+title: "MCP server"
+description: "Available tools, resources, authentication, and example calls for the Exterview MCP server."
+---
+
+## Who this is for
+
+Developers integrating Exterview via the Model Context Protocol (MCP).
+
+## Overview
+
+The Exterview MCP server exposes platform capabilities as MCP tools and resources for AI clients (e.g., Cursor, Claude Desktop).
+
+## Authentication
+
+MCP connections use the same credential model as the API:
+
+- Organization API key (`x-api-key`)
+- Bearer token (`Authorization: Bearer YOUR_TOKEN`)
+
+See [Authentication](/api-reference/auth) for credential setup.
+
+## Available tools
+
+<Note>
+Tool inventory reflects what is currently built. This page will be updated as new MCP tools ship.
+</Note>
+
+| Tool | Description |
+|------|-------------|
+| *Documentation in progress* | Tool catalog being validated against production MCP server |
+
+## Example connection
+
+```json
+{
+  "mcpServers": {
+    "exterview": {
+      "url": "https://mcp.exterview.ai/sse",
+      "headers": {
+        "x-api-key": "YOUR_API_KEY",
+        "Authorization": "Bearer YOUR_TOKEN"
+      }
+    }
+  }
+}
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/home/quickstart">
+    Get API credentials and make your first call.
+  </Card>
+  <Card title="API Reference" icon="book" href="/api-reference/graphql-schema">
+    Full GraphQL schema reference.
+  </Card>
+</CardGroup>

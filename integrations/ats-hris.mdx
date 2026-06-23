@@ -1,0 +1,36 @@
+---
+title: "ATS / HRIS integrations"
+description: "Integration patterns for Darwinbox, Phenom, and other ATS/HRIS platforms."
+---
+
+## Who this is for
+
+Integration engineers connecting Exterview to existing applicant tracking systems.
+
+## Status
+
+**Beta** — One-way export is available. Two-way sync is on the roadmap.
+
+## Supported patterns
+
+### Report export
+
+- Push unified candidate evaluation reports (PDF) to your ATS
+- Push candidate evaluation status back to the ATS
+
+### Supported platforms
+
+| Platform | Report export | Status sync | Two-way sync |
+|----------|--------------|-------------|--------------|
+| Darwinbox | Beta | Beta | Roadmap |
+| Phenom | Beta | Beta | Roadmap |
+
+## Fallback connectivity
+
+For ATS platforms not directly supported, use [Unified.to / Merge.dev](/integrations/unified-merge) as a connectivity layer.
+
+## Next steps
+
+<Card title="Webhook patterns" icon="bell" href="/integrations/webhook-patterns">
+  Event-driven integration alternatives.
+</Card>

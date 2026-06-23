@@ -1,0 +1,68 @@
+---
+title: "Bias & fairness controls"
+description: "Bias detection, fairness monitoring, and adverse-impact analysis available to customers."
+---
+
+## Who this is for
+
+Compliance teams, recruiters, and admins monitoring fairness across evaluation workflows.
+
+## Overview
+
+Exterview provides bias detection and fairness monitoring tools that help customers identify and investigate potential adverse impact in their evaluation pipelines.
+
+## Key metrics dashboard
+
+<CardGroup cols={3}>
+  <Card title="% Interviews audited" icon="magnifying-glass-chart">
+    Proportion of total interviews that have undergone automated or manual bias auditing.
+  </Card>
+  <Card title="Flag rate" icon="flag">
+    Percentage of interviews that triggered one or more bias-related alerts.
+  </Card>
+  <Card title="Actions closed" icon="circle-check">
+    Number of bias-related cases reviewed and resolved.
+  </Card>
+</CardGroup>
+
+## Adverse-Impact Matrix (AIM)
+
+Evaluates fairness across recruitment stages by comparing selection outcomes between demographic groups.
+
+### Controls
+
+- **Weighted** — Apply weighted calculations based on group size
+- **Show n** — Display sample sizes for each group
+- **Suppress &lt;N** — Hide values with insufficient sample sizes
+
+## Parity & drift timeline
+
+A line chart visualizing fairness trends over time, tracking changes in parity and potential scoring drift.
+
+## Interviews audit table
+
+A review table listing interviews that triggered bias checks, with expandable details for investigation.
+
+| Column | Description |
+|--------|-------------|
+| Interview ID | Identifier for the interview under review |
+| Role / Stage | Job role and recruitment stage |
+| Decision + Score | Interview outcome and evaluation score |
+| Bias Score | Bias risk level detected |
+| Flags | Bias-related alerts triggered |
+| Reasoning | Expandable narrative explaining the flag |
+| Protected Attribute | Whether demographic attributes were considered |
+| Model / Rubric | Model version and rubric used |
+| Reviewer & Actions | Reviewer info and available actions |
+| Timestamp | When the interview was evaluated or flagged |
+
+## Related documentation
+
+<CardGroup cols={2}>
+  <Card title="Human-in-the-loop" icon="user-check" href="/concepts/human-in-the-loop">
+    No automated adverse decisions.
+  </Card>
+  <Card title="Responsible AI" icon="shield-check" href="/trust-compliance/responsible-ai">
+    Platform-wide responsible AI posture.
+  </Card>
+</CardGroup>

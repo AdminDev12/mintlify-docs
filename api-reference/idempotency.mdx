@@ -1,0 +1,36 @@
+---
+title: "Idempotency"
+description: "Safe retry behavior for mutations and webhook event handling."
+---
+
+## Who this is for
+
+Developers implementing reliable, retry-safe integrations.
+
+## Mutations
+
+When retrying failed mutation requests:
+
+- Use consistent request parameters across retries
+- Check response status before retrying to avoid duplicate operations
+- Log request IDs for correlation with support
+
+## Webhooks
+
+Webhook deliveries may be retried on failure. Handle events idempotently:
+
+1. Extract the unique event ID from each payload
+2. Check if the event has already been processed
+3. Skip duplicate deliveries silently
+4. Return HTTP 200 after successful processing
+
+## Related documentation
+
+<CardGroup cols={2}>
+  <Card title="Webhooks" icon="bell" href="/api-reference/webhooks">
+    Webhook configuration and payloads.
+  </Card>
+  <Card title="Error codes" icon="triangle-exclamation" href="/api-reference/error-codes">
+    Error handling reference.
+  </Card>
+</CardGroup>

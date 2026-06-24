@@ -1,6 +1,6 @@
 ---
 title: "Per-tenant compounding model"
-description: "How evaluation quality compounds within your organization — offline, batched, versioned, and strictly isolated."
+description: "How evaluation quality compounds within your organization offline, batched, versioned, and strictly isolated."
 ---
 
 ## Who this is for
@@ -13,17 +13,34 @@ Exterview's **per-tenant compounding model** improves scoring quality within eac
 
 ### Key guarantees
 
-1. **Per-tenant only** — Compounding occurs within a single tenant's data boundary. No cross-tenant data or model bleed.
-2. **Offline and batched** — Learning runs offline in batched pipelines, not as live, unaudited in-session adaptation.
-3. **Versioned** — Every compounding update produces a new model version with full audit trail.
-4. **Auditable** — Compounding artifacts are versioned and traceable; there is no live black-box learning during evaluations.
+1. **Per-tenant only** Compounding occurs within a single tenant's data boundary. No cross-tenant data or model bleed.
+2. **Offline and batched** Learning runs offline in batched pipelines, not as live, unaudited in-session adaptation.
+3. **Versioned** Every compounding update produces a new model version with full audit trail.
+4. **Auditable** Compounding artifacts are versioned and traceable; there is no live black-box learning during evaluations.
 
 ```mermaid
-graph LR
-    A[Tenant A Evaluations] --> B[Offline Batched Pipeline]
-    B --> C[Versioned Model vN]
-    C --> D[Tenant A Scoring Only]
-    E[Tenant B Data] -.->|No cross-tenant access| D
+graph TB
+    subgraph TenantA["Tenant A"]
+        A_Evals["Evaluations"]
+    end
+
+    subgraph OfflinePipeline["Offline Batched Pipeline"]
+        direction LR
+        Batch["Batch Processor"]
+        Versioning["Version Controller"]
+    end
+
+    subgraph TenantModel["Tenant A Model"]
+        direction LR
+        ModelVN["Versioned Model vN"]
+        ScoringEngine["Scoring Engine"]
+    end
+
+    TenantA --> OfflinePipeline
+    OfflinePipeline --> TenantModel
+    TenantModel --> Output["Tenant A Scoring Only"]
+
+    TenantB["Tenant B Data"] -.->|No cross-tenant access| Output
 ```
 
 ## Why this matters

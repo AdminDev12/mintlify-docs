@@ -1,6 +1,6 @@
 ---
 title: "Scoring methodology"
-description: "How evaluation signals become scores — deterministic rubrics, model-driven analysis, and versioned outputs."
+description: "How evaluation signals become scores deterministic rubrics, model-driven analysis, and versioned outputs."
 ---
 
 ## Who this is for
@@ -15,7 +15,7 @@ Exterview scoring combines **deterministic rubric signals** with **model-driven 
 
 | Signal type | Source | Deterministic? |
 |-------------|--------|----------------|
-| Resume match | Scan + Match agents | Partially — rubric weights are deterministic; parsing uses models |
+| Resume match | Scan + Match agents | Partially rubric weights are deterministic; parsing uses models |
 | Interview performance | Voice, Avatar, Code agents | Rubric-structured; model-driven evaluation against criteria |
 | Panel feedback | Panel agent + human reviewers | Structured rubric scores with human input |
 | Aggregate ranking | Rank agent | Weighted combination of stage scores per configured rubric |
@@ -24,15 +24,15 @@ Exterview scoring combines **deterministic rubric signals** with **model-driven 
 
 Rubrics define:
 
-- **Categories** — Competency areas measured (e.g., technical skills, communication)
-- **Weights** — How each category contributes to the overall score
-- **Thresholds** — Benchmark scores for stage progression
-- **Version** — Rubric version tied to each evaluation for auditability
+- **Categories**: Competency areas measured (e.g., technical skills, communication)
+- **Weights**: How each category contributes to the overall score
+- **Thresholds**: Benchmark scores for stage progression
+- **Version**: Rubric version tied to each evaluation for auditability
 
 ## Deterministic vs model-driven
 
-- **Deterministic** — Rubric weights, thresholds, stage gates, and aggregation formulas are explicitly configured and reproducible.
-- **Model-driven** — Natural language analysis (resume parsing, interview evaluation, transcript scoring) uses versioned models with structured output schemas.
+- **Deterministic**: Rubric weights, thresholds, stage gates, and aggregation formulas are explicitly configured and reproducible.
+- **Model-driven**: Natural language analysis (resume parsing, interview evaluation, transcript scoring) uses versioned models with structured output schemas.
 
 <Info>
 Model-driven scores are always mapped to rubric categories. Raw model outputs are not exposed as final decisions.

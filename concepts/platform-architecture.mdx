@@ -13,27 +13,67 @@ Exterview's evaluation engine is built on **nine specialized agents** coordinate
 
 ```mermaid
 graph TB
-    subgraph Smaya["Smaya Orchestrator"]
-        direction TB
+    subgraph Interface["Exterview Interface Layer"]
+        direction LR
+        subgraph InterviewChannels["Interview Channels"]
+            VoiceUI["Voice Interview"]
+            VideoUI["Video Interview"]
+            CodeUI["Code Assessment"]
+            PanelUI["Panel Interview"]
+        end
+        subgraph RecruiterPortal["Recruiter & Candidate Portal"]
+            JDInput["JD / Role Input"]
+            CandActions["Candidate Actions"]
+            LiveFeed["Live Evaluation Feed"]
+        end
     end
-    Role["Role Agent"] --> Smaya
-    Match["Match Agent"] --> Smaya
-    Scan["Scan Agent"] --> Smaya
-    Voice["Voice Agent"] --> Smaya
-    Avatar["Avatar Agent"] --> Smaya
-    Code["Code Agent"] --> Smaya
-    Panel["Panel Agent"] --> Smaya
-    Rank["Rank Agent"] --> Smaya
-    HR["HR Agent"] --> Smaya
-    Smaya --> Output["Unified Evaluation Output"]
+
+    Interface -->|connects| Smaya
+
+    subgraph Smaya["Smaya Orchestrator"]
+        SuperEngine["Supervisor Engine"]
+    end
+
+    Smaya --> AgentLayer
+    Smaya -->|integrates| EvalCloud
+
+    subgraph AgentLayer["Agent Layer"]
+        direction TB
+        Role["Role Agent"]
+        Match["Match Agent"]
+        Scan["Scan Agent"]
+        Voice["Voice Agent"]
+        Avatar["Avatar Agent"]
+        CodeA["Code Agent"]
+        subgraph OutputPipeline["Output Pipeline"]
+            Panel["Panel Agent"]
+            Rank["Rank Agent"]
+            HR["HR Agent"]
+        end
+    end
+
+    subgraph EvalCloud["Evaluation Cloud"]
+        direction LR
+        subgraph DataSources["Data Sources"]
+            M365["M365 SharePoint"]
+            AzureDB["Azure SQL / NoSQL"]
+            GDrive["Google Drive"]
+            Teams["Microsoft Teams"]
+        end
+        TenantModel["Per-Tenant Models"]
+        Analytics["Analytics & ROI"]
+        Compliance["Compliance Audit"]
+        Guardrails["Guardrails"]
+        Memory["Memory Store"]
+    end
 ```
 
 ## Design principles
 
-- **Specialized agents** — Each agent handles one evaluation capability with clear boundaries.
-- **Supervisor orchestration** — Smaya coordinates agent execution, sequencing, and result aggregation.
-- **Per-tenant isolation** — All agent outputs and model artifacts are partitioned by tenant.
-- **Azure-native** — Platform infrastructure runs on Azure regions with Microsoft ecosystem integrations.
+- **Specialized agents**: Each agent handles one evaluation capability with clear boundaries.
+- **Supervisor orchestration**: Smaya coordinates agent execution, sequencing, and result aggregation.
+- **Per-tenant isolation**: All agent outputs and model artifacts are partitioned by tenant.
+- **Azure-native**: Platform infrastructure runs on Azure regions with Microsoft ecosystem integrations.
 
 ## Agent summary
 

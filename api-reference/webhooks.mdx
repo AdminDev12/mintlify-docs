@@ -1,0 +1,42 @@
+---
+title: "Webhooks"
+description: "Configure webhook endpoints, verify signatures, and handle event payloads."
+---
+
+## Who this is for
+
+Developers building event-driven integrations.
+
+## Overview
+
+Webhooks deliver HTTP callbacks when platform events occur. Configure webhook endpoints in your Exterview dashboard or via API.
+
+## Configuration
+
+1. Register your endpoint URL in the Exterview dashboard
+2. Store the signing secret securely
+3. Implement signature verification on incoming payloads
+4. Handle events idempotently using event IDs
+
+## Signature verification
+
+Verify webhook authenticity using the signing secret provided at registration. Reject payloads that fail verification.
+
+## Event payloads
+
+See [Webhook patterns](/integrations/webhook-patterns) for the event catalog and integration best practices.
+
+<Note>
+Full webhook API reference is being validated against the production webhook service.
+</Note>
+
+## Related documentation
+
+<CardGroup cols={2}>
+  <Card title="Webhook patterns" icon="bell" href="/integrations/webhook-patterns">
+    Event catalog and delivery patterns.
+  </Card>
+  <Card title="Idempotency" icon="rotate" href="/api-reference/idempotency">
+    Safe retry handling.
+  </Card>
+</CardGroup>

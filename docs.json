@@ -1,12 +1,13 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Exterview API Docs",
+  "name": "Exterview Documentation",
   "logo": {
     "light": "/logo/Logo-Black.svg",
     "dark": "/logo/Logo-White.svg"
   },
   "favicon": "/favicon.svg",
+  "css": "/mintlify.css",
   "colors": {
     "primary": "#0072f5",
     "light": "#604aff",
@@ -15,31 +16,70 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Documentation",
+        "tab": "Home",
         "pages": [
           {
-            "group": "Getting started",
+            "group": "Getting Started",
             "pages": [
-              "documentation/getting-started/introduction",
-              "documentation/getting-started/authentication",
-              "documentation/getting-started/aboutexterview",
-              "documentation/getting-started/howitworks"
-            ]
-          },
-          {
-            "group": "Product Updates",
-            "pages": [
-              "documentation/productupdates",
-              "documentation/biasfeatures",
-              "documentation/modelusage",
-              "documentation/faqs"
+              "home/overview",
+              "home/what-is-exterview",
+              "home/core-concepts",
+              "home/quickstart",
+              "home/glossary"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "Concepts",
         "pages": [
+          {
+            "group": "Platform Design",
+            "pages": [
+              "concepts/platform-architecture",
+              "concepts/agent-roles",
+              "concepts/scoring-methodology",
+              "concepts/per-tenant-compounding",
+              "concepts/human-in-the-loop",
+              "concepts/multi-tenancy-data-isolation"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Guides",
+        "pages": [
+          {
+            "group": "Administration",
+            "pages": [
+              "guides/tenant-setup",
+              "guides/creating-an-evaluation",
+              "guides/configuring-rubrics",
+              "guides/reviewing-results",
+              "guides/agent-transparency-panel",
+              "guides/bias-fairness-controls",
+              "guides/roles-access-rbac"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "pages": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api-reference/auth",
+              "api-reference/graphql-schema",
+              "api-reference/queries",
+              "api-reference/mutations",
+              "api-reference/webhooks",
+              "api-reference/rate-limits",
+              "api-reference/idempotency",
+              "api-reference/error-codes",
+              "api-reference/versioning-deprecation"
+            ]
+          },
           {
             "group": "Jobs",
             "pages": [
@@ -65,6 +105,67 @@
             "pages": [
               "api-reference/reports/get-leaderboard",
               "api-reference/reports/interview-report"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Integrations",
+        "pages": [
+          {
+            "group": "Connectivity",
+            "pages": [
+              "integrations/overview",
+              "integrations/mcp-server",
+              "integrations/ats-hris",
+              "integrations/unified-merge",
+              "integrations/m365-teams",
+              "integrations/sso-scim",
+              "integrations/webhook-patterns"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Trust & Compliance",
+        "pages": [
+          {
+            "group": "Security & Privacy",
+            "pages": [
+              "trust-compliance/security-overview",
+              "trust-compliance/certifications",
+              "trust-compliance/privacy",
+              "trust-compliance/platform-coverage-residency",
+              "trust-compliance/accessibility",
+              "trust-compliance/responsible-ai",
+              "trust-compliance/sub-processors",
+              "trust-compliance/legal"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Knowledge Base",
+        "pages": [
+          {
+            "group": "Support",
+            "pages": [
+              "knowledge-base/troubleshooting",
+              "knowledge-base/how-to-articles",
+              "knowledge-base/best-practices",
+              "knowledge-base/support-sla-status"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "FAQ + Changelog",
+        "pages": [
+          {
+            "group": "Updates",
+            "pages": [
+              "faq-changelog/faq",
+              "faq-changelog/changelog"
             ]
           }
         ]

@@ -1,0 +1,66 @@
+---
+title: "Agent roles"
+description: "Plain-language responsibilities for each of Exterview's nine evaluation agents."
+---
+
+## Who this is for
+
+Technical buyers, architects, and admins who need to understand what each agent does without reading implementation details.
+
+## Agent responsibilities
+
+### Role Agent
+
+Creates and structures job roles from any input source — a JD file, a natural-language prompt, or manual entry. Configures questionnaires, scoring categories, and interview flows.
+
+### Match Agent
+
+Sources, ranks, and qualifies candidates against a role at scale. Produces stack-ranked candidate lists with AI-generated resume analysis and match reports.
+
+### Scan Agent
+
+Parses resumes and extracts structured signals: skills, experience, education, certifications, and work history. Powers resume scoring against role requirements.
+
+### Voice Agent
+
+Conducts AI-led voice interviews. Captures audio, transcripts, and evaluation scores. Supports scheduling, consent capture, and instant interview modes.
+
+### Avatar Agent
+
+Conducts video-avatar interviews with customizable avatars, integrity consent, and fallback to voice if sessions are interrupted.
+
+### Code Agent
+
+Evaluates technical competency through integrated coding assessments during interview workflows.
+
+### Panel Agent
+
+Supports multi-interviewer panel evaluation with structured feedback collection and aggregated panel outcomes.
+
+### Rank Agent
+
+Aggregates signals from all evaluation stages into ranked outcomes and leaderboards for a given role.
+
+### HR Agent
+
+Coordinates HR workflow operations including compliance-aware data handling, retention policies, and audit-aware actions.
+
+## Smaya orchestrator
+
+**Smaya** is the supervisor that coordinates agent execution:
+
+- Sequences agents across the evaluation pipeline
+- Aggregates multi-agent outputs into unified reports
+- Enforces tenant isolation boundaries at orchestration time
+- Surfaces provenance metadata for the Transparency Panel
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Platform architecture" icon="sitemap" href="/concepts/platform-architecture">
+    Architecture diagram and design principles.
+  </Card>
+  <Card title="Transparency Panel" icon="eye" href="/guides/agent-transparency-panel">
+    How agent provenance is surfaced in the UI.
+  </Card>
+</CardGroup>

@@ -1,0 +1,45 @@
+---
+title: "Best practices"
+description: "Recommended practices for evaluations, API integration, security, and compliance."
+---
+
+## Who this is for
+
+Developers, recruiters, and admins optimizing their Exterview usage.
+
+## API integration
+
+<CardGroup cols={2}>
+  <Card title="Use environment variables" icon="shield">
+    Never hardcode API keys or tokens. Use environment variables for all credentials.
+  </Card>
+  <Card title="Implement error handling" icon="triangle-exclamation">
+    Handle errors gracefully with retry logic and exponential backoff.
+  </Card>
+  <Card title="Paginate large results" icon="list">
+    Use `pageNum` and `perPage` for queries returning many results.
+  </Card>
+  <Card title="Monitor rate limits" icon="gauge">
+    Check rate limit headers and implement throttling. See [Rate limits](/api-reference/rate-limits).
+  </Card>
+</CardGroup>
+
+## Evaluation workflows
+
+- Configure rubric weights before launching evaluations — see [Configuring rubrics](/guides/configuring-rubrics)
+- Set AI interview benchmark scores to filter candidates at the right threshold
+- Review the Transparency Panel for every high-stakes decision
+- Use human override when AI recommendations need context the model lacks
+
+## Security
+
+- Rotate API keys every 90 days
+- Use SSO for enterprise teams — see [SSO / SCIM](/integrations/sso-scim)
+- Enable MFA for admin accounts
+- Use HTTPS only for all API requests
+
+## Compliance
+
+- Configure data residency per region before processing candidate PII
+- Submit GDPR deletion requests through the admin console when required
+- Review bias/fairness dashboards regularly — see [Bias / fairness controls](/guides/bias-fairness-controls)

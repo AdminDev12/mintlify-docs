@@ -1,0 +1,51 @@
+---
+title: "Queries"
+description: "GraphQL query operations for reading Exterview platform data."
+---
+
+## Who this is for
+
+Developers reading data from the Exterview GraphQL API.
+
+## Prerequisites
+
+- Valid API key and Bearer token — see [Authentication](/api-reference/auth)
+
+## Common queries
+
+### Schema introspection
+
+```graphql
+query {
+  __typename
+}
+```
+
+### List jobs
+
+See [List Jobs](/api-reference/jobs/list-jobs) for the full query schema, parameters, and response examples.
+
+### List candidates
+
+See [List Candidates](/api-reference/candidates/list-candidates).
+
+### Get leaderboard
+
+See [Get Leaderboard](/api-reference/reports/get-leaderboard).
+
+### Interview report
+
+See [Interview Report](/api-reference/reports/interview-report).
+
+<Note>
+Full query catalog is being auto-generated from the live GraphQL schema. Endpoint pages below contain request, response, and error examples.
+</Note>
+
+## Endpoint reference
+
+<CardGroup cols={2}>
+  <Card title="List Jobs" icon="briefcase" href="/api-reference/jobs/list-jobs" />
+  <Card title="List Candidates" icon="users" href="/api-reference/candidates/list-candidates" />
+  <Card title="Get Leaderboard" icon="trophy" href="/api-reference/reports/get-leaderboard" />
+  <Card title="Interview Report" icon="file-text" href="/api-reference/reports/interview-report" />
+</CardGroup>

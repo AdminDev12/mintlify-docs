@@ -1,17 +1,17 @@
 ---
 title: "Authentication"
-description: "Learn how to authenticate with the Exterview API using required headers and base URLs"
+description: "Learn how to authenticate with the Exterview API using required headers and base URLs."
 ---
 
 ## Overview
 
 All API requests to Exterview require authentication using two methods combined:
-1. **API Key** - Organization-specific identifier
-2. **Bearer Token** - User-specific authorization token
+1. **API Key** — Organization-specific identifier
+2. **Bearer Token** — User-specific authorization token
 
 Both must be included in every request to access the API endpoints.
 
-## Required Headers
+## Required headers
 
 Every API request must include the following three headers:
 
@@ -35,17 +35,17 @@ Exterview provides two environments for API access:
 ```
 https://api.exterview.ai/graphql
 ```
+
 Use this for production applications and live data.
 
 ### Sandbox
 ```
 https://sandbox-api.exterview.ai/graphql
 ```
+
 Use this for testing and development purposes.
 
-## Quick Start Example
-
-Here's a complete example showing how to authenticate and make your first API request:
+## Quick start example
 
 <CodeGroup>
 
@@ -92,9 +92,10 @@ print(response.json())
 
 </CodeGroup>
 
-## Getting Your Credentials
+## Getting your credentials
 
-### API Key
+### API key
+
 Your organization's API key is available in the Exterview dashboard:
 1. Log in to your Exterview account
 2. Navigate to **Settings** → **API Keys**
@@ -104,7 +105,8 @@ Your organization's API key is available in the Exterview dashboard:
 Keep your API key secure and never commit it to version control. Use environment variables to store sensitive credentials.
 </Warning>
 
-### Bearer Token
+### Bearer token
+
 The Bearer token is generated when you authenticate:
 1. Use your Exterview credentials to log in
 2. The authentication response includes your Bearer token
@@ -114,7 +116,7 @@ The Bearer token is generated when you authenticate:
 Bearer tokens typically expire after a certain period. Implement token refresh logic in your application to handle expiration.
 </Info>
 
-## Authentication Errors
+## Authentication errors
 
 | Status Code | Error | Description |
 |-------------|-------|-------------|
@@ -122,7 +124,7 @@ Bearer tokens typically expire after a certain period. Implement token refresh l
 | 401 | Unauthorized | Invalid or missing API key or Bearer token |
 | 403 | Forbidden | API key lacks required permissions for this operation |
 
-### Example Error Responses
+### Example error responses
 
 <CodeGroup>
 
@@ -148,34 +150,34 @@ Bearer tokens typically expire after a certain period. Implement token refresh l
 
 </CodeGroup>
 
-## Security Best Practices
+## Security best practices
 
 <AccordionGroup>
-  <Accordion title="Use Environment Variables">
+  <Accordion title="Use environment variables">
     Never hardcode API keys or tokens in your source code. Use environment variables:
-    
+
     ```bash
     export EXTERVIEW_API_KEY="your_api_key"
     export EXTERVIEW_BEARER_TOKEN="your_token"
     ```
   </Accordion>
 
-  <Accordion title="Rotate Credentials Regularly">
+  <Accordion title="Rotate credentials regularly">
     Rotate your API keys and tokens periodically to maintain security:
     - API keys: Every 90 days
     - Bearer tokens: Implement automatic refresh
   </Accordion>
 
-  <Accordion title="Use HTTPS Only">
+  <Accordion title="Use HTTPS only">
     Always use HTTPS (not HTTP) when making API requests to ensure your credentials are encrypted in transit.
   </Accordion>
 
-  <Accordion title="Restrict API Key Permissions">
+  <Accordion title="Restrict API key permissions">
     Configure your API key with the minimum required permissions for your use case. Avoid using admin-level keys for routine operations.
   </Accordion>
 </AccordionGroup>
 
-## Testing Your Authentication
+## Testing your authentication
 
 Use this simple query to verify your authentication is working correctly:
 
@@ -195,15 +197,13 @@ If authentication is successful, you'll receive:
 }
 ```
 
-<Check>
-**Authentication Successful!** You're now ready to start using the Exterview API. Check out the [API Reference](/api-reference/jobs/create-job) to explore available endpoints.
-</Check>
+## Next steps
 
-
-## Need Help?
-
-Having trouble with authentication? Here are some resources:
-
-- **Documentation**: Check our [API Reference](/api-reference/jobs/create-job) for detailed endpoint information
-- **Support**: Contact support@exterview.ai
-- **Status**: Check system status at status.exterview.ai
+<CardGroup cols={2}>
+  <Card title="GraphQL schema" icon="code" href="/api-reference/graphql-schema">
+    Explore the API schema.
+  </Card>
+  <Card title="Quickstart" icon="rocket" href="/home/quickstart">
+    Complete your first evaluation via API.
+  </Card>
+</CardGroup>

@@ -1,0 +1,37 @@
+---
+title: "Troubleshooting"
+description: "Resolve common failure modes in Exterview evaluations, API calls, and integrations."
+---
+
+## Who this is for
+
+Admins and developers encountering issues with the platform or API.
+
+## API authentication errors
+
+| Status | Error | Resolution |
+|--------|-------|------------|
+| 401 | Invalid or missing API key/token | Verify `x-api-key` and `Authorization` headers. See [Authentication](/api-reference/auth). |
+| 403 | Insufficient permissions | Confirm your API key has access to the requested operation. |
+| 400 | Missing required headers | Ensure `Content-Type` is set correctly. |
+
+## Interview issues
+
+| Issue | Resolution |
+|-------|------------|
+| Incomplete interview score | Reports require ≥70% of questions answered. Incomplete sessions show status, not misleading scores. |
+| Avatar session interrupted | System falls back to voice interview automatically. |
+| Candidate device check fails | Candidate should verify mic, camera, and network before joining. |
+
+## Integration issues
+
+| Issue | Resolution |
+|-------|------------|
+| Webhook delivery failures | Verify endpoint URL, check signature validation, implement idempotent handlers. See [Webhooks](/api-reference/webhooks). |
+| SSO login failure | Confirm IdP metadata and group-to-role mappings. See [SSO / SCIM](/integrations/sso-scim). |
+
+## Get help
+
+- **Email**: support@exterview.ai
+- **Status**: [status.exterview.ai](https://status.exterview.ai)
+- **Support & SLA**: [Support, SLA & status](/knowledge-base/support-sla-status)

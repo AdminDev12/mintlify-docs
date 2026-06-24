@@ -1,0 +1,61 @@
+---
+title: "Glossary"
+description: "Definitions for platform terms used across Exterview documentation."
+---
+
+## Platform terms
+
+<AccordionGroup>
+  <Accordion title="Agent" icon="robot">
+    A specialized AI component responsible for one part of the evaluation workflow (e.g., Voice, Match, Rank). Nine agents are coordinated by the Smaya orchestrator.
+  </Accordion>
+  <Accordion title="Compounding" icon="layer-group">
+    Offline, batched, versioned improvement of scoring quality within a single tenant based on that tenant's own evaluation outcomes. No cross-tenant learning.
+  </Accordion>
+  <Accordion title="Evaluation" icon="clipboard-check">
+    A structured assessment of a candidate against a role, potentially spanning multiple agent-driven stages.
+  </Accordion>
+  <Accordion title="Human-in-the-loop" icon="user-check">
+    The principle that Exterview informs hiring decisions but does not auto-reject or make automated adverse employment decisions. Humans retain final authority.
+  </Accordion>
+  <Accordion title="Rubric" icon="list-check">
+    Structured scoring criteria that define how candidate signals are measured and weighted during an evaluation.
+  </Accordion>
+  <Accordion title="Smaya" icon="sitemap">
+    The supervisor orchestrator that coordinates the nine specialized agents across an evaluation workflow.
+  </Accordion>
+  <Accordion title="Tenant" icon="building">
+    An isolated organization workspace. All data, models, and compounding are strictly partitioned per tenant.
+  </Accordion>
+  <Accordion title="Transparency Panel" icon="eye">
+    The UI surface that shows agent provenance for each signal: server-generated, client-provided, or synthesized.
+  </Accordion>
+</AccordionGroup>
+
+## API terms
+
+<AccordionGroup>
+  <Accordion title="Additive-only API" icon="plus">
+    The Exterview GraphQL API only adds fields and operations over time. Breaking changes require advance notice and a deprecation timeline.
+  </Accordion>
+  <Accordion title="Idempotency" icon="rotate">
+    Safe retry behavior for mutations and webhook deliveries. See [Idempotency](/api-reference/idempotency).
+  </Accordion>
+  <Accordion title="Webhook" icon="bell">
+    An HTTP callback that notifies your system when platform events occur. See [Webhooks](/api-reference/webhooks).
+  </Accordion>
+</AccordionGroup>
+
+## Compliance terms
+
+<AccordionGroup>
+  <Accordion title="Data residency" icon="globe">
+    The geographic region where tenant data is stored and processed. See [Platform coverage & residency](/trust-compliance/platform-coverage-residency).
+  </Accordion>
+  <Accordion title="Responsible AI" icon="shield-check">
+    Exterview's approach to bias auditing, human oversight, and prohibition of automated adverse decisions. See [Responsible AI](/trust-compliance/responsible-ai).
+  </Accordion>
+  <Accordion title="Sub-processor" icon="building-columns">
+    A third-party service provider that processes data on behalf of Exterview. See [Sub-processors](/trust-compliance/sub-processors).
+  </Accordion>
+</AccordionGroup>

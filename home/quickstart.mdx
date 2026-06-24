@@ -1,0 +1,124 @@
+---
+title: "Quickstart"
+description: "Create your first evaluation via the Exterview API in about 10 minutes."
+---
+
+## Who this is for
+
+Developers and integrators who want a working first API call without contacting support.
+
+## Prerequisites
+
+- An Exterview organization account
+- API key and Bearer token from your dashboard
+- `curl` or any HTTP client
+
+## Step 1: Authenticate
+
+Every request requires two credentials:
+
+<ParamField header="x-api-key" type="string" required>
+  Your organization-specific API key.
+</ParamField>
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token in the format: `Bearer YOUR_TOKEN`
+</ParamField>
+
+Verify authentication with a simple query:
+
+```bash
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "query { __typename }"}'
+```
+
+Expected response:
+
+```json
+{
+  "data": {
+    "__typename": "Query"
+  }
+}
+```
+
+<Warning>
+Never commit API keys or tokens to version control. Use environment variables.
+</Warning>
+
+## Step 2: Create a job
+
+Upload a job definition to start an evaluation workflow:
+
+```bash
+curl -X POST https://api.exterview.ai/addJobByFile \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "recfiles=@job-description.pdf" \
+  -F "recruiterId=YOUR_RECRUITER_ID" \
+  -F "organizationId=YOUR_ORG_ID"
+```
+
+See [Create Job](/api-reference/jobs/create-job) for full request and response details.
+
+## Step 3: Upload candidates
+
+Bulk upload resumes for processing:
+
+```bash
+curl -X POST https://api.exterview.ai/bulkUpload \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "files=@resume.pdf" \
+  -F "jobId=YOUR_JOB_ID"
+```
+
+See [Bulk Upload](/api-reference/candidates/bulk-upload) for parameters and error handling.
+
+## Step 4: View results
+
+Retrieve the candidate leaderboard for your job:
+
+```bash
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "query { leaderboard(jobId: \"YOUR_JOB_ID\") { candidates { id score } } }"}'
+```
+
+See [Get Leaderboard](/api-reference/reports/get-leaderboard) for the full schema.
+
+## Environments
+
+<CodeGroup>
+
+```bash Production
+https://api.exterview.ai/graphql
+```
+
+```bash Sandbox
+https://sandbox-api.exterview.ai/graphql
+```
+
+</CodeGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/api-reference/auth">
+    Full auth model, error codes, and security practices.
+  </Card>
+  <Card title="API Reference" icon="book" href="/api-reference/graphql-schema">
+    GraphQL schema, queries, mutations, and webhooks.
+  </Card>
+  <Card title="MCP Server" icon="plug" href="/integrations/mcp-server">
+    Integrate via Model Context Protocol.
+  </Card>
+  <Card title="Glossary" icon="book-open" href="/home/glossary">
+    Platform terminology reference.
+  </Card>
+</CardGroup>

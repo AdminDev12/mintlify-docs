@@ -1,0 +1,35 @@
+---
+title: "Rate limits"
+description: "API rate limiting behavior, headers, and best practices."
+---
+
+## Who this is for
+
+Developers building high-volume integrations.
+
+## Default limits
+
+- **Default limit**: 600 requests per minute per organization
+- **Pagination**: Use `pageNum` and `perPage` for large datasets
+- **Bulk operations**: Recommended for high-volume candidate and job operations
+
+## Rate limit headers
+
+Rate limit headers are included in every API response to help you track usage:
+
+| Header | Description |
+|--------|-------------|
+| `X-RateLimit-Limit` | Maximum requests per window |
+| `X-RateLimit-Remaining` | Requests remaining in current window |
+| `X-RateLimit-Reset` | Time when the rate limit window resets |
+
+## Handling rate limits
+
+When rate limited, the API returns HTTP `429 Too Many Requests`. Implement exponential backoff and respect the `Retry-After` header when present.
+
+## Best practices
+
+- Use bulk upload endpoints for high-volume candidate operations
+- Paginate large query results
+- Monitor rate limit headers in your application
+- Cache read-heavy queries where appropriate

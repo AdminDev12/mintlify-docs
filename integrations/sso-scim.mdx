@@ -1,0 +1,42 @@
+---
+title: "SSO / SCIM"
+description: "Supported identity providers, SAML configuration, and SCIM provisioning status."
+---
+
+## Who this is for
+
+Enterprise identity administrators and procurement reviewers.
+
+## SSO status
+
+| Capability | Status |
+|------------|--------|
+| Microsoft Entra ID (SAML/OIDC) | **Available** |
+| SAML 2.0 (generic IdP) | **Available** |
+| SCIM 2.0 provisioning | **Roadmap** |
+
+## Microsoft Entra ID
+
+Enterprise customers can configure Microsoft Entra ID for single sign-on:
+
+1. Register Exterview as an enterprise application in Entra ID
+2. Configure SAML/OIDC federation
+3. Map Entra ID groups to Exterview roles
+
+## SAML configuration
+
+For non-Microsoft IdPs, Exterview supports SAML 2.0 federation. Contact your account team for IdP-specific metadata and configuration guides.
+
+## SCIM provisioning
+
+SCIM 2.0 automated user provisioning is on the **roadmap**. Until GA, user management is performed via the Exterview admin console or API.
+
+<Warning>
+SSO and SCIM availability labels are current as of this documentation version. Do not assume SCIM is available for procurement without confirming status here.
+</Warning>
+
+## Next steps
+
+<Card title="Roles & access (RBAC)" icon="user-shield" href="/guides/roles-access-rbac">
+  Configure roles after SSO is enabled.
+</Card>

@@ -1,0 +1,38 @@
+---
+title: "Webhook patterns"
+description: "Event catalog, delivery patterns, and integration best practices for Exterview webhooks."
+---
+
+## Who this is for
+
+Developers building event-driven integrations with Exterview.
+
+## Overview
+
+Webhooks notify your system when platform events occur — interview completion, candidate status changes, and evaluation milestones.
+
+## Event catalog
+
+<Note>
+Full event catalog is being validated against the production webhook service. See [Webhooks](/api-reference/webhooks) for the API reference.
+</Note>
+
+| Event | Description |
+|-------|-------------|
+| `interview.completed` | An interview stage has finished |
+| `candidate.status_changed` | Candidate evaluation status updated |
+| `evaluation.report_ready` | Unified evaluation report is available |
+
+## Delivery patterns
+
+- **Retry with exponential backoff** — Failed deliveries are retried automatically
+- **Signature verification** — Validate webhook payloads using the signing secret
+- **Idempotency** — Use event IDs to safely handle duplicate deliveries
+
+See [Idempotency](/api-reference/idempotency) for retry-safe integration patterns.
+
+## Next steps
+
+<Card title="Webhooks API" icon="bell" href="/api-reference/webhooks">
+  Webhook configuration and payload reference.
+</Card>

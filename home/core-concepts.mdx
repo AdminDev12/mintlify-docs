@@ -1,0 +1,58 @@
+---
+title: "Core concepts (60 seconds)"
+description: "The essential Exterview concepts — evaluation, agents, scoring, and human-in-the-loop — in under two minutes."
+---
+
+## The essentials
+
+These five concepts appear throughout the documentation. Read this page first if you are new to Exterview.
+
+### 1. Evaluation
+
+An **evaluation** is a structured assessment of a candidate against a role. It includes one or more agent-driven stages (resume match, voice, avatar, code, panel) coordinated into a single decision-ready outcome.
+
+### 2. Agents
+
+Exterview uses **nine specialized agents** — Role, Match, Scan, Voice, Avatar, Code, Panel, Rank, and HR — coordinated by the **Smaya** supervisor orchestrator. Each agent handles a distinct part of the evaluation workflow.
+
+[Learn more about agent roles →](/concepts/agent-roles)
+
+### 3. Scoring
+
+**Scoring** combines deterministic rubric signals with model-driven analysis. Scores are structured, versioned, and tied to explicit rubric criteria — not opaque black-box rankings.
+
+[Learn more about scoring methodology →](/concepts/scoring-methodology)
+
+### 4. Human-in-the-loop
+
+Exterview **informs** decisions; it does **not** auto-decide or auto-reject. Recruiters and hiring managers review agent outputs, override recommendations when needed, and retain final authority.
+
+[Learn more about human-in-the-loop →](/concepts/human-in-the-loop)
+
+### 5. Per-tenant compounding
+
+Evaluation quality **compounds within your tenant** from your organization's own outcomes. Learning is **offline, batched, and versioned** — with strict per-tenant isolation and no cross-tenant data bleed.
+
+[Learn more about per-tenant compounding →](/concepts/per-tenant-compounding)
+
+## Key terms
+
+| Term | Definition |
+|------|------------|
+| **Tenant** | An isolated organization workspace with its own data, models, and configuration. |
+| **Rubric** | Structured scoring criteria that define how evaluations are measured. |
+| **Transparency Panel** | UI surface showing agent provenance (server / client / synthesized). |
+| **Compounding** | Offline, versioned improvement of scoring quality within a single tenant. |
+
+For the full term list, see the [Glossary](/home/glossary).
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/home/quickstart">
+    Create your first evaluation in about 10 minutes.
+  </Card>
+  <Card title="Platform architecture" icon="sitemap" href="/concepts/platform-architecture">
+    Deep dive into the nine-agent design.
+  </Card>
+</CardGroup>

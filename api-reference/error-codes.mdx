@@ -16,7 +16,7 @@ Developers implementing error handling in Exterview integrations.
 | 403 | Forbidden | API key lacks required permissions |
 | 404 | Not Found | Resource does not exist |
 | 429 | Too Many Requests | Rate limit exceeded |
-| 500 | Internal Server Error | Platform error — retry with backoff |
+| 500 | Internal Server Error | Platform error retry with backoff |
 
 ## Authentication errors
 
@@ -50,7 +50,7 @@ GraphQL responses include an `errors` array when operations fail:
 
 | Error type | Retry? |
 |------------|--------|
-| 401 / 403 | No — fix credentials or permissions |
-| 400 | No — fix request format |
-| 429 | Yes — after backoff per [Rate limits](/api-reference/rate-limits) |
-| 500 | Yes — with exponential backoff |
+| 401 / 403 | No fix credentials or permissions |
+| 400 | No fix request format |
+| 429 | Yes after backoff per [Rate limits](/api-reference/rate-limits) |
+| 500 | Yes with exponential backoff |

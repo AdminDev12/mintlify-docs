@@ -11,19 +11,19 @@ Enterprise security teams, architects, and procurement reviewers evaluating data
 
 Every Exterview customer operates in a **dedicated tenant** with strict partitioning:
 
-- **Data** — Candidate, evaluation, and configuration data is isolated per tenant
-- **Models** — Compounding artifacts and model versions are tenant-scoped
-- **Configuration** — Rubrics, roles, and access policies are tenant-specific
-- **Audit logs** — Actions are logged within the tenant boundary
+- **Data**: Candidate, evaluation, and configuration data is isolated per tenant
+- **Models**: Compounding artifacts and model versions are tenant-scoped
+- **Configuration**: Rubrics, roles, and access policies are tenant-specific
+- **Audit logs**: Actions are logged within the tenant boundary
 
 ## No cross-tenant bleed
 
 Exterview enforces isolation at multiple layers:
 
-1. **Storage partitioning** — Tenant data is logically and physically separated
-2. **Orchestration boundaries** — Smaya enforces tenant context for every agent invocation
-3. **Compounding isolation** — Offline learning pipelines operate on single-tenant data only
-4. **Access control** — RBAC policies are scoped to the tenant
+1. **Storage partitioning** Tenant data is logically and physically separated
+2. **Orchestration boundaries** Smaya enforces tenant context for every agent invocation
+3. **Compounding isolation** Offline learning pipelines operate on single-tenant data only
+4. **Access control** RBAC policies are scoped to the tenant
 
 <Warning>
 No evaluation data, model artifacts, or compounding signals cross tenant boundaries. This is a platform guarantee, not a configuration option.

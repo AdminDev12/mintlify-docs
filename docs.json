@@ -3,15 +3,15 @@
   "theme": "mint",
   "name": "Exterview Documentation",
   "logo": {
-    "light": "/logo/Logo-Black.svg",
-    "dark": "/logo/Logo-White.svg"
+    "light": "/logo/Ex dark.png",
+    "dark": "/logo/Ex light.png"
   },
   "favicon": "/favicon.svg",
   "css": "/mintlify.css",
   "colors": {
-    "primary": "#0072f5",
-    "light": "#604aff",
-    "dark": "#0052cc"
+    "primary": "#226BFF",
+    "light": "#226BFF",
+    "dark": "#226BFF"
   },
   "navigation": {
     "tabs": [

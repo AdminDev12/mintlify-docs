@@ -7,333 +7,272 @@ description: "Versioned, dated release notes for the Exterview platform."
 
 <AccordionGroup>
 
-<Accordion title="June 2026 Microsoft Marketplace GA (Launching June 30)" icon="rocket" defaultOpen>
+<Accordion title="June 2026 — Microsoft Marketplace GA (June 30)" icon="rocket" defaultOpen>
 
-Everything built across January–May becomes generally available to all customers on the Microsoft Marketplace. The AI Candidate Matcher, the Phone and Voice interviewers, and the Unified Candidate Report (resume + phone + voice) are all GA at launch.
+The launch. The commercial and reliability layer around the Marketplace listing is hardened for general availability.
 
-**Microsoft Marketplace Live & Transactable**
-
-Buy and run EX directly from the Microsoft Marketplace, billed against committed Microsoft spend.
+**Microsoft Marketplace — Live & Transactable**
 
 - Transact EX directly through the Microsoft Marketplace listing
-- Meter usage transparently across all billable dimensions (resume, phone, voice, avatar)
-- Review usage and capacity consumption in-product
-- Bill against committed Microsoft spend (MACC): no surprise invoices
+- Meter usage across all four billable dimensions — resume, phone, voice, avatar
+- Review usage and capacity-entitlement consumption in-product
 
-**Sales-Led Trial Experience**
-
-A real 21-day product trial, not a sandbox.
-
-- Start a full-product 21-day trial with one click
-- Receive a Day 7 nudge as the trial progresses
-- Move to read-only at Day 14 if the trial is not yet converted
-- Graduate a trial to a paid plan without losing data
-
-**ATS Report Export**
-
-Send EX evaluation results into the ATS you already run.
-
-- Push the unified candidate report (PDF) into your existing ATS
-- Push candidate evaluation status back to the ATS
-- One-way export to major ATS platforms (two-way sync: see roadmap)
-
-**AI Avatar Interviewer Early Access**
-
-The video-avatar interviewer, available as a guided early-access experience at launch.
+**AI Avatar Interviewer — Early Access**
 
 - Run a video-avatar interview as a guided early-access experience
-- Capture candidate integrity consent before the interview
-- Capture data-privacy consent before the interview
-- Fall back to a voice interview if the avatar session is interrupted
+- Capture integrity and recording consent before the interview
+- Recording capture and webhook handling hardened (BYO Azure Blob storage, VNet proxy, authenticated callbacks)
 
-**Interview Completion & Reliable Billing**
+**Reliable Billing**
 
-Reports and charges only ever land on interviews that were actually finished.
-
-- Only see a competency report when enough of the interview was answered (≥ 70% of questions answered properly)
-- Trust that a low score is a real result, not an unfinished interview: genuine finishers are never chased
-- Automatically nudge candidates who dropped off to come back and finish (fresh session, starting from question 1)
-- See live interview status in the dashboard: In progress, Follow-up in progress, Complete, Expired: never a misleading score for an incomplete session
-- Get charged one credit per completed candidate, ever: incomplete interviews and recovery re-attempts are never billed
+- Usage is metered only on interviews that reached a completed state with an AI decision — incomplete sessions emit no charge
+- Billing is idempotent per report, so retries never double-charge
 
 </Accordion>
 
-<Accordion title="May 2026 Early Access (May 30)" icon="layer-group" defaultOpen>
+<Accordion title="May 2026 — Microsoft integrations & early access" icon="layer-group">
 
-Every signal from every agent now lands in one decision surface, and the leaderboard makes hiring outcomes visible at a glance.
-
-**Unified Candidate Report (V1)**
-
-Every signal on a candidate resume, phone screen, voice interview, and avatar interview stacked into one decision-ready report.
-
-- View resume, phone, voice, and avatar signals stacked in one place
-- Share the report conditionally with stakeholders
-- Download the unified report as a PDF
-- Override the AI's hire/no-hire decision on the candidate
-- Read the AI's justification behind every decision
-
-**Candidate Leaderboard (V1)**
-
-The ranking surface for every job who's leading, who's not, why.
-
-- See candidates ranked across all rounds for any job
-- Override the AI decision for a single interview round
-- Override the AI's overall decision on a candidate
+Microsoft-native surfaces, the Marketplace billing pipeline, report sharing, and workspace polish ship on the launch runway.
 
 **Microsoft-Native Integrations**
 
-First-class integration with the Microsoft ecosystem built for the Microsoft sales motion.
-
 - Sign in with Microsoft Entra ID SSO
-- Receive recruiter alerts in Microsoft Teams via webhooks
-- Schedule interviews directly from Outlook calendar
-- Open candidate records via Microsoft 365 deep links
 
-**Search & Data Operations**
+**Marketplace Billing Pipeline**
 
-Global search and export capabilities across the workspace.
+- Azure Marketplace billing integration: subscription lifecycle, post-purchase landing, and subscription linking
+- Capacity / metering pipeline and per-dimension entitlement reads
+- Trial-expiry and org-usage aggregation timer functions
 
-- Run global search across jobs, candidates, and customers
-- Export candidate data as CSV or Excel
-- Export jobs and reports for offline review
-- Run expanded bulk actions on candidates
+**Report Sharing**
+
+- Share a candidate report internally, publicly, or as a restricted, email-bound, OTP-verified link with expiry
+
+**AI Avatar Interviewer (early access)**
+
+- Run a video-avatar interview (Tavus-based) as a guided early-access experience
 
 **Platform Polish**
 
-- Switch between new tabs added to Jobs and Candidates views
-- Use refined search and filter controls on Jobs and Candidates
-- Read updated analytics widgets on jobs and candidates
-- Navigate consolidated agent reports across all five AI agents
+- New status and view tabs on Jobs and Candidates, including an Internal Pool tab
+- Refined, debounced search and shared filter controls
+- Updated analytics widgets across jobs and candidates
+- Consolidated agent reports rendered through one report surface
 
 </Accordion>
 
-<Accordion title="April 2026" icon="microphone" defaultOpen>
+<Accordion title="April 2026 — The interview agents" icon="microphone">
 
-The interview agents land. Customers can now run fully automated voice interviews with the consent, scheduling, and candidate-side flows that make them compliant.
+Customers can now run fully automated voice interviews, with the consent, scheduling, and candidate-side flows that make them compliant. The decision surface arrives alongside.
 
 **AI Voice Interviewer**
 
-Voice-based AI interviews. The candidate talks to an agent over voice no human in the loop.
-
-- Schedule a voice interview with a candidate
-- Send the interview invite via email
-- Capture candidate integrity consent before the interview
-- Capture data privacy consent before the interview
-- Launch an instant interview when scheduling isn't needed
+- Schedule a voice interview with a candidate and send the invite via email
+- Capture candidate integrity consent and recording consent before the interview
 - Review the voice interview report after completion
 
 **Candidate Interview Experience**
-
-The end-to-end experience candidates have when they take an AI interview.
 
 - Land on a branded interview lobby
 - Run a device check (mic, camera, network) before joining
 - See clear progress indicators during the interview
 - Land on a post-interview thank-you screen
-- Receive a confirmation email after completion
 
 **Recruiter Dashboard**
 
-The home screen every recruiter's daily starting point.
-
 - See the overview analytics dashboard on landing
-- Review agent analytics: sessions and reports across all agents
+- Review agent analytics: sessions and reports across agents
 - See recent activity from across the workspace
+
+**Decision Surface**
+
+- Candidate Leaderboard: candidates ranked across all rounds per job
+- Override the AI decision for a single round or overall, with the AI's justification shown
+- Consolidated candidate report across resume, phone, and AI-screening (voice / avatar) signals
 
 **Interviewer Persona**
 
-The interviewer role lands humans can now collaborate inside EX alongside the agents.
-
 - Sign in with the Interviewer role
-- See your assigned candidates on a dedicated dashboard
-- Submit structured feedback after each interview
-- Review agent-generated reports for context
 
 </Accordion>
 
-<Accordion title="March 2026" icon="wand-magic-sparkles" defaultOpen>
+<Accordion title="March 2026 — The first three AI agents" icon="wand-magic-sparkles">
 
-The first three AI agents go live, taking EX from a passive system of record to an active hiring engine. Email notifications, in-app alerts, and the commercial layer ship alongside.
+EX goes from a passive system of record to an active hiring engine. Email and in-app notifications and the commercial layer ship alongside.
 
 **AI Role Builder**
 
-Creates and structures job roles from any input source a JD file, a one-line prompt, or manual entry.
-
-- Create a job by uploading a JD file
-- Create a job from a natural-language prompt
-- Create a job manually from scratch
+- Create a job by uploading a JD file, from a natural-language prompt, or manually
 - Configure detailed job settings
 - Build the candidate questionnaire (phone agent + AI screening)
-- Use AI-suggested interview questions
-- Configure custom scoring categories per job
+- Use AI-suggested interview questions and configure custom scoring categories per job
 - Publish jobs to the careers page
-- Review the role configuration report for any job
 
 **AI Candidate Matcher**
 
-Sources, ranks, and qualifies candidates against any job at scale.
-
-- Upload candidates in bulk via file
+- Upload candidates in bulk via file (async, parallel worker)
 - Pull candidates from the internal talent pool
-- View stack-ranked candidates per job
-- Read AI-generated resume analysis on each candidate
-- Run bulk eligibility updates across multiple candidates
+- View stack-ranked candidates per job with AI-generated resume analysis
 - Review the match report for any candidate
 
 **AI Phone Screener**
 
-Initiates outbound AI phone screens no recruiter dialing.
-
-- Trigger an AI phone call to any candidate
-- Review the phone screen report after a call completes
+- Trigger an outbound AI phone screen to any candidate
+- Review the phone-screen report after a call completes
 
 **Email Notifications**
 
-The transactional email layer for the most important platform moments.
-
 - Send invite-approval emails to recruiters and admins
 - Send AI interview invitations to candidates
-- Send trial welcome emails when an admin or recruiter starts a trial
+- Send trial-welcome emails
 
 **In-App Notifications**
 
 - Open the in-app notification center
 - See alerts when an interview completes
-- See alerts when a candidate is ready for review
 - Mark notifications as read
 
-**Billing & Careers**
+**Billing, Careers & Logs**
 
 - Browse available billing packages
-- Download usage reports
-- Manage the public careers page
-- Post jobs to the branded careers page
-
-**Platform Logs**
-
-- Browse the platform logs view
-- Filter logs by user, action, or date range
+- Manage the public careers page and post jobs to the branded careers page
+- Browse the tenant activity / telemetry logs view with date-range and free-text search
 
 </Accordion>
 
-<Accordion title="February 2026" icon="database" defaultOpen>
+<Accordion title="February 2026 — Core entity management" icon="database">
 
-Core entity management lands. Jobs, Candidates, and Customers become first-class objects with their own views, actions, and detail panels plus the configuration surfaces the AI agents will read from.
+Jobs, Candidates, and Customers become first-class objects with their own views, actions, and detail panels — plus the configuration surfaces the AI agents read from.
 
 **Jobs Workspace**
 
-Everything recruiters need to browse, find, and inspect open requisitions.
-
-- Switch between list view, grid view, and tab view
-- Search across all jobs in the workspace
-- Apply filters to narrow down jobs
+- Switch between list, grid, and tab views
+- Search across all jobs; apply filters
 - Review job KPIs in the analytics panel
 - Open a job to see primary info and its candidate leaderboard
-- Browse the candidates table within a job
-- Expand any candidate row for a detailed view
+- Browse the candidates table within a job; expand any row
 - Open the AI agent report for the job
 
 **Candidate Workspace**
 
-The candidate index and the deep-dive view for each person.
-
-- Switch between list and grid views of all candidates
-- Search and filter the candidate pool
+- Switch between list and grid views; search and filter the pool
 - Open the candidate detail view to override status
-- Review overview, experience, and skills
-- Read agent reports tied to the candidate
-- See the full activity log on each candidate
+- Review overview, experience, and skills tabs
+- Read agent reports tied to the candidate and the full activity log
 - Upload your own resume as a candidate
 
 **Customer Workspace**
 
-Manage the companies you hire for.
-
-- Create a new customer record
-- Browse customers in list or grid view
-- Open the customer detail view to see firmographics
-- View contacts, jobs, and contact details linked to each customer
+- Create a new customer record; browse in list or grid view
+- Open the detail view to see firmographics
+- View contacts and jobs linked to each customer
 - Edit any customer's profile
 
 **AI Screening Configuration**
 
-Define how the phone and AI interview agents behave inside the org.
+- Configure phone-screen settings org-wide and AI interview / voice / avatar defaults
+- Build the hiring pipeline stages and define skills used across roles
+- Set stage, resume-rubric, and competency weights
+- Create reusable pipeline templates
 
-- Configure phone screen settings org-wide
-- Set up AI interview defaults
-- Build the hiring pipeline stages
-- Define skills used across roles
-- Set stage, resume, and competency weights
-- Create reusable templates
+**Data & Audit**
 
-**Data, Compliance & Audit**
-
-Enterprise-grade controls for handling candidate PII responsibly.
-
-- Submit GDPR data-deletion requests on behalf of candidates
-- Enforce data residency per region (IND / US / EU)
 - Browse the granular audit log of every action
-- Configure candidate data retention policies per region
+- Per-container data-retention TTLs on PII (recordings, transcripts)
 
 </Accordion>
 
-<Accordion title="January 2026" icon="flag" defaultOpen>
+<Accordion title="January 2026 — Foundation" icon="flag">
 
-The foundation. Self-serve onboarding, authentication, the super-admin control plane, and organization scaffolding all came online making it possible for the first orgs to land on EX safely.
+Self-serve onboarding, authentication, the super-admin control plane, and organization scaffolding come online — making it possible for the first orgs to land on EX safely.
 
 **Self-Serve Onboarding**
-
-The full first-run experience for new admins and recruiters.
 
 - Sign up with social login or via magic link
 - Complete organization setup during first run
 - Select the AI agent, voice, and avatar that represent the org
 - Pick a plan from the plan selector
 - Invite the team in the same flow
-- See the welcome popup on first login
-- Watch the embedded walkthrough video
 
 **Authentication & Access**
 
-Secure sign-in, recovery, and session handling for every user.
-
 - Reset a forgotten password via email
-- Log out of the active session
-- Stay signed in with "remember me"
-- Get auto-signed-out after session timeout
-- Enable 2FA / MFA for admin accounts
+- Log out of the active session (and sign out of all devices)
 
-**Super Admin Console (Internal)**
-
-Internal control plane for managing every organization on EX.
+**Super Admin Console (internal)**
 
 - View organization-wide KPIs at a glance
 - See the full list of organizations on the platform
 - Open any organization's profile to inspect setup
-- Toggle Trial mode on an organization
-- Toggle Enterprise mode on an organization
+- Toggle Trial mode and Enterprise mode on an organization
 
 **Organization, Users & Localization**
-
-Configure who's in the org, what they can do, and where they operate.
 
 - Edit personal and org profiles
 - Set up company locations across India, US, and EU
 - Configure departments
-- Manage compliance settings per region
-- Define roles for Recruiters and Super Admins
+- Define roles for Recruiters and Super Admins (multi-tenant RBAC + permission matrix)
 - Add and manage users in the workspace
-- Switch the UI language
 - View the workspace on mobile-responsive web
 
 **Support & Lifecycle**
 
-The onboarding lifecycle and support touchpoints that surround every new user.
-
-- Open the in-app help center widget
-- Receive Day 1, Day 3, and Day 7 onboarding emails
-- Submit NPS and product feedback in-app
+- Send the trial-welcome email when an org starts a trial
 - See polished error, empty, and 404 / 500 states across the product
+
+</Accordion>
+
+</AccordionGroup>
+
+## Planned — not yet available {#planned}
+
+On the roadmap and not yet shipped. Listed so they are not mistaken for released capability. Do not commit delivery dates to customers.
+
+<AccordionGroup>
+
+<Accordion title="Trial & onboarding lifecycle" icon="clock">
+
+- 21-day trial length (today the trial is 14 days) and a Day-7 nudge.
+- Day 1 / Day 3 / Day 7 onboarding email drip.
+- In-app help-center widget; in-app NPS / feedback capture.
+- UI language switcher; embedded onboarding walkthrough video.
+- "Remember me" persistent sessions and idle session-timeout auto-logout.
+
+</Accordion>
+
+<Accordion title="Compliance & data ops" icon="shield">
+
+- GDPR / DPDPA data-deletion request workflow (currently manual / per-store).
+- Per-region data-residency enforcement and per-region retention overrides.
+- Global search across jobs, candidates, and customers.
+- Export candidate data, jobs, and reports as CSV / Excel; download usage reports.
+- Expanded bulk actions on candidates beyond bulk delete.
+
+</Accordion>
+
+<Accordion title="Reports & interviews" icon="file-lines">
+
+- Download the unified report as a PDF.
+- Instant (no-scheduling) interview launch.
+- Candidate confirmation email after completion.
+- Automatic avatar → voice fallback on session interruption.
+- Interviewer persona: dedicated assigned-candidate dashboard and structured interviewer feedback / scorecards.
+
+</Accordion>
+
+<Accordion title="Completion gate & recovery (EX-CR1, draft)" icon="rotate">
+
+- Competency report gated on ≥70% of questions answered.
+- Auto-nudge / recovery for drop-offs; "Follow-up in progress" and "Expired" interview states.
+- Per-invite billing dedup across recovery re-attempts.
+
+</Accordion>
+
+<Accordion title="Commerce & integrations" icon="store">
+
+- Bill against committed Microsoft spend (MACC).
+- ATS report export and two-way ATS / HRIS sync.
+- Microsoft 365 deep links into candidate records (unverified — confirm before listing as shipped).
 
 </Accordion>
 

@@ -1,0 +1,187 @@
+---
+title: "Get Interview Deadline"
+api: "POST /graphql"
+description: "Retrieve the deadline and completion status for a candidate's AI interview"
+---
+
+## Overview
+
+`aiInterviewDeadline` returns the deadline for a candidate's AI interview along with flags indicating whether the deadline has passed and whether the interview has already been completed. Use it before presenting the interview experience to decide whether the candidate can still start, and to render organization branding (name and logo) on the interview landing screen. Once the interview is complete, use `aiInterviewReport` to retrieve the full results.
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query AiInterviewDeadline($candidateId: String!) {
+  aiInterviewDeadline(candidateId: $candidateId) {
+    aiInterviewDeadline
+    isExpired
+    isInterviewCompleted
+    organizationName
+    organizationLogo
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="candidateId" type="string" required>
+  Identifier of the candidate whose interview deadline is being checked.
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query AiInterviewDeadline($candidateId: String!) { aiInterviewDeadline(candidateId: $candidateId) { aiInterviewDeadline isExpired isInterviewCompleted organizationName organizationLogo } }",
+    "variables": {
+      "candidateId": "68a5b11168f3d6ccd1a4e2f3"
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query AiInterviewDeadline($candidateId: String!) {
+    aiInterviewDeadline(candidateId: $candidateId) {
+      aiInterviewDeadline
+      isExpired
+      isInterviewCompleted
+      organizationName
+      organizationLogo
+    }
+  }
+`;
+
+const variables = {
+  candidateId: "68a5b11168f3d6ccd1a4e2f3"
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query AiInterviewDeadline($candidateId: String!) {
+  aiInterviewDeadline(candidateId: $candidateId) {
+    aiInterviewDeadline
+    isExpired
+    isInterviewCompleted
+    organizationName
+    organizationLogo
+  }
+}
+"""
+
+variables = {
+    "candidateId": "68a5b11168f3d6ccd1a4e2f3"
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="aiInterviewDeadline" type="object">
+      <Expandable title="aiInterviewDeadline properties">
+        <ResponseField name="aiInterviewDeadline" type="string">
+          The deadline by which the candidate must complete the AI interview. Null when no deadline is set.
+        </ResponseField>
+
+        <ResponseField name="isExpired" type="boolean" required>
+          Whether the interview deadline has already passed.
+        </ResponseField>
+
+        <ResponseField name="isInterviewCompleted" type="boolean" required>
+          Whether the candidate has already completed the interview.
+        </ResponseField>
+
+        <ResponseField name="organizationName" type="string">
+          Display name of the hiring organization, for use on the interview landing screen.
+        </ResponseField>
+
+        <ResponseField name="organizationLogo" type="string">
+          URL of the hiring organization's logo.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "aiInterviewDeadline": {
+      "aiInterviewDeadline": "2026-07-10T23:59:59.000Z",
+      "isExpired": false,
+      "isInterviewCompleted": false,
+      "organizationName": "Acme Inc.",
+      "organizationLogo": "https://cdn.exterview.ai/orgs/acme/logo.png"
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+|------------|-------------|
+| UNAUTHENTICATED | The request is missing valid authentication credentials. |
+| BAD_USER_INPUT | The `candidateId` argument is missing or malformed. |
+| NOT_FOUND | No candidate exists with the supplied `candidateId`. |
+| INTERNAL_SERVER_ERROR | An unexpected error occurred while resolving the deadline. |

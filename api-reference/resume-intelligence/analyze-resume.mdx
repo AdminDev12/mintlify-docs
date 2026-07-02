@@ -1,0 +1,281 @@
+---
+title: "Analyze Resume"
+api: "POST /graphql"
+description: "Re-run the AI resume scoring pipeline for a candidate against their job's current description"
+---
+
+## Overview
+
+Re-runs the AI resume scoring pipeline for a single candidate against their job's current description. Exterview pulls the stored resume from blob storage, re-extracts the text, re-scores it, then persists the new per-section breakdown and aggregate `resumeScore`, recording a `CANDIDATE_RESUME_ANALYZED` audit event with before/after snapshots. Use it after the job description changes or a replacement resume is uploaded; for a manual score override without re-running the AI, use `updateResumeScore` instead.
+
+<Note>
+This operation requires the write scope.
+</Note>
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Mutation
+
+```graphql
+mutation analyzeResume($candidateId: UUID!) {
+  analyzeResume(candidateId: $candidateId) {
+    id
+    name
+    email
+    jobId
+    resumeScore
+    resumeScoreDetailBreakdown
+    candidateStatus
+    eligibility
+    skillsFound
+    merits {
+      title
+      description
+      category
+    }
+    updatedAt
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="candidateId" type="string" required>
+  UUID of the candidate whose resume should be re-analyzed. The candidate must exist in the caller's tenant and have a resume on file, and their job must have a description.
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "mutation analyzeResume($candidateId: UUID!) { analyzeResume(candidateId: $candidateId) { id name email jobId resumeScore resumeScoreDetailBreakdown candidateStatus eligibility skillsFound merits { title description category } updatedAt } }",
+    "variables": {
+      "candidateId": "7f8b0c4e-2a51-4a7e-9d3b-6c1f2e8a9b01"
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  mutation analyzeResume($candidateId: UUID!) {
+    analyzeResume(candidateId: $candidateId) {
+      id
+      name
+      email
+      jobId
+      resumeScore
+      resumeScoreDetailBreakdown
+      candidateStatus
+      eligibility
+      skillsFound
+      merits {
+        title
+        description
+        category
+      }
+      updatedAt
+    }
+  }
+`;
+
+const variables = {
+  candidateId: "7f8b0c4e-2a51-4a7e-9d3b-6c1f2e8a9b01"
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+mutation analyzeResume($candidateId: UUID!) {
+  analyzeResume(candidateId: $candidateId) {
+    id
+    name
+    email
+    jobId
+    resumeScore
+    resumeScoreDetailBreakdown
+    candidateStatus
+    eligibility
+    skillsFound
+    merits {
+      title
+      description
+      category
+    }
+    updatedAt
+  }
+}
+"""
+
+variables = {
+    "candidateId": "7f8b0c4e-2a51-4a7e-9d3b-6c1f2e8a9b01"
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="analyzeResume" type="object">
+      The updated candidate with the freshly computed score.
+
+      <Expandable title="analyzeResume properties">
+        <ResponseField name="id" type="string">
+          Unique candidate identifier (UUID)
+        </ResponseField>
+
+        <ResponseField name="name" type="string">
+          Candidate's full name
+        </ResponseField>
+
+        <ResponseField name="email" type="string">
+          Candidate's email address (nullable)
+        </ResponseField>
+
+        <ResponseField name="jobId" type="string">
+          Identifier of the job the candidate belongs to
+        </ResponseField>
+
+        <ResponseField name="resumeScore" type="number">
+          Recomputed aggregate resume score
+        </ResponseField>
+
+        <ResponseField name="resumeScoreDetailBreakdown" type="object">
+          Per-section score breakdown produced by the scoring pipeline
+        </ResponseField>
+
+        <ResponseField name="candidateStatus" type="string">
+          Lifecycle status in the hiring pipeline. One of `APPLIED`, `IN_PROGRESS`, `ADVANCED`, `REJECTED`, `HIRED`, `WITHDRAWN`
+        </ResponseField>
+
+        <ResponseField name="eligibility" type="string">
+          Recruiter's eligibility decision. One of `ELIGIBLE`, `INELIGIBLE`, `UNSET` (legacy rows without the field surface as `UNSET`)
+        </ResponseField>
+
+        <ResponseField name="skillsFound" type="array">
+          Skills extracted from the resume
+        </ResponseField>
+
+        <ResponseField name="merits" type="array">
+          Job-description-relevant strength cards composed at extraction time
+
+          <Expandable title="Merit Object">
+            <ResponseField name="title" type="string">
+              Strength card title
+            </ResponseField>
+
+            <ResponseField name="description" type="string">
+              Strength card description
+            </ResponseField>
+
+            <ResponseField name="category" type="string">
+              Strength category, for example skill, domain, or certification (nullable)
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+
+        <ResponseField name="updatedAt" type="string">
+          ISO 8601 timestamp of the last update
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "analyzeResume": {
+      "id": "7f8b0c4e-2a51-4a7e-9d3b-6c1f2e8a9b01",
+      "name": "Priya Raman",
+      "email": "priya.raman@example.com",
+      "jobId": "3d2f1a9c-8e4b-42d0-b7a5-1c9e0f6d2a34",
+      "resumeScore": 84,
+      "resumeScoreDetailBreakdown": {
+        "skillMatch": 90,
+        "experienceRelevance": 80,
+        "educationMatch": 85,
+        "workHistory": 75,
+        "certifications": 60,
+        "resumeQuality": 88
+      },
+      "candidateStatus": "IN_PROGRESS",
+      "eligibility": "ELIGIBLE",
+      "skillsFound": ["Go", "Kubernetes", "PostgreSQL"],
+      "merits": [
+        {
+          "title": "Deep Kubernetes experience",
+          "description": "Operated multi-region clusters at scale for three years.",
+          "category": "skill"
+        }
+      ],
+      "updatedAt": "2026-07-02T09:41:27.000Z"
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+| --- | --- |
+| UNAUTHENTICATED | Missing or invalid API key or bearer token |
+| FORBIDDEN | The caller lacks the write scope for this tenant |
+| BAD_USER_INPUT | The candidate has no resume on file, or the job has no description |
+| NOT_FOUND | The candidate id does not exist in the caller's tenant |
+| INTERNAL_SERVER_ERROR | Blob fetch failed, the AI scorer threw, or the write failed |

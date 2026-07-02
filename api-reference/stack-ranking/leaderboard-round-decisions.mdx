@@ -1,0 +1,314 @@
+---
+title: "List Round Decisions"
+api: "POST /graphql"
+description: "List per-round AI verdicts for a job, with optional round, verdict, and override filters"
+---
+
+## Overview
+
+`leaderboardRoundDecisions` lists the per-round AI verdicts recorded for a job, sorted by candidate name and then round order (`RESUME`, `PHONE`, `VOICE`, `AVATAR`) at the resolver layer. Each row carries the AI's verdict, score, and reasoning plus any recruiter override, with `effectiveVerdict` resolving the override over the AI verdict. Use `leaderboardCandidateDecisions` for the one-row-per-candidate, across-rounds view. An unknown or cross-tenant `jobId` returns an empty list rather than an error, so there is no existence oracle across tenants.
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query LeaderboardRoundDecisions($input: LeaderboardRoundDecisionsFilterInput!) {
+  leaderboardRoundDecisions(input: $input) {
+    decisionId
+    candidateId
+    candidateName
+    jobId
+    round
+    aiVerdict
+    aiScore
+    aiReasoning
+    aiProducedAt
+    effectiveVerdict
+    override {
+      verdict
+      reason
+      byUserId
+      at
+    }
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="jobId" type="string" required>
+  UUID of the job whose round decisions to list
+</ParamField>
+
+<ParamField body="round" type="AiDecisionRound">
+  Filter to a single round. One of `RESUME`, `PHONE`, `VOICE`, `AVATAR`
+</ParamField>
+
+<ParamField body="verdict" type="AiDecisionVerdict">
+  Filter to rows with this AI verdict. One of `ADVANCE`, `HOLD`, `REJECT`
+</ParamField>
+
+<ParamField body="overriddenOnly" type="boolean">
+  When true, return only rows that carry a recruiter override
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query LeaderboardRoundDecisions($input: LeaderboardRoundDecisionsFilterInput!) { leaderboardRoundDecisions(input: $input) { decisionId candidateId candidateName jobId round aiVerdict aiScore aiReasoning aiProducedAt effectiveVerdict override { verdict reason byUserId at } } }",
+    "variables": {
+      "input": {
+        "jobId": "3f8b2c1e-9d4a-4f6b-8a2e-1c5d7e9f0a3b",
+        "round": "PHONE",
+        "overriddenOnly": false
+      }
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query LeaderboardRoundDecisions($input: LeaderboardRoundDecisionsFilterInput!) {
+    leaderboardRoundDecisions(input: $input) {
+      decisionId
+      candidateId
+      candidateName
+      jobId
+      round
+      aiVerdict
+      aiScore
+      aiReasoning
+      aiProducedAt
+      effectiveVerdict
+      override {
+        verdict
+        reason
+        byUserId
+        at
+      }
+    }
+  }
+`;
+
+const variables = {
+  input: {
+    jobId: "3f8b2c1e-9d4a-4f6b-8a2e-1c5d7e9f0a3b",
+    round: "PHONE",
+    overriddenOnly: false
+  }
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query LeaderboardRoundDecisions($input: LeaderboardRoundDecisionsFilterInput!) {
+  leaderboardRoundDecisions(input: $input) {
+    decisionId
+    candidateId
+    candidateName
+    jobId
+    round
+    aiVerdict
+    aiScore
+    aiReasoning
+    aiProducedAt
+    effectiveVerdict
+    override {
+      verdict
+      reason
+      byUserId
+      at
+    }
+  }
+}
+"""
+
+variables = {
+    "input": {
+        "jobId": "3f8b2c1e-9d4a-4f6b-8a2e-1c5d7e9f0a3b",
+        "round": "PHONE",
+        "overriddenOnly": False
+    }
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="leaderboardRoundDecisions" type="array">
+      Per-round AI verdict rows for the job
+
+      <Expandable title="AiRoundDecision Object">
+        <ResponseField name="decisionId" type="string">
+          Identifier of the decision row
+        </ResponseField>
+
+        <ResponseField name="candidateId" type="string">
+          UUID of the candidate the decision belongs to
+        </ResponseField>
+
+        <ResponseField name="candidateName" type="string">
+          Candidate's name, joined from the candidates container at resolver time
+        </ResponseField>
+
+        <ResponseField name="jobId" type="string">
+          UUID of the job the decision belongs to
+        </ResponseField>
+
+        <ResponseField name="round" type="string">
+          Round the verdict applies to. One of `RESUME`, `PHONE`, `VOICE`, `AVATAR`
+        </ResponseField>
+
+        <ResponseField name="aiVerdict" type="string">
+          Verdict produced by the AI. One of `ADVANCE`, `HOLD`, `REJECT`
+        </ResponseField>
+
+        <ResponseField name="aiScore" type="integer">
+          Score the AI assigned for this round
+        </ResponseField>
+
+        <ResponseField name="aiReasoning" type="string">
+          The AI's explanation for its verdict
+        </ResponseField>
+
+        <ResponseField name="aiProducedAt" type="string">
+          ISO 8601 timestamp when the AI produced the verdict
+        </ResponseField>
+
+        <ResponseField name="effectiveVerdict" type="string">
+          Derived verdict that resolves the override's verdict when present, otherwise the AI verdict, so clients render the right pill without computing it twice. One of `ADVANCE`, `HOLD`, `REJECT`
+        </ResponseField>
+
+        <ResponseField name="override" type="object">
+          Recruiter override block; null when the AI verdict has not been overridden
+
+          <Expandable title="AiDecisionOverride Object">
+            <ResponseField name="verdict" type="string">
+              Overriding verdict. One of `ADVANCE`, `HOLD`, `REJECT`
+            </ResponseField>
+
+            <ResponseField name="reason" type="string">
+              Reason the recruiter recorded for the override
+            </ResponseField>
+
+            <ResponseField name="byUserId" type="string">
+              Identifier of the user who applied the override
+            </ResponseField>
+
+            <ResponseField name="at" type="string">
+              ISO 8601 timestamp when the override was applied
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "leaderboardRoundDecisions": [
+      {
+        "decisionId": "dec_01a2b3c4d5e6f7",
+        "candidateId": "8c1d5f7a-2b3e-4a9c-b6d8-0e4f2a7c9b15",
+        "candidateName": "Daniel Okafor",
+        "jobId": "3f8b2c1e-9d4a-4f6b-8a2e-1c5d7e9f0a3b",
+        "round": "PHONE",
+        "aiVerdict": "HOLD",
+        "aiScore": 68,
+        "aiReasoning": "Solid fundamentals but limited depth on distributed systems questions.",
+        "aiProducedAt": "2026-06-20T11:18:44Z",
+        "effectiveVerdict": "ADVANCE",
+        "override": {
+          "verdict": "ADVANCE",
+          "reason": "Strong referral and relevant fintech experience outweigh the phone screen.",
+          "byUserId": "usr_5f2e9c1b7a3d",
+          "at": "2026-06-21T08:02:19Z"
+        }
+      },
+      {
+        "decisionId": "dec_08f9e8d7c6b5a4",
+        "candidateId": "b7e6c3d2-4f1a-4c8e-9b2d-6a5e8f0c1d24",
+        "candidateName": "Priya Raman",
+        "jobId": "3f8b2c1e-9d4a-4f6b-8a2e-1c5d7e9f0a3b",
+        "round": "PHONE",
+        "aiVerdict": "ADVANCE",
+        "aiScore": 88,
+        "aiReasoning": "Clear, structured answers with strong system-design instincts.",
+        "aiProducedAt": "2026-06-19T15:47:03Z",
+        "effectiveVerdict": "ADVANCE",
+        "override": null
+      }
+    ]
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+|------------|-------------|
+| `UNAUTHENTICATED` | Missing or invalid API key or bearer token |
+| `FORBIDDEN` | The caller is not permitted to read decisions for this tenant |
+| `BAD_USER_INPUT` | `jobId` is not a valid UUID or a filter value is not a valid enum member |
+| `INTERNAL_SERVER_ERROR` | Unexpected server-side failure while reading decisions |

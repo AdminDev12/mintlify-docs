@@ -1,0 +1,279 @@
+---
+title: "Get Job Form Options"
+api: "POST /graphql"
+description: "Retrieve the option lists for every Create-Job wizard Step 1 dropdown"
+---
+
+## Overview
+
+The `jobFormOptions` query returns server-driven option lists for every dropdown on the Create-Job wizard's Step 1, in one call. Per-tenant lists (`departments`, `cities`, `hiringManagers`, `customers`) are scoped to the caller's tenant, while the static lists (`employmentTypes`, `workTypes`, `ctcCurrencies`, `noticePeriods`, `agentRecommendations`) come from validator-blessed constants. It is designed to be fired in parallel with `job` in a single GraphQL document so the wizard hydrates in one round-trip, and it is gated by the same read permission as `job`.
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query GetJobFormOptions {
+  jobFormOptions {
+    departments
+    hiringManagers {
+      value
+      label
+      tags
+    }
+    customers {
+      value
+      label
+      tags
+    }
+    cities
+    cityOptions {
+      name
+      region
+    }
+    employmentTypes
+    workTypes
+    ctcCurrencies
+    noticePeriods
+    agentRecommendations
+  }
+}
+```
+
+## Request Parameters
+
+This operation takes no arguments. The option lists are resolved from the tenant identified by the caller's credentials.
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query GetJobFormOptions { jobFormOptions { departments hiringManagers { value label tags } customers { value label tags } cities cityOptions { name region } employmentTypes workTypes ctcCurrencies noticePeriods agentRecommendations } }"
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query GetJobFormOptions {
+    jobFormOptions {
+      departments
+      hiringManagers {
+        value
+        label
+        tags
+      }
+      customers {
+        value
+        label
+        tags
+      }
+      cities
+      cityOptions {
+        name
+        region
+      }
+      employmentTypes
+      workTypes
+      ctcCurrencies
+      noticePeriods
+      agentRecommendations
+    }
+  }
+`;
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query GetJobFormOptions {
+  jobFormOptions {
+    departments
+    hiringManagers {
+      value
+      label
+      tags
+    }
+    customers {
+      value
+      label
+      tags
+    }
+    cities
+    cityOptions {
+      name
+      region
+    }
+    employmentTypes
+    workTypes
+    ctcCurrencies
+    noticePeriods
+    agentRecommendations
+  }
+}
+"""
+
+response = requests.post(url, headers=headers, json={"query": query})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="jobFormOptions" type="object">
+      Option lists for every Create-Job wizard Step 1 dropdown.
+
+      <Expandable title="jobFormOptions properties">
+        <ResponseField name="departments" type="array">
+          Tenant org-location department names, deduplicated. Flat string list.
+        </ResponseField>
+        <ResponseField name="hiringManagers" type="array">
+          Tenant active users keyed by user id; the label is the user's name, falling back to email.
+          <Expandable title="Option Object">
+            <ResponseField name="value" type="string">
+              Identifier the form submits back (stored as the job's `hiringManager`).
+            </ResponseField>
+            <ResponseField name="label" type="string">
+              Display label shown to the recruiter.
+            </ResponseField>
+            <ResponseField name="tags" type="array">
+              Human-readable role names rendered as badges alongside the label (for example `["Hiring Manager"]`, or multiple entries for multi-role users). Empty array when no tags apply.
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        <ResponseField name="customers" type="array">
+          Tenant customers keyed by customer id; the label is the customer's name. Same option object shape as `hiringManagers` (`value`, `label`, `tags`); the submitted `value` is stored as the job's `customerId`. `tags` is currently an empty array for customer entries.
+        </ResponseField>
+        <ResponseField name="cities" type="array">
+          Tenant org-location city names, deduplicated across regions. Flat string list.
+        </ResponseField>
+        <ResponseField name="cityOptions" type="array">
+          The same cities as `cities`, each paired with its region code so the Location picker can send the region alongside the city. Deduplicated by name (first region wins).
+          <Expandable title="City Option Object">
+            <ResponseField name="name" type="string">
+              City name.
+            </ResponseField>
+            <ResponseField name="region" type="string">
+              Region code. One of the `OrgLocationRegion` enum values: `APAC`, `EMEA`, `AMERICAS`.
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        <ResponseField name="employmentTypes" type="array">
+          Static list of employment types (for example `full-time`, `part-time`, `contract`, `internship`).
+        </ResponseField>
+        <ResponseField name="workTypes" type="array">
+          Static list of work types (for example `Hybrid`, `Remote`, `OnSite`).
+        </ResponseField>
+        <ResponseField name="ctcCurrencies" type="array">
+          Static list of supported compensation currencies (for example `INR`, `USD`, `EUR`).
+        </ResponseField>
+        <ResponseField name="noticePeriods" type="array">
+          Static list of notice-period options.
+        </ResponseField>
+        <ResponseField name="agentRecommendations" type="array">
+          Static list of AI screening confidence bands (integers) accepted by the `agentRecommendation` field on a job.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "jobFormOptions": {
+      "departments": ["Engineering", "Product", "Talent Acquisition"],
+      "hiringManagers": [
+        {
+          "value": "7e2c4b90-1a5f-4d38-9c6e-3b8d0f7a2e14",
+          "label": "Priya Sharma",
+          "tags": ["Hiring Manager"]
+        },
+        {
+          "value": "b41d8f26-9e3a-4c07-8d5b-6f2a1c9e0d73",
+          "label": "Alex Doe",
+          "tags": ["Hiring Manager", "Recruiter"]
+        }
+      ],
+      "customers": [
+        {
+          "value": "f09a3c58-7d2e-4b16-a4c9-5e8b1d0f6a27",
+          "label": "Acme Corporation",
+          "tags": []
+        }
+      ],
+      "cities": ["Bengaluru", "London", "Austin"],
+      "cityOptions": [
+        { "name": "Bengaluru", "region": "APAC" },
+        { "name": "London", "region": "EMEA" },
+        { "name": "Austin", "region": "AMERICAS" }
+      ],
+      "employmentTypes": ["full-time", "part-time", "contract", "internship"],
+      "workTypes": ["Hybrid", "Remote", "OnSite"],
+      "ctcCurrencies": ["INR", "USD", "EUR"],
+      "noticePeriods": ["Immediate", "15 days", "30 days", "60 days", "90 days"],
+      "agentRecommendations": [95, 85, 77, 72, 65, 55, 40]
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+|------------|-------------|
+| UNAUTHENTICATED | Missing or invalid API key or bearer token |
+| FORBIDDEN | The caller lacks read access to jobs in this tenant |
+| INTERNAL_SERVER_ERROR | Unexpected server-side failure |

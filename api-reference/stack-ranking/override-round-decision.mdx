@@ -1,0 +1,306 @@
+---
+title: "Override Round Decision"
+api: "POST /graphql"
+description: "Override the AI verdict for a single interview round on a candidate"
+---
+
+## Overview
+
+Override one round's AI verdict for a candidate. The mutation patches the `override` block on the existing decision row and never touches the original `aiVerdict`, so the AI's assessment remains visible alongside the recruiter's call. Use `overrideCandidateDecision` for the candidate-level (across-rounds) verdict, `leaderboardRoundDecisions` to list per-round verdicts, and `leaderboardAuditTrail` to review the history of overrides on a job.
+
+<Warning>
+This operation requires the `decisions:write` scope and mutates the hiring decision audit trail. It is never available in the default read tier.
+</Warning>
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Mutation
+
+```graphql
+mutation overrideRoundDecision($input: OverrideDecisionInput!) {
+  overrideRoundDecision(input: $input) {
+    decisionId
+    candidateId
+    candidateName
+    jobId
+    round
+    aiVerdict
+    aiScore
+    aiReasoning
+    aiProducedAt
+    override {
+      verdict
+      reason
+      byUserId
+      at
+    }
+    effectiveVerdict
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="decisionId" type="string" required>
+  ID of the AI round decision row to override. If no AI decision exists at this ID, the request fails with `BAD_USER_INPUT` (`NO_AI_DECISION_TO_OVERRIDE`).
+</ParamField>
+
+<ParamField body="verdict" type="AiDecisionVerdict" required>
+  The verdict to record as the override. Allowed values: `ADVANCE`, `HOLD`, `REJECT`.
+</ParamField>
+
+<ParamField body="reason" type="string" required>
+  Justification for the override, recorded in the audit trail. Must be non-empty.
+</ParamField>
+
+<ParamField body="expectedVersion" type="integer">
+  Optional optimistic-concurrency guard. If supplied and stale, the request is rejected with a version-conflict error instead of silently overwriting a newer override.
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "mutation overrideRoundDecision($input: OverrideDecisionInput!) { overrideRoundDecision(input: $input) { decisionId candidateId candidateName jobId round aiVerdict aiScore aiReasoning aiProducedAt override { verdict reason byUserId at } effectiveVerdict } }",
+    "variables": {
+      "input": {
+        "decisionId": "dec_round_9f2c4b7a1e6d",
+        "verdict": "ADVANCE",
+        "reason": "Strong system design discussion outweighs the low phone-screen score.",
+        "expectedVersion": 3
+      }
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  mutation overrideRoundDecision($input: OverrideDecisionInput!) {
+    overrideRoundDecision(input: $input) {
+      decisionId
+      candidateId
+      candidateName
+      jobId
+      round
+      aiVerdict
+      aiScore
+      aiReasoning
+      aiProducedAt
+      override {
+        verdict
+        reason
+        byUserId
+        at
+      }
+      effectiveVerdict
+    }
+  }
+`;
+
+const variables = {
+  input: {
+    decisionId: "dec_round_9f2c4b7a1e6d",
+    verdict: "ADVANCE",
+    reason: "Strong system design discussion outweighs the low phone-screen score.",
+    expectedVersion: 3
+  }
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+mutation overrideRoundDecision($input: OverrideDecisionInput!) {
+  overrideRoundDecision(input: $input) {
+    decisionId
+    candidateId
+    candidateName
+    jobId
+    round
+    aiVerdict
+    aiScore
+    aiReasoning
+    aiProducedAt
+    override {
+      verdict
+      reason
+      byUserId
+      at
+    }
+    effectiveVerdict
+  }
+}
+"""
+
+variables = {
+    "input": {
+        "decisionId": "dec_round_9f2c4b7a1e6d",
+        "verdict": "ADVANCE",
+        "reason": "Strong system design discussion outweighs the low phone-screen score.",
+        "expectedVersion": 3
+    }
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="overrideRoundDecision" type="object">
+      The updated per-round AI decision row, including the new override block.
+
+      <Expandable title="overrideRoundDecision properties">
+        <ResponseField name="decisionId" type="string">
+          Unique ID of the decision row
+        </ResponseField>
+
+        <ResponseField name="candidateId" type="string">
+          UUID of the candidate the decision applies to
+        </ResponseField>
+
+        <ResponseField name="candidateName" type="string">
+          Candidate display name, joined from the candidates store at resolver time (nullable)
+        </ResponseField>
+
+        <ResponseField name="jobId" type="string">
+          UUID of the job the decision belongs to
+        </ResponseField>
+
+        <ResponseField name="round" type="AiDecisionRound">
+          Interview round the verdict covers. One of `RESUME`, `PHONE`, `VOICE`, `AVATAR`.
+        </ResponseField>
+
+        <ResponseField name="aiVerdict" type="AiDecisionVerdict">
+          The AI's original verdict, unchanged by the override. One of `ADVANCE`, `HOLD`, `REJECT`.
+        </ResponseField>
+
+        <ResponseField name="aiScore" type="integer">
+          Numeric score the AI produced for the round
+        </ResponseField>
+
+        <ResponseField name="aiReasoning" type="string">
+          The AI's explanation for its verdict
+        </ResponseField>
+
+        <ResponseField name="aiProducedAt" type="string">
+          ISO 8601 timestamp when the AI produced the verdict
+        </ResponseField>
+
+        <ResponseField name="override" type="object">
+          Recruiter override block (null when the row has never been overridden).
+
+          <Expandable title="override properties">
+            <ResponseField name="verdict" type="AiDecisionVerdict">
+              The overriding verdict: `ADVANCE`, `HOLD`, or `REJECT`
+            </ResponseField>
+
+            <ResponseField name="reason" type="string">
+              Justification supplied with the override
+            </ResponseField>
+
+            <ResponseField name="byUserId" type="string">
+              ID of the user who applied the override
+            </ResponseField>
+
+            <ResponseField name="at" type="string">
+              ISO 8601 timestamp of the override
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+
+        <ResponseField name="effectiveVerdict" type="AiDecisionVerdict">
+          Derived field resolving to the override's verdict when present, otherwise `aiVerdict`. One of `ADVANCE`, `HOLD`, `REJECT`.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "overrideRoundDecision": {
+      "decisionId": "dec_round_9f2c4b7a1e6d",
+      "candidateId": "7c1e4a9b-2d6f-4b3a-8e5c-9f0a1b2c3d4e",
+      "candidateName": "Maya Rodriguez",
+      "jobId": "b4d2f8a1-6c3e-4d9b-a7f5-0e1c2b3a4d5f",
+      "round": "PHONE",
+      "aiVerdict": "HOLD",
+      "aiScore": 62,
+      "aiReasoning": "Communication was clear but depth on distributed systems questions was limited.",
+      "aiProducedAt": "2026-07-01T18:05:41.000Z",
+      "override": {
+        "verdict": "ADVANCE",
+        "reason": "Strong system design discussion outweighs the low phone-screen score.",
+        "byUserId": "usr_4d8f2a91c6b3",
+        "at": "2026-07-02T14:32:08.000Z"
+      },
+      "effectiveVerdict": "ADVANCE"
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+|------------|-------------|
+| UNAUTHENTICATED | Missing or invalid authentication credentials |
+| FORBIDDEN | Caller lacks the decisions-override permission |
+| BAD_USER_INPUT | No AI decision exists at `decisionId` (`NO_AI_DECISION_TO_OVERRIDE`), the `reason` is empty, or the `verdict` is unknown |
+| INTERNAL_SERVER_ERROR | Unexpected server-side failure while writing the override |

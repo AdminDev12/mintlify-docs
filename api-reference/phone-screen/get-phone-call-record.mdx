@@ -1,0 +1,324 @@
+---
+title: "Get Phone Call Record"
+api: "POST /graphql"
+description: "Retrieve a single AI phone screen call record by its unique identifier"
+---
+
+## Overview
+
+Retrieve the full record for a single AI phone screen call, including provider details, call status, timing, duration, and — once post-call processing completes — the recording URL, transcript URL, and analysis result. Use this operation to check the state of a call you initiated and to fetch its results once available. To list calls across a job or a candidate, use `phoneCallsByJob` or `phoneCallsByCandidate`; for lighter, focused projections of just the media or transcript, use `phoneCallRecording` or `phoneCallTranscript`.
+
+<Info>
+  Exterview has no customer-facing outbound webhooks. Integrators poll this operation until the result is available — for example, until `status` reaches a terminal value and `analysisStatus`, `recordingUrl`, or `transcriptUrl` are populated.
+</Info>
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query GetPhoneCallRecord($id: UUID!) {
+  phoneCallRecord(id: $id) {
+    id
+    tenantId
+    candidateId
+    jobId
+    organizationId
+    provider
+    conversationId
+    callSid
+    toNumber
+    status
+    startedAt
+    endedAt
+    totalDurationSeconds
+    formattedDuration
+    failureReason
+    recordingUrl
+    transcriptUrl
+    analysisStatus
+    analysisResult
+    createdAt
+    updatedAt
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="id" type="string" required>
+  UUID of the phone call record to retrieve. The operation returns `null` for an unknown ID or an ID belonging to another tenant.
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query GetPhoneCallRecord($id: UUID!) { phoneCallRecord(id: $id) { id tenantId candidateId jobId organizationId provider conversationId callSid toNumber status startedAt endedAt totalDurationSeconds formattedDuration failureReason recordingUrl transcriptUrl analysisStatus analysisResult createdAt updatedAt } }",
+    "variables": {
+      "id": "7d9f3b2a-4c1e-4f8a-9b6d-2e5a8c1f0d34"
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query GetPhoneCallRecord($id: UUID!) {
+    phoneCallRecord(id: $id) {
+      id
+      tenantId
+      candidateId
+      jobId
+      organizationId
+      provider
+      conversationId
+      callSid
+      toNumber
+      status
+      startedAt
+      endedAt
+      totalDurationSeconds
+      formattedDuration
+      failureReason
+      recordingUrl
+      transcriptUrl
+      analysisStatus
+      analysisResult
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+const variables = {
+  id: "7d9f3b2a-4c1e-4f8a-9b6d-2e5a8c1f0d34"
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query GetPhoneCallRecord($id: UUID!) {
+  phoneCallRecord(id: $id) {
+    id
+    tenantId
+    candidateId
+    jobId
+    organizationId
+    provider
+    conversationId
+    callSid
+    toNumber
+    status
+    startedAt
+    endedAt
+    totalDurationSeconds
+    formattedDuration
+    failureReason
+    recordingUrl
+    transcriptUrl
+    analysisStatus
+    analysisResult
+    createdAt
+    updatedAt
+  }
+}
+"""
+
+variables = {
+    "id": "7d9f3b2a-4c1e-4f8a-9b6d-2e5a8c1f0d34"
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="phoneCallRecord" type="object">
+      The phone call record, or `null` when the ID is unknown or belongs to another tenant.
+
+      <Expandable title="phoneCallRecord properties">
+        <ResponseField name="id" type="string">
+          Unique identifier (UUID) of the phone call record
+        </ResponseField>
+
+        <ResponseField name="tenantId" type="string">
+          UUID of the tenant that owns this call
+        </ResponseField>
+
+        <ResponseField name="candidateId" type="string">
+          Identifier of the candidate who was called
+        </ResponseField>
+
+        <ResponseField name="jobId" type="string">
+          Identifier of the job the call was screened for
+        </ResponseField>
+
+        <ResponseField name="organizationId" type="string">
+          Identifier of the organization
+        </ResponseField>
+
+        <ResponseField name="provider" type="string">
+          Telephony provider used for the call. Enum `PhoneCallProvider`: `EXOTEL`, `ELEVENLABS_TWILIO`
+        </ResponseField>
+
+        <ResponseField name="conversationId" type="string">
+          Provider conversation identifier (ElevenLabs canonical key), if assigned
+        </ResponseField>
+
+        <ResponseField name="callSid" type="string">
+          Provider call SID, if assigned
+        </ResponseField>
+
+        <ResponseField name="toNumber" type="string">
+          Phone number that was dialed
+        </ResponseField>
+
+        <ResponseField name="status" type="string">
+          Call status. Enum `PhoneCallStatus`: `INITIATING`, `IN_PROGRESS`, `COMPLETED`, `FAILED`, `NO_ANSWER`, `BUSY`, `CANCELLED`
+        </ResponseField>
+
+        <ResponseField name="startedAt" type="string">
+          ISO 8601 timestamp when the call started, or `null` if it has not started
+        </ResponseField>
+
+        <ResponseField name="endedAt" type="string">
+          ISO 8601 timestamp when the call ended, or `null` if it has not ended
+        </ResponseField>
+
+        <ResponseField name="totalDurationSeconds" type="integer">
+          Total call duration in seconds
+        </ResponseField>
+
+        <ResponseField name="formattedDuration" type="string">
+          Human-readable call duration
+        </ResponseField>
+
+        <ResponseField name="failureReason" type="string">
+          Reason the call failed or was cancelled, when applicable
+        </ResponseField>
+
+        <ResponseField name="recordingUrl" type="string">
+          URL of the call recording once post-call processing completes
+        </ResponseField>
+
+        <ResponseField name="transcriptUrl" type="string">
+          URL of the call transcript once post-call processing completes
+        </ResponseField>
+
+        <ResponseField name="analysisStatus" type="string">
+          Status of the AI post-call analysis
+        </ResponseField>
+
+        <ResponseField name="analysisResult" type="object">
+          AI analysis result payload (JSON), once analysis completes
+        </ResponseField>
+
+        <ResponseField name="createdAt" type="string">
+          ISO 8601 timestamp when the record was created
+        </ResponseField>
+
+        <ResponseField name="updatedAt" type="string">
+          ISO 8601 timestamp when the record was last updated
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "phoneCallRecord": {
+      "id": "7d9f3b2a-4c1e-4f8a-9b6d-2e5a8c1f0d34",
+      "tenantId": "b1a2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "candidateId": "68c42431b9f38f8c24fbc91f",
+      "jobId": "68b1f0aa2c9d4e5f6a7b8c9d",
+      "organizationId": "acme",
+      "provider": "ELEVENLABS_TWILIO",
+      "conversationId": "conv_01j9x2v8kfe3ta7r5m6q0d8w1z",
+      "callSid": "CA9f8e7d6c5b4a39281706f5e4d3c2b1a0",
+      "toNumber": "+14155550123",
+      "status": "COMPLETED",
+      "startedAt": "2026-07-01T14:03:12.000Z",
+      "endedAt": "2026-07-01T14:11:47.000Z",
+      "totalDurationSeconds": 515,
+      "formattedDuration": "8m 35s",
+      "failureReason": null,
+      "recordingUrl": "https://media.exterview.ai/recordings/7d9f3b2a-4c1e-4f8a-9b6d-2e5a8c1f0d34.mp3",
+      "transcriptUrl": "https://media.exterview.ai/transcripts/7d9f3b2a-4c1e-4f8a-9b6d-2e5a8c1f0d34.json",
+      "analysisStatus": "completed",
+      "analysisResult": {
+        "overallScore": 82,
+        "recommendation": "advance"
+      },
+      "createdAt": "2026-07-01T14:02:58.000Z",
+      "updatedAt": "2026-07-01T14:12:30.000Z"
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+| --- | --- |
+| `UNAUTHENTICATED` | Missing or invalid API key or bearer token |
+| `FORBIDDEN` | The authenticated principal lacks the Admin or Recruiter role |
+| `BAD_USER_INPUT` | The `id` argument is not a valid UUID |
+| `INTERNAL_SERVER_ERROR` | Unexpected server-side failure |

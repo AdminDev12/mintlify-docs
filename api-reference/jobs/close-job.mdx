@@ -1,0 +1,200 @@
+---
+title: "Close Job"
+api: "POST /graphql"
+description: "Set a job's status to CLOSED to take it off the market"
+---
+
+## Overview
+
+Close a job, setting its lifecycle status to `CLOSED`. Use this when a position has been filled or is no longer being hired for. Because the unauthenticated `careersPublicJobs` query only returns jobs in `PUBLISHED` status, a closed job immediately disappears from the organization's public careers page; the job record itself is retained (use `deleteJob` for removal).
+
+<Note>
+This operation requires the `write` scope.
+</Note>
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Mutation
+
+```graphql
+mutation CloseJob($id: UUID!) {
+  closeJob(id: $id) {
+    id
+    uid
+    title
+    status
+    publishToCareersPage
+    updatedAt
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="id" type="string" required>
+  UUID of the job to close. The job must belong to the caller's tenant.
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "mutation CloseJob($id: UUID!) { closeJob(id: $id) { id uid title status publishToCareersPage updatedAt } }",
+    "variables": {
+      "id": "3f8a2c1e-9d4b-4e6a-8c7f-1b2d3e4f5a6b"
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  mutation CloseJob($id: UUID!) {
+    closeJob(id: $id) {
+      id
+      uid
+      title
+      status
+      publishToCareersPage
+      updatedAt
+    }
+  }
+`;
+
+const variables = {
+  id: "3f8a2c1e-9d4b-4e6a-8c7f-1b2d3e4f5a6b"
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+mutation CloseJob($id: UUID!) {
+  closeJob(id: $id) {
+    id
+    uid
+    title
+    status
+    publishToCareersPage
+    updatedAt
+  }
+}
+"""
+
+variables = {
+    "id": "3f8a2c1e-9d4b-4e6a-8c7f-1b2d3e4f5a6b"
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="closeJob" type="object">
+      <Expandable title="closeJob properties">
+        <ResponseField name="id" type="string">
+          Unique job identifier (UUID).
+        </ResponseField>
+
+        <ResponseField name="uid" type="string">
+          Friendly per-tenant job code (for example, JOB-79BB).
+        </ResponseField>
+
+        <ResponseField name="title" type="string">
+          Job title.
+        </ResponseField>
+
+        <ResponseField name="status" type="string">
+          Job lifecycle status. One of `DRAFT`, `PUBLISHED`, `CLOSED`. After this mutation it is `CLOSED`.
+        </ResponseField>
+
+        <ResponseField name="publishToCareersPage" type="boolean">
+          Whether the job was set to appear on the public careers page. Closed jobs are not listed regardless of this flag.
+        </ResponseField>
+
+        <ResponseField name="updatedAt" type="string">
+          ISO 8601 timestamp when the job was last updated.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "closeJob": {
+      "id": "3f8a2c1e-9d4b-4e6a-8c7f-1b2d3e4f5a6b",
+      "uid": "JOB-79BB",
+      "title": "Senior Backend Engineer",
+      "status": "CLOSED",
+      "publishToCareersPage": true,
+      "updatedAt": "2026-07-02T15:48:12.000Z"
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+| --- | --- |
+| UNAUTHENTICATED | Missing or invalid API key or bearer token. |
+| FORBIDDEN | The caller lacks the Recruiter or Admin role, or the `write` scope. |
+| BAD_USER_INPUT | `id` is missing or is not a valid UUID. |
+| NOT_FOUND | No job with the given `id` exists for the caller's tenant. |
+| INTERNAL_SERVER_ERROR | Unexpected server-side failure while closing the job. |

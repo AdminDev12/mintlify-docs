@@ -1,0 +1,208 @@
+---
+title: "Publish Job"
+api: "POST /graphql"
+description: "Set a job's status to PUBLISHED so it goes live"
+---
+
+## Overview
+
+Publish a job, setting its lifecycle status to `PUBLISHED`. Use this once a draft created with `createJob` (and enriched with `updateJob`) is ready to go live. Published jobs with `publishToCareersPage` set to true also become visible on the organization's public careers page via the unauthenticated `careersPublicJobs` query; to take a job back off the market later, use `closeJob`.
+
+<Note>
+This operation requires the `write` scope.
+</Note>
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Mutation
+
+```graphql
+mutation PublishJob($id: UUID!) {
+  publishJob(id: $id) {
+    id
+    uid
+    title
+    status
+    publishToCareersPage
+    questionsStatus
+    updatedAt
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="id" type="string" required>
+  UUID of the job to publish. The job must belong to the caller's tenant.
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "mutation PublishJob($id: UUID!) { publishJob(id: $id) { id uid title status publishToCareersPage questionsStatus updatedAt } }",
+    "variables": {
+      "id": "3f8a2c1e-9d4b-4e6a-8c7f-1b2d3e4f5a6b"
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  mutation PublishJob($id: UUID!) {
+    publishJob(id: $id) {
+      id
+      uid
+      title
+      status
+      publishToCareersPage
+      questionsStatus
+      updatedAt
+    }
+  }
+`;
+
+const variables = {
+  id: "3f8a2c1e-9d4b-4e6a-8c7f-1b2d3e4f5a6b"
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+mutation PublishJob($id: UUID!) {
+  publishJob(id: $id) {
+    id
+    uid
+    title
+    status
+    publishToCareersPage
+    questionsStatus
+    updatedAt
+  }
+}
+"""
+
+variables = {
+    "id": "3f8a2c1e-9d4b-4e6a-8c7f-1b2d3e4f5a6b"
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="publishJob" type="object">
+      <Expandable title="publishJob properties">
+        <ResponseField name="id" type="string">
+          Unique job identifier (UUID).
+        </ResponseField>
+
+        <ResponseField name="uid" type="string">
+          Friendly per-tenant job code (for example, JOB-79BB).
+        </ResponseField>
+
+        <ResponseField name="title" type="string">
+          Job title.
+        </ResponseField>
+
+        <ResponseField name="status" type="string">
+          Job lifecycle status. One of `DRAFT`, `PUBLISHED`, `CLOSED`. After this mutation it is `PUBLISHED`.
+        </ResponseField>
+
+        <ResponseField name="publishToCareersPage" type="boolean">
+          Whether the published job is listed on the organization's public careers page.
+        </ResponseField>
+
+        <ResponseField name="questionsStatus" type="string">
+          Status of the LLM-generated questionnaire for this job.
+        </ResponseField>
+
+        <ResponseField name="updatedAt" type="string">
+          ISO 8601 timestamp when the job was last updated.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "publishJob": {
+      "id": "3f8a2c1e-9d4b-4e6a-8c7f-1b2d3e4f5a6b",
+      "uid": "JOB-79BB",
+      "title": "Senior Backend Engineer",
+      "status": "PUBLISHED",
+      "publishToCareersPage": true,
+      "questionsStatus": "ready",
+      "updatedAt": "2026-07-02T11:05:37.000Z"
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+| --- | --- |
+| UNAUTHENTICATED | Missing or invalid API key or bearer token. |
+| FORBIDDEN | The caller lacks the Recruiter or Admin role, or the `write` scope. |
+| BAD_USER_INPUT | `id` is missing or is not a valid UUID. |
+| NOT_FOUND | No job with the given `id` exists for the caller's tenant. |
+| INTERNAL_SERVER_ERROR | Unexpected server-side failure while publishing the job. |

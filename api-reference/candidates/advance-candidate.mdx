@@ -1,0 +1,238 @@
+---
+title: "Advance Candidate"
+api: "POST /graphql"
+description: "Advance a candidate to the next pipeline stage"
+---
+
+## Overview
+
+Advance a candidate to the next stage of the hiring pipeline. The mutation sets `candidateStatus` to `ADVANCED`, records the target stage in `currentStageId`, and emits a `CANDIDATE_ADVANCED` audit event. It is idempotent on the (`candidateId`, `toStageId`) pair — re-running with the same stage is a no-op. Use `rejectCandidate` to move a candidate out of the pipeline instead.
+
+<Note>
+This operation requires the **write** scope.
+</Note>
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Mutation
+
+```graphql
+mutation advanceCandidate($input: AdvanceCandidateInput!) {
+  advanceCandidate(input: $input) {
+    id
+    name
+    email
+    jobId
+    organizationId
+    candidateStatus
+    currentStageId
+    updatedAt
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="candidateId" type="string" required>
+  UUID of the candidate to advance
+</ParamField>
+
+<ParamField body="toStageId" type="string" required>
+  Identifier of the pipeline stage the candidate is advanced to
+</ParamField>
+
+<ParamField body="reason" type="string">
+  Optional reason recorded alongside the audit event
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "mutation advanceCandidate($input: AdvanceCandidateInput!) { advanceCandidate(input: $input) { id name email jobId organizationId candidateStatus currentStageId updatedAt } }",
+    "variables": {
+      "input": {
+        "candidateId": "7d0f2a4e-9b1c-4e6d-8a3f-5c2b1e9d7f60",
+        "toStageId": "technical-interview",
+        "reason": "Strong resume score and screening call"
+      }
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  mutation advanceCandidate($input: AdvanceCandidateInput!) {
+    advanceCandidate(input: $input) {
+      id
+      name
+      email
+      jobId
+      organizationId
+      candidateStatus
+      currentStageId
+      updatedAt
+    }
+  }
+`;
+
+const variables = {
+  input: {
+    candidateId: "7d0f2a4e-9b1c-4e6d-8a3f-5c2b1e9d7f60",
+    toStageId: "technical-interview",
+    reason: "Strong resume score and screening call"
+  }
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+mutation advanceCandidate($input: AdvanceCandidateInput!) {
+  advanceCandidate(input: $input) {
+    id
+    name
+    email
+    jobId
+    organizationId
+    candidateStatus
+    currentStageId
+    updatedAt
+  }
+}
+"""
+
+variables = {
+    "input": {
+        "candidateId": "7d0f2a4e-9b1c-4e6d-8a3f-5c2b1e9d7f60",
+        "toStageId": "technical-interview",
+        "reason": "Strong resume score and screening call"
+    }
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="advanceCandidate" type="object">
+      The candidate after advancement
+
+      <Expandable title="advanceCandidate properties">
+        <ResponseField name="id" type="string">
+          UUID of the candidate
+        </ResponseField>
+
+        <ResponseField name="name" type="string">
+          Full name of the candidate
+        </ResponseField>
+
+        <ResponseField name="email" type="string">
+          Email address, if set
+        </ResponseField>
+
+        <ResponseField name="jobId" type="string">
+          Identifier of the job the candidate belongs to
+        </ResponseField>
+
+        <ResponseField name="organizationId" type="string">
+          Identifier of the owning organization
+        </ResponseField>
+
+        <ResponseField name="candidateStatus" type="string">
+          Lifecycle status; `ADVANCED` after this mutation. Allowed values: `APPLIED`, `IN_PROGRESS`, `ADVANCED`, `REJECTED`, `HIRED`, `WITHDRAWN`
+        </ResponseField>
+
+        <ResponseField name="currentStageId" type="string">
+          Identifier of the pipeline stage the candidate now sits in
+        </ResponseField>
+
+        <ResponseField name="updatedAt" type="string">
+          ISO 8601 last-update timestamp
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "advanceCandidate": {
+      "id": "7d0f2a4e-9b1c-4e6d-8a3f-5c2b1e9d7f60",
+      "name": "Priya Sharma",
+      "email": "priya.sharma@example.com",
+      "jobId": "b2e6d1c4-8f3a-4d97-9c5e-2a1f6b8e4d30",
+      "organizationId": "acme",
+      "candidateStatus": "ADVANCED",
+      "currentStageId": "technical-interview",
+      "updatedAt": "2026-07-02T11:26:07.000Z"
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+| --- | --- |
+| UNAUTHENTICATED | Missing or invalid API key or bearer token |
+| FORBIDDEN | The token does not include the write scope |
+| BAD_USER_INPUT | `candidateId` is not a valid UUID or `toStageId` is missing |
+| NOT_FOUND | The candidate does not exist in the caller's tenant |
+| INTERNAL_SERVER_ERROR | Unexpected server-side failure while advancing the candidate |

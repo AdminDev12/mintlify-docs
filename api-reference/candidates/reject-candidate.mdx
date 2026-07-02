@@ -1,0 +1,238 @@
+---
+title: "Reject Candidate"
+api: "POST /graphql"
+description: "Reject a candidate with a captured reason"
+---
+
+## Overview
+
+Reject a candidate from the hiring pipeline. The mutation sets `candidateStatus` to `REJECTED` with the captured reason and emits a `CANDIDATE_REJECTED` audit event. Rejection is terminal — re-rejecting an already-rejected candidate is a no-op. Use `advanceCandidate` to move a candidate forward instead, or `deleteCandidate` to soft-delete the row entirely.
+
+<Note>
+This operation requires the **write** scope.
+</Note>
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Mutation
+
+```graphql
+mutation rejectCandidate($input: RejectCandidateInput!) {
+  rejectCandidate(input: $input) {
+    id
+    name
+    email
+    jobId
+    organizationId
+    candidateStatus
+    currentStageId
+    updatedAt
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="candidateId" type="string" required>
+  UUID of the candidate to reject
+</ParamField>
+
+<ParamField body="reason" type="string" required>
+  Reason for the rejection, captured on the candidate and in the audit trail
+</ParamField>
+
+<ParamField body="atStageId" type="string">
+  Identifier of the pipeline stage at which the candidate was rejected
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "mutation rejectCandidate($input: RejectCandidateInput!) { rejectCandidate(input: $input) { id name email jobId organizationId candidateStatus currentStageId updatedAt } }",
+    "variables": {
+      "input": {
+        "candidateId": "7d0f2a4e-9b1c-4e6d-8a3f-5c2b1e9d7f60",
+        "reason": "Insufficient experience with distributed systems",
+        "atStageId": "technical-interview"
+      }
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  mutation rejectCandidate($input: RejectCandidateInput!) {
+    rejectCandidate(input: $input) {
+      id
+      name
+      email
+      jobId
+      organizationId
+      candidateStatus
+      currentStageId
+      updatedAt
+    }
+  }
+`;
+
+const variables = {
+  input: {
+    candidateId: "7d0f2a4e-9b1c-4e6d-8a3f-5c2b1e9d7f60",
+    reason: "Insufficient experience with distributed systems",
+    atStageId: "technical-interview"
+  }
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+mutation rejectCandidate($input: RejectCandidateInput!) {
+  rejectCandidate(input: $input) {
+    id
+    name
+    email
+    jobId
+    organizationId
+    candidateStatus
+    currentStageId
+    updatedAt
+  }
+}
+"""
+
+variables = {
+    "input": {
+        "candidateId": "7d0f2a4e-9b1c-4e6d-8a3f-5c2b1e9d7f60",
+        "reason": "Insufficient experience with distributed systems",
+        "atStageId": "technical-interview"
+    }
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="rejectCandidate" type="object">
+      The candidate after rejection
+
+      <Expandable title="rejectCandidate properties">
+        <ResponseField name="id" type="string">
+          UUID of the candidate
+        </ResponseField>
+
+        <ResponseField name="name" type="string">
+          Full name of the candidate
+        </ResponseField>
+
+        <ResponseField name="email" type="string">
+          Email address, if set
+        </ResponseField>
+
+        <ResponseField name="jobId" type="string">
+          Identifier of the job the candidate belongs to
+        </ResponseField>
+
+        <ResponseField name="organizationId" type="string">
+          Identifier of the owning organization
+        </ResponseField>
+
+        <ResponseField name="candidateStatus" type="string">
+          Lifecycle status; `REJECTED` after this mutation. Allowed values: `APPLIED`, `IN_PROGRESS`, `ADVANCED`, `REJECTED`, `HIRED`, `WITHDRAWN`
+        </ResponseField>
+
+        <ResponseField name="currentStageId" type="string">
+          Identifier of the pipeline stage the candidate was in
+        </ResponseField>
+
+        <ResponseField name="updatedAt" type="string">
+          ISO 8601 last-update timestamp
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "rejectCandidate": {
+      "id": "7d0f2a4e-9b1c-4e6d-8a3f-5c2b1e9d7f60",
+      "name": "Priya Sharma",
+      "email": "priya.sharma@example.com",
+      "jobId": "b2e6d1c4-8f3a-4d97-9c5e-2a1f6b8e4d30",
+      "organizationId": "acme",
+      "candidateStatus": "REJECTED",
+      "currentStageId": "technical-interview",
+      "updatedAt": "2026-07-02T14:41:52.000Z"
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+| --- | --- |
+| UNAUTHENTICATED | Missing or invalid API key or bearer token |
+| FORBIDDEN | The token does not include the write scope |
+| BAD_USER_INPUT | `candidateId` is not a valid UUID or `reason` is missing |
+| NOT_FOUND | The candidate does not exist in the caller's tenant |
+| INTERNAL_SERVER_ERROR | Unexpected server-side failure while rejecting the candidate |

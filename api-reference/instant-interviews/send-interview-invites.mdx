@@ -1,0 +1,211 @@
+---
+title: "Send AI Interview Invites"
+api: "POST /graphql"
+description: "Dispatch AI interview invitation emails to selected candidates for a job"
+---
+
+## Overview
+
+Dispatch AI-interview invite emails to a selected set of candidates for a specific job. Each invited candidate receives a link to complete an AI interview in the chosen mode before the deadline you specify. Use this recruiter-facing operation to kick off screening at scale; candidates then launch their sessions through `startAiInterview`, and results are collected per candidate.
+
+<Warning>
+  This operation requires the billing/comms-impacting scope because it sends real communications to candidates and incurs usage costs.
+</Warning>
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Mutation
+
+```graphql
+mutation sendAiInterviewInvites($input: SendAiInterviewInvitesInput!) {
+  sendAiInterviewInvites(input: $input) {
+    total
+    sent
+    failed
+    failedCandidateIds
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="jobId" type="string" required>
+  Identifier of the job the candidates are being interviewed for
+</ParamField>
+
+<ParamField body="candidateIds" type="array" required>
+  List of candidate identifiers to invite. Each candidate receives an individual invite email.
+</ParamField>
+
+<ParamField body="aiInterviewDeadline" type="string" required>
+  DateTime (ISO 8601) by which candidates must complete the AI interview. Invites for candidates who do not finish by this time expire.
+</ParamField>
+
+<ParamField body="interviewMode" type="InterviewMode" required>
+  Interview mode for the invited candidates. Allowed values: `AVATAR`, `VOICE`.
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "mutation sendAiInterviewInvites($input: SendAiInterviewInvitesInput!) { sendAiInterviewInvites(input: $input) { total sent failed failedCandidateIds } }",
+    "variables": {
+      "input": {
+        "jobId": "job_5f8a1b2c9d3e",
+        "candidateIds": ["cand_7d1f4a2b", "cand_9c3e6f8d", "cand_2b5a8e1c"],
+        "aiInterviewDeadline": "2026-07-15T23:59:59Z",
+        "interviewMode": "AVATAR"
+      }
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  mutation sendAiInterviewInvites($input: SendAiInterviewInvitesInput!) {
+    sendAiInterviewInvites(input: $input) {
+      total
+      sent
+      failed
+      failedCandidateIds
+    }
+  }
+`;
+
+const variables = {
+  input: {
+    jobId: "job_5f8a1b2c9d3e",
+    candidateIds: ["cand_7d1f4a2b", "cand_9c3e6f8d", "cand_2b5a8e1c"],
+    aiInterviewDeadline: "2026-07-15T23:59:59Z",
+    interviewMode: "AVATAR"
+  }
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+mutation sendAiInterviewInvites($input: SendAiInterviewInvitesInput!) {
+  sendAiInterviewInvites(input: $input) {
+    total
+    sent
+    failed
+    failedCandidateIds
+  }
+}
+"""
+
+variables = {
+    "input": {
+        "jobId": "job_5f8a1b2c9d3e",
+        "candidateIds": ["cand_7d1f4a2b", "cand_9c3e6f8d", "cand_2b5a8e1c"],
+        "aiInterviewDeadline": "2026-07-15T23:59:59Z",
+        "interviewMode": "AVATAR"
+    }
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="sendAiInterviewInvites" type="object">
+      <Expandable title="sendAiInterviewInvites properties">
+        <ResponseField name="total" type="integer">
+          Total number of candidates the operation attempted to invite
+        </ResponseField>
+
+        <ResponseField name="sent" type="integer">
+          Number of invite emails dispatched successfully
+        </ResponseField>
+
+        <ResponseField name="failed" type="integer">
+          Number of invites that could not be dispatched
+        </ResponseField>
+
+        <ResponseField name="failedCandidateIds" type="array">
+          Candidate identifiers whose invites failed to send. Retry these candidates in a follow-up call.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "sendAiInterviewInvites": {
+      "total": 3,
+      "sent": 2,
+      "failed": 1,
+      "failedCandidateIds": ["cand_2b5a8e1c"]
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+|------------|-------------|
+| UNAUTHENTICATED | Missing or invalid API key or bearer token |
+| FORBIDDEN | The authenticated principal lacks the Admin or Recruiter role, or the billing/comms-impacting scope |
+| BAD_USER_INPUT | Invalid input, such as an empty `candidateIds` list, a malformed `aiInterviewDeadline`, or an unknown `interviewMode` |
+| NOT_FOUND | The job or one of the referenced candidates does not exist |
+| INTERNAL_SERVER_ERROR | Unexpected server error while dispatching invites |

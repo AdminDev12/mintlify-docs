@@ -1,0 +1,316 @@
+---
+title: "Voice Interview Report"
+api: "POST /graphql"
+description: "Retrieve the post-interview report for a candidate's voice-mode AI interview"
+---
+
+## Overview
+
+`voiceInterviewReport` is a focused voice-mode read that mirrors `aiInterviewReport` but only matches interviews conducted in `VOICE` mode, so a recruiter interface built around voice screening never accidentally surfaces an avatar interview. It returns the same report shape — status, timing, transcript, and AI analysis — and clients select only the fields they need. Use `avatarInterviewReport` for the equivalent avatar-mode read. This operation is restricted to Admin and Recruiter roles.
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query VoiceInterviewReport($candidateId: String!) {
+  voiceInterviewReport(candidateId: $candidateId) {
+    id
+    candidateId
+    jobId
+    status
+    mode
+    startedAt
+    completedAt
+    recordingUrl
+    thumbnailUrl
+    transcript {
+      role
+      text
+      at
+    }
+    analysis {
+      status
+      fitScore
+      candidateFitCategory
+      criticalConcerns
+      feedback
+      strength
+      weakness
+    }
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="candidateId" type="string" required>
+  Identifier of the candidate whose voice interview report is being retrieved.
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query VoiceInterviewReport($candidateId: String!) { voiceInterviewReport(candidateId: $candidateId) { id candidateId jobId status mode startedAt completedAt recordingUrl thumbnailUrl transcript { role text at } analysis { status fitScore candidateFitCategory criticalConcerns feedback strength weakness } } }",
+    "variables": {
+      "candidateId": "68a5b11168f3d6ccd1a4e2f3"
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query VoiceInterviewReport($candidateId: String!) {
+    voiceInterviewReport(candidateId: $candidateId) {
+      id
+      candidateId
+      jobId
+      status
+      mode
+      startedAt
+      completedAt
+      recordingUrl
+      thumbnailUrl
+      transcript {
+        role
+        text
+        at
+      }
+      analysis {
+        status
+        fitScore
+        candidateFitCategory
+        criticalConcerns
+        feedback
+        strength
+        weakness
+      }
+    }
+  }
+`;
+
+const variables = {
+  candidateId: "68a5b11168f3d6ccd1a4e2f3"
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query VoiceInterviewReport($candidateId: String!) {
+  voiceInterviewReport(candidateId: $candidateId) {
+    id
+    candidateId
+    jobId
+    status
+    mode
+    startedAt
+    completedAt
+    recordingUrl
+    thumbnailUrl
+    transcript {
+      role
+      text
+      at
+    }
+    analysis {
+      status
+      fitScore
+      candidateFitCategory
+      criticalConcerns
+      feedback
+      strength
+      weakness
+    }
+  }
+}
+"""
+
+variables = {
+    "candidateId": "68a5b11168f3d6ccd1a4e2f3"
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="voiceInterviewReport" type="object">
+      Null when the candidate has no voice-mode interview report.
+      <Expandable title="voiceInterviewReport properties">
+        <ResponseField name="id" type="string" required>
+          Unique identifier (UUID) of the interview record.
+        </ResponseField>
+        <ResponseField name="candidateId" type="string" required>
+          Identifier of the candidate the report belongs to.
+        </ResponseField>
+        <ResponseField name="jobId" type="string" required>
+          Identifier of the job the interview was conducted for.
+        </ResponseField>
+        <ResponseField name="status" type="string" required>
+          Interview status. One of `SCHEDULED`, `STARTED`, `COMPLETED`, `EXPIRED`.
+        </ResponseField>
+        <ResponseField name="mode" type="string" required>
+          Interview mode. One of `AVATAR`, `VOICE`. Always `VOICE` for this operation.
+        </ResponseField>
+        <ResponseField name="startedAt" type="string">
+          Timestamp when the interview started, in ISO 8601 format.
+        </ResponseField>
+        <ResponseField name="completedAt" type="string">
+          Timestamp when the interview completed, in ISO 8601 format.
+        </ResponseField>
+        <ResponseField name="recordingUrl" type="string">
+          URL of the interview recording, when available.
+        </ResponseField>
+        <ResponseField name="thumbnailUrl" type="string">
+          URL of the recording thumbnail image, when available.
+        </ResponseField>
+        <ResponseField name="transcript" type="array" required>
+          Chronological transcript lines from the interview.
+          <Expandable title="Transcript line">
+            <ResponseField name="role" type="string" required>
+              Speaker of the line. One of `USER`, `ASSISTANT`.
+            </ResponseField>
+            <ResponseField name="text" type="string" required>
+              Text content of the transcript line.
+            </ResponseField>
+            <ResponseField name="at" type="string" required>
+              Timestamp of the line, in ISO 8601 format.
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        <ResponseField name="analysis" type="object" required>
+          AI-generated analysis of the interview.
+          <Expandable title="analysis properties">
+            <ResponseField name="status" type="string" required>
+              Processing status of the analysis.
+            </ResponseField>
+            <ResponseField name="fitScore" type="integer">
+              Overall candidate fit score.
+            </ResponseField>
+            <ResponseField name="candidateFitCategory" type="string">
+              Categorical fit assessment for the candidate.
+            </ResponseField>
+            <ResponseField name="criticalConcerns" type="array">
+              List of critical concerns flagged by the analysis.
+            </ResponseField>
+            <ResponseField name="feedback" type="string">
+              Narrative feedback on the candidate's performance.
+            </ResponseField>
+            <ResponseField name="strength" type="string">
+              Summary of the candidate's strengths.
+            </ResponseField>
+            <ResponseField name="weakness" type="string">
+              Summary of the candidate's weaknesses.
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "voiceInterviewReport": {
+      "id": "9b2d47e1-5a6f-4d38-b0c4-2e8f91a3d576",
+      "candidateId": "68a5b11168f3d6ccd1a4e2f3",
+      "jobId": "68c42431b9f38f8c24fbc91f",
+      "status": "COMPLETED",
+      "mode": "VOICE",
+      "startedAt": "2026-06-29T09:10:00.000Z",
+      "completedAt": "2026-06-29T09:34:47.000Z",
+      "recordingUrl": null,
+      "thumbnailUrl": null,
+      "transcript": [
+        {
+          "role": "ASSISTANT",
+          "text": "Thanks for joining this screening for the Senior Backend Engineer role at Acme. To start, how have you used message queues in production?",
+          "at": "2026-06-29T09:10:15.000Z"
+        },
+        {
+          "role": "USER",
+          "text": "We used RabbitMQ to decouple order processing from notification delivery, which cut peak latency significantly.",
+          "at": "2026-06-29T09:10:52.000Z"
+        }
+      ],
+      "analysis": {
+        "status": "COMPLETED",
+        "fitScore": 76,
+        "candidateFitCategory": "Good Fit",
+        "criticalConcerns": [],
+        "feedback": "The candidate gave structured answers and demonstrated solid production experience.",
+        "strength": "Practical experience with asynchronous messaging and system reliability.",
+        "weakness": "Answers on database optimization lacked depth."
+      }
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+|------------|-------------|
+| UNAUTHENTICATED | The request is missing valid authentication credentials. |
+| FORBIDDEN | The authenticated principal lacks the Admin or Recruiter role. |
+| BAD_USER_INPUT | The `candidateId` argument is missing or malformed. |
+| NOT_FOUND | No candidate exists with the supplied `candidateId`. |
+| INTERNAL_SERVER_ERROR | An unexpected error occurred while resolving the report. |

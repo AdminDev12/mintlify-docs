@@ -1,0 +1,309 @@
+---
+title: "Get Scoring Config"
+api: "POST /graphql"
+description: "Read the organization's saved scoring weights configuration"
+---
+
+## Overview
+
+Read the organization's saved Scoring configuration: stage weights, resume rubric weights, competency mix, HR-specific competency overrides, plus the preset labels and AI-recommended flags edited on the recruiter Settings Scoring tab. There is one record per organization, and the operation returns `null` when the config has never been saved, in which case clients should fall back to their defaults. Use `saveScoringConfig` to write the config; reading is available to Admin and Recruiter roles.
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query GetScoringConfig {
+  scoringConfig {
+    tenantId
+    stageWeights {
+      id
+      label
+      percent
+      iconKey
+    }
+    resumeRubricWeights {
+      id
+      label
+      percent
+      iconKey
+    }
+    competencyWeights {
+      id
+      label
+      percent
+      iconKey
+    }
+    hrCompetencyOverrides {
+      id
+      label
+      percent
+      iconKey
+    }
+    stagePresetLabel
+    stageSectionAiRecommended
+    competencyDescription
+    competencyPresetLabel
+    competencyIsAiRecommended
+    createdAt
+    updatedAt
+    updatedBy
+  }
+}
+```
+
+## Request Parameters
+
+This operation takes no arguments. The configuration is resolved from the authenticated caller's organization.
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query GetScoringConfig { scoringConfig { tenantId stageWeights { id label percent iconKey } resumeRubricWeights { id label percent iconKey } competencyWeights { id label percent iconKey } hrCompetencyOverrides { id label percent iconKey } stagePresetLabel stageSectionAiRecommended competencyDescription competencyPresetLabel competencyIsAiRecommended createdAt updatedAt updatedBy } }"
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query GetScoringConfig {
+    scoringConfig {
+      tenantId
+      stageWeights {
+        id
+        label
+        percent
+        iconKey
+      }
+      resumeRubricWeights {
+        id
+        label
+        percent
+        iconKey
+      }
+      competencyWeights {
+        id
+        label
+        percent
+        iconKey
+      }
+      hrCompetencyOverrides {
+        id
+        label
+        percent
+        iconKey
+      }
+      stagePresetLabel
+      stageSectionAiRecommended
+      competencyDescription
+      competencyPresetLabel
+      competencyIsAiRecommended
+      createdAt
+      updatedAt
+      updatedBy
+    }
+  }
+`;
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query GetScoringConfig {
+  scoringConfig {
+    tenantId
+    stageWeights {
+      id
+      label
+      percent
+      iconKey
+    }
+    resumeRubricWeights {
+      id
+      label
+      percent
+      iconKey
+    }
+    competencyWeights {
+      id
+      label
+      percent
+      iconKey
+    }
+    hrCompetencyOverrides {
+      id
+      label
+      percent
+      iconKey
+    }
+    stagePresetLabel
+    stageSectionAiRecommended
+    competencyDescription
+    competencyPresetLabel
+    competencyIsAiRecommended
+    createdAt
+    updatedAt
+    updatedBy
+  }
+}
+"""
+
+response = requests.post(url, headers=headers, json={"query": query})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="scoringConfig" type="object">
+      The org's saved scoring config. Null when the config has never been saved
+
+      <Expandable title="scoringConfig properties">
+        <ResponseField name="tenantId" type="string">
+          UUID of the organization the config belongs to
+        </ResponseField>
+
+        <ResponseField name="stageWeights" type="array">
+          Weight rows for the pipeline stages. Each row has `id` (string), `label` (string), `percent` (number, 0-100; each section is expected to total 100), and `iconKey` (string, nullable icon hint for stage rows: `file`, `phone`, `video`, `users`, or `user`)
+        </ResponseField>
+
+        <ResponseField name="resumeRubricWeights" type="array">
+          Weight rows for the resume scoring rubric, with the same row shape as `stageWeights`
+        </ResponseField>
+
+        <ResponseField name="competencyWeights" type="array">
+          Weight rows for the competency mix, with the same row shape as `stageWeights`
+        </ResponseField>
+
+        <ResponseField name="hrCompetencyOverrides" type="array">
+          Sparse HR-specific competency-weight modifier. Each entry overrides the bot-bundled weight for a matching competency on HR-round reports; an empty list means the bot's bundled weights are used as-is
+        </ResponseField>
+
+        <ResponseField name="stagePresetLabel" type="string">
+          Label of the preset selected for the stage weights section
+        </ResponseField>
+
+        <ResponseField name="stageSectionAiRecommended" type="boolean">
+          Whether the stage weights section is flagged as AI-recommended
+        </ResponseField>
+
+        <ResponseField name="competencyDescription" type="string">
+          Free-text description of the competency mix
+        </ResponseField>
+
+        <ResponseField name="competencyPresetLabel" type="string">
+          Label of the preset selected for the competency section
+        </ResponseField>
+
+        <ResponseField name="competencyIsAiRecommended" type="boolean">
+          Whether the competency mix is flagged as AI-recommended
+        </ResponseField>
+
+        <ResponseField name="createdAt" type="string">
+          ISO 8601 timestamp of when the config was first saved
+        </ResponseField>
+
+        <ResponseField name="updatedAt" type="string">
+          ISO 8601 timestamp of the most recent save
+        </ResponseField>
+
+        <ResponseField name="updatedBy" type="string">
+          Identifier of the user who last saved the config. Null when unknown
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "scoringConfig": {
+      "tenantId": "4f8b2d61-9c3e-4a7f-b5d2-8e1a6c4f9b70",
+      "stageWeights": [
+        { "id": "resume", "label": "Resume Screening", "percent": 30, "iconKey": "file" },
+        { "id": "phone", "label": "Phone Screen", "percent": 30, "iconKey": "phone" },
+        { "id": "avatar", "label": "Avatar Interview", "percent": 40, "iconKey": "video" }
+      ],
+      "resumeRubricWeights": [
+        { "id": "skills", "label": "Skills Match", "percent": 50, "iconKey": null },
+        { "id": "experience", "label": "Experience", "percent": 50, "iconKey": null }
+      ],
+      "competencyWeights": [
+        { "id": "technical", "label": "Technical Depth", "percent": 60, "iconKey": null },
+        { "id": "communication", "label": "Communication", "percent": 40, "iconKey": null }
+      ],
+      "hrCompetencyOverrides": [],
+      "stagePresetLabel": "Balanced",
+      "stageSectionAiRecommended": true,
+      "competencyDescription": "Weighted toward technical depth for engineering roles at acme.",
+      "competencyPresetLabel": "Engineering Default",
+      "competencyIsAiRecommended": false,
+      "createdAt": "2026-05-12T09:15:30.000Z",
+      "updatedAt": "2026-06-25T11:48:02.000Z",
+      "updatedBy": "usr_admin_maria_chen"
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+|------------|-------------|
+| UNAUTHENTICATED | Missing or invalid API key or bearer token |
+| FORBIDDEN | Caller's role is not Admin or Recruiter |
+| INTERNAL_SERVER_ERROR | Unexpected server-side failure while reading the config |

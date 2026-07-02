@@ -1,0 +1,287 @@
+---
+title: "Get Job Stack Rank"
+api: "POST /graphql"
+description: "Retrieve the paginated, resume-score-ranked candidate list for a job"
+---
+
+## Overview
+
+`jobStackRank` is the canonical stack-rank read for a single job. It returns the same data as `candidatesByJob` with `sortBy: RESUME_SCORE` and `sortDir: DESC`, exposed as a named query so the recruiter UI and the leaderboard feature can share one resolver and one cache key. The result is paged because at scale a single job can hold thousands of candidates; candidates without a `resumeScore` sort after scored ones, so partially scored pools surface scored rows first.
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query JobStackRank($jobId: UUID!, $perPage: Int, $pageNumber: Int) {
+  jobStackRank(jobId: $jobId, perPage: $perPage, pageNumber: $pageNumber) {
+    items {
+      id
+      name
+      email
+      role
+      resumeScore
+      aiInterviewStatus
+      candidateStatus
+      eligibility
+      source
+      isStarred
+      organizationId
+      createdAt
+    }
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="jobId" type="string" required>
+  UUID of the job whose candidates should be stack-ranked
+</ParamField>
+
+<ParamField body="perPage" type="integer">
+  Number of candidates to return per page
+</ParamField>
+
+<ParamField body="pageNumber" type="integer">
+  Page of results to fetch
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query JobStackRank($jobId: UUID!, $perPage: Int, $pageNumber: Int) { jobStackRank(jobId: $jobId, perPage: $perPage, pageNumber: $pageNumber) { items { id name email role resumeScore aiInterviewStatus candidateStatus eligibility source isStarred organizationId createdAt } } }",
+    "variables": {
+      "jobId": "3f8b2c1e-9d4a-4f6b-8a2e-1c5d7e9f0a3b",
+      "perPage": 25,
+      "pageNumber": 1
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query JobStackRank($jobId: UUID!, $perPage: Int, $pageNumber: Int) {
+    jobStackRank(jobId: $jobId, perPage: $perPage, pageNumber: $pageNumber) {
+      items {
+        id
+        name
+        email
+        role
+        resumeScore
+        aiInterviewStatus
+        candidateStatus
+        eligibility
+        source
+        isStarred
+        organizationId
+        createdAt
+      }
+    }
+  }
+`;
+
+const variables = {
+  jobId: "3f8b2c1e-9d4a-4f6b-8a2e-1c5d7e9f0a3b",
+  perPage: 25,
+  pageNumber: 1
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query JobStackRank($jobId: UUID!, $perPage: Int, $pageNumber: Int) {
+  jobStackRank(jobId: $jobId, perPage: $perPage, pageNumber: $pageNumber) {
+    items {
+      id
+      name
+      email
+      role
+      resumeScore
+      aiInterviewStatus
+      candidateStatus
+      eligibility
+      source
+      isStarred
+      organizationId
+      createdAt
+    }
+  }
+}
+"""
+
+variables = {
+    "jobId": "3f8b2c1e-9d4a-4f6b-8a2e-1c5d7e9f0a3b",
+    "perPage": 25,
+    "pageNumber": 1
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="jobStackRank" type="object">
+      <Expandable title="jobStackRank properties">
+        <ResponseField name="items" type="array">
+          Candidates for the page, ranked by resume score descending
+
+          <Expandable title="Candidate Object">
+            <ResponseField name="id" type="string">
+              UUID of the candidate
+            </ResponseField>
+
+            <ResponseField name="name" type="string">
+              Candidate's full name
+            </ResponseField>
+
+            <ResponseField name="email" type="string">
+              Candidate's email address, when available
+            </ResponseField>
+
+            <ResponseField name="role" type="string">
+              Candidate's current or target role, from resume extraction
+            </ResponseField>
+
+            <ResponseField name="resumeScore" type="number">
+              Aggregate AI resume score used for ranking; null for unscored candidates, which sort last
+            </ResponseField>
+
+            <ResponseField name="aiInterviewStatus" type="string">
+              Status of the candidate's AI interview, when one exists
+            </ResponseField>
+
+            <ResponseField name="candidateStatus" type="string">
+              Lifecycle status in the hiring pipeline. One of `APPLIED`, `IN_PROGRESS`, `ADVANCED`, `REJECTED`, `HIRED`, `WITHDRAWN`
+            </ResponseField>
+
+            <ResponseField name="eligibility" type="string">
+              Recruiter's eligibility decision. One of `ELIGIBLE`, `INELIGIBLE`, `UNSET`; legacy rows without a stored value surface as `UNSET`
+            </ResponseField>
+
+            <ResponseField name="source" type="string">
+              Provenance of the candidate row. One of `MANUAL`, `BULK_UPLOAD`, `INTERNAL_POOL`, `CAREERS_PAGE`
+            </ResponseField>
+
+            <ResponseField name="isStarred" type="boolean">
+              Recruiter-marked standout candidate; legacy rows without the field surface as `false`
+            </ResponseField>
+
+            <ResponseField name="organizationId" type="string">
+              Identifier of the owning organization
+            </ResponseField>
+
+            <ResponseField name="createdAt" type="string">
+              ISO 8601 timestamp when the candidate row was created
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "jobStackRank": {
+      "items": [
+        {
+          "id": "b7e6c3d2-4f1a-4c8e-9b2d-6a5e8f0c1d24",
+          "name": "Priya Raman",
+          "email": "priya.raman@example.com",
+          "role": "Senior Backend Engineer",
+          "resumeScore": 91.5,
+          "aiInterviewStatus": "Completed",
+          "candidateStatus": "IN_PROGRESS",
+          "eligibility": "ELIGIBLE",
+          "source": "BULK_UPLOAD",
+          "isStarred": true,
+          "organizationId": "acme",
+          "createdAt": "2026-06-12T09:41:27Z"
+        },
+        {
+          "id": "8c1d5f7a-2b3e-4a9c-b6d8-0e4f2a7c9b15",
+          "name": "Daniel Okafor",
+          "email": "daniel.okafor@example.com",
+          "role": "Backend Engineer",
+          "resumeScore": 84.0,
+          "aiInterviewStatus": "Scheduled",
+          "candidateStatus": "APPLIED",
+          "eligibility": "UNSET",
+          "source": "MANUAL",
+          "isStarred": false,
+          "organizationId": "acme",
+          "createdAt": "2026-06-14T16:05:52Z"
+        }
+      ]
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+|------------|-------------|
+| `UNAUTHENTICATED` | Missing or invalid API key or bearer token |
+| `FORBIDDEN` | The caller is not permitted to read candidates for this tenant |
+| `BAD_USER_INPUT` | `jobId` is not a valid UUID or pagination arguments are malformed |
+| `INTERNAL_SERVER_ERROR` | Unexpected server-side failure while ranking candidates |

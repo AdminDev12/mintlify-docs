@@ -1,0 +1,308 @@
+---
+title: "Get Bulk Upload Job"
+api: "POST /graphql"
+description: "Poll the status and per-file results of an asynchronous bulk resume upload"
+---
+
+## Overview
+
+Poll the status of an asynchronous bulk resume-upload job. The `POST /candidates/bulk-upload-resumes` HTTP endpoint returns `{ jobId }` immediately; call this query with that ID until `status` reaches `COMPLETED` or `FAILED`, then refetch the job's candidates (for example with `candidatesByJob`). The query returns `null` if the job does not exist for your tenant.
+
+<Info>
+  Exterview has no customer-facing outbound webhooks. Integrators poll this operation until the result is available.
+</Info>
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query GetBulkUploadJob($id: UUID!) {
+  getBulkUploadJob(id: $id) {
+    id
+    targetJobId
+    status
+    total
+    processed
+    succeeded
+    failed
+    duplicates
+    createdCandidateIds
+    failures {
+      fileName
+      stage
+      reason
+    }
+    startedAt
+    completedAt
+    error
+    createdAt
+    updatedAt
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="id" type="string" required>
+  Unique identifier (UUID) of the bulk upload job, as returned by `POST /candidates/bulk-upload-resumes`. Returns `null` if no job with this ID exists in your tenant.
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query GetBulkUploadJob($id: UUID!) { getBulkUploadJob(id: $id) { id targetJobId status total processed succeeded failed duplicates createdCandidateIds failures { fileName stage reason } startedAt completedAt error createdAt updatedAt } }",
+    "variables": {
+      "id": "5b8d1f3a-2c4e-4b7a-9d6f-0e3a8c5b2d71"
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query GetBulkUploadJob($id: UUID!) {
+    getBulkUploadJob(id: $id) {
+      id
+      targetJobId
+      status
+      total
+      processed
+      succeeded
+      failed
+      duplicates
+      createdCandidateIds
+      failures {
+        fileName
+        stage
+        reason
+      }
+      startedAt
+      completedAt
+      error
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+const variables = {
+  id: "5b8d1f3a-2c4e-4b7a-9d6f-0e3a8c5b2d71"
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query GetBulkUploadJob($id: UUID!) {
+  getBulkUploadJob(id: $id) {
+    id
+    targetJobId
+    status
+    total
+    processed
+    succeeded
+    failed
+    duplicates
+    createdCandidateIds
+    failures {
+      fileName
+      stage
+      reason
+    }
+    startedAt
+    completedAt
+    error
+    createdAt
+    updatedAt
+  }
+}
+"""
+
+variables = {
+    "id": "5b8d1f3a-2c4e-4b7a-9d6f-0e3a8c5b2d71"
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="getBulkUploadJob" type="object">
+      The bulk upload job record, or `null` if not found in your tenant.
+
+      <Expandable title="getBulkUploadJob properties">
+        <ResponseField name="id" type="string">
+          Unique identifier (UUID) of the bulk upload job.
+        </ResponseField>
+
+        <ResponseField name="targetJobId" type="string">
+          Identifier of the job the resumes are being uploaded to.
+        </ResponseField>
+
+        <ResponseField name="status" type="string">
+          Lifecycle status of the upload. One of `PENDING`, `PROCESSING`, `COMPLETED`, `FAILED`. Poll until `COMPLETED` or `FAILED`.
+        </ResponseField>
+
+        <ResponseField name="total" type="integer">
+          Total number of files in the upload.
+        </ResponseField>
+
+        <ResponseField name="processed" type="integer">
+          Number of files processed so far.
+        </ResponseField>
+
+        <ResponseField name="succeeded" type="integer">
+          Number of files that produced a candidate.
+        </ResponseField>
+
+        <ResponseField name="failed" type="integer">
+          Number of files that failed processing.
+        </ResponseField>
+
+        <ResponseField name="duplicates" type="integer">
+          Number of files skipped as duplicates.
+        </ResponseField>
+
+        <ResponseField name="createdCandidateIds" type="array">
+          Identifiers of the candidate rows created by this upload.
+        </ResponseField>
+
+        <ResponseField name="failures" type="array">
+          Per-file failures surfaced back to the recruiter.
+
+          <Expandable title="BulkUploadJobFailure">
+            <ResponseField name="fileName" type="string">
+              Name of the file that failed.
+            </ResponseField>
+
+            <ResponseField name="stage" type="string">
+              Pipeline stage where the failure occurred: `upload`, `extract`, `classify`, `score`, or `write`.
+            </ResponseField>
+
+            <ResponseField name="reason" type="string">
+              Human-readable failure reason.
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+
+        <ResponseField name="startedAt" type="string">
+          Timestamp when processing started, if it has started.
+        </ResponseField>
+
+        <ResponseField name="completedAt" type="string">
+          Timestamp when processing finished, if it has finished.
+        </ResponseField>
+
+        <ResponseField name="error" type="string">
+          Job-level error message when `status` is `FAILED`.
+        </ResponseField>
+
+        <ResponseField name="createdAt" type="string">
+          ISO 8601 timestamp of job creation.
+        </ResponseField>
+
+        <ResponseField name="updatedAt" type="string">
+          ISO 8601 timestamp of the last update.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "getBulkUploadJob": {
+      "id": "5b8d1f3a-2c4e-4b7a-9d6f-0e3a8c5b2d71",
+      "targetJobId": "9c2e4f8a-6b1d-4a3e-8f7c-5d0b2a9e1c46",
+      "status": "COMPLETED",
+      "total": 25,
+      "processed": 25,
+      "succeeded": 23,
+      "failed": 1,
+      "duplicates": 1,
+      "createdCandidateIds": [
+        "3f7b8a2c-9d41-4e6a-b5c2-8e1f0d9a7c34",
+        "b4e6c1d8-73f2-4a9b-8c5e-1f0a2d7b9e63"
+      ],
+      "failures": [
+        {
+          "fileName": "resume_batch_07.pdf",
+          "stage": "extract",
+          "reason": "Unable to extract text from a scanned image PDF"
+        }
+      ],
+      "startedAt": "2026-07-01T10:15:02.114Z",
+      "completedAt": "2026-07-01T10:17:48.902Z",
+      "error": null,
+      "createdAt": "2026-07-01T10:14:59.870Z",
+      "updatedAt": "2026-07-01T10:17:48.902Z"
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+| --- | --- |
+| UNAUTHENTICATED | Missing or invalid API key or bearer token. |
+| FORBIDDEN | The credentials are valid but lack access to this operation. |
+| BAD_USER_INPUT | `id` is not a valid UUID. |
+| INTERNAL_SERVER_ERROR | Unexpected server-side failure. |

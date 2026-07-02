@@ -1,0 +1,290 @@
+---
+title: "Get Candidate Analysis"
+api: "POST /graphql"
+description: "Retrieve the per-dimension resume analysis breakdown for a single candidate"
+---
+
+## Overview
+
+Returns the structured Candidate Analysis payload for one candidate: six scoring dimensions with raw and weighted-contribution numbers pre-computed, the LLM justification for each dimension, and resume metadata. It backs the analysis drawer in the recruiter UI and is kept separate from list queries so the heavier justification payload stays off the hot path. The query returns `null` when the candidate does not exist for the caller's tenant or has no score breakdown yet (analysis pending); to produce or refresh the breakdown, run `analyzeResume`.
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query candidateAnalysis($id: UUID!) {
+  candidateAnalysis(id: $id) {
+    candidateId
+    jobId
+    candidateName
+    overallScore
+    isAgentMatch
+    benchmarkScore
+    dimensions {
+      key
+      label
+      rawScore
+      weight
+      score
+      maxScore
+      justification
+    }
+    resumeUrl
+    resumeName
+    analysedAt
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="id" type="string" required>
+  UUID of the candidate to fetch the analysis for. Returns `null` if the candidate does not exist in the caller's tenant or has no analysis breakdown yet.
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query candidateAnalysis($id: UUID!) { candidateAnalysis(id: $id) { candidateId jobId candidateName overallScore isAgentMatch benchmarkScore dimensions { key label rawScore weight score maxScore justification } resumeUrl resumeName analysedAt } }",
+    "variables": {
+      "id": "7f8b0c4e-2a51-4a7e-9d3b-6c1f2e8a9b01"
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query candidateAnalysis($id: UUID!) {
+    candidateAnalysis(id: $id) {
+      candidateId
+      jobId
+      candidateName
+      overallScore
+      isAgentMatch
+      benchmarkScore
+      dimensions {
+        key
+        label
+        rawScore
+        weight
+        score
+        maxScore
+        justification
+      }
+      resumeUrl
+      resumeName
+      analysedAt
+    }
+  }
+`;
+
+const variables = {
+  id: "7f8b0c4e-2a51-4a7e-9d3b-6c1f2e8a9b01"
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query candidateAnalysis($id: UUID!) {
+  candidateAnalysis(id: $id) {
+    candidateId
+    jobId
+    candidateName
+    overallScore
+    isAgentMatch
+    benchmarkScore
+    dimensions {
+      key
+      label
+      rawScore
+      weight
+      score
+      maxScore
+      justification
+    }
+    resumeUrl
+    resumeName
+    analysedAt
+  }
+}
+"""
+
+variables = {
+    "id": "7f8b0c4e-2a51-4a7e-9d3b-6c1f2e8a9b01"
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="candidateAnalysis" type="object">
+      Full analysis payload. `null` when the candidate does not exist for the caller's tenant or has no score breakdown yet.
+
+      <Expandable title="candidateAnalysis properties">
+        <ResponseField name="candidateId" type="string">
+          Candidate identifier (UUID)
+        </ResponseField>
+
+        <ResponseField name="jobId" type="string">
+          Identifier of the job the candidate belongs to
+        </ResponseField>
+
+        <ResponseField name="candidateName" type="string">
+          Candidate's full name
+        </ResponseField>
+
+        <ResponseField name="overallScore" type="integer">
+          0 to 100 weighted overall score, equal to the sum of `dimensions[].score`
+        </ResponseField>
+
+        <ResponseField name="isAgentMatch" type="boolean">
+          True if `overallScore` is at or above the job's benchmark score
+        </ResponseField>
+
+        <ResponseField name="benchmarkScore" type="integer">
+          The job's configured benchmark score (defaults to 70 when the job has not set one)
+        </ResponseField>
+
+        <ResponseField name="dimensions" type="array">
+          Six rows in canonical order: Skill Match, Experience Relevance, Education Match, Work History, Certifications, Resume Quality
+
+          <Expandable title="Dimension Object">
+            <ResponseField name="key" type="string">
+              Stable identifier matching the field on `resumeScoreDetailBreakdown`
+            </ResponseField>
+
+            <ResponseField name="label" type="string">
+              Display label, for example "Skill Match"
+            </ResponseField>
+
+            <ResponseField name="rawScore" type="integer">
+              Raw LLM score on the 0 to 100 scale
+            </ResponseField>
+
+            <ResponseField name="weight" type="integer">
+              Dimension weight as a percentage (0 to 100); weights across the six dimensions sum to 100
+            </ResponseField>
+
+            <ResponseField name="score" type="integer">
+              Weighted contribution to the overall, computed as round(rawScore x weight / 100)
+            </ResponseField>
+
+            <ResponseField name="maxScore" type="integer">
+              Maximum possible weighted contribution, equal to `weight`
+            </ResponseField>
+
+            <ResponseField name="justification" type="string">
+              LLM-authored explanation for the dimension. `null` on legacy rows where only the score was persisted
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+
+        <ResponseField name="resumeUrl" type="string">
+          Short-lived (1-hour) SAS-signed URL for the resume blob, safe to render in a browser. `null` when no resume is on file, storage is not configured, or signing failed
+        </ResponseField>
+
+        <ResponseField name="resumeName" type="string">
+          Original uploaded filename; clients switch viewer on the extension (`.pdf` / `.docx`). `null` when no resume is on file
+        </ResponseField>
+
+        <ResponseField name="analysedAt" type="string">
+          ISO 8601 timestamp of when the breakdown was last computed. `null` on legacy rows
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "candidateAnalysis": {
+      "candidateId": "7f8b0c4e-2a51-4a7e-9d3b-6c1f2e8a9b01",
+      "jobId": "3d2f1a9c-8e4b-42d0-b7a5-1c9e0f6d2a34",
+      "candidateName": "Priya Raman",
+      "overallScore": 83,
+      "isAgentMatch": true,
+      "benchmarkScore": 70,
+      "dimensions": [
+        { "key": "skillMatch", "label": "Skill Match", "rawScore": 85, "weight": 40, "score": 34, "maxScore": 40, "justification": "Covers Go, Kubernetes, and PostgreSQL from the job description." },
+        { "key": "experienceRelevance", "label": "Experience Relevance", "rawScore": 78, "weight": 20, "score": 16, "maxScore": 20, "justification": "Six years in backend roles closely matching the position." },
+        { "key": "educationMatch", "label": "Education Match", "rawScore": 90, "weight": 10, "score": 9, "maxScore": 10, "justification": "B.S. in Computer Science meets the stated requirement." },
+        { "key": "workHistory", "label": "Work History", "rawScore": 80, "weight": 15, "score": 12, "maxScore": 15, "justification": "Steady tenure with clear progression across two companies." },
+        { "key": "certifications", "label": "Certifications", "rawScore": 60, "weight": 5, "score": 3, "maxScore": 5, "justification": "Holds CKA; no cloud provider certification listed." },
+        { "key": "resumeQuality", "label": "Resume Quality", "rawScore": 88, "weight": 10, "score": 9, "maxScore": 10, "justification": "Well-structured resume with quantified accomplishments." }
+      ],
+      "resumeUrl": "https://storage.exterview.ai/acme/Resumes/9b2c7d1e-5f60-4a3b-8c2d-0e1f2a3b4c5d.pdf?sv=2024-11-04&se=2026-07-02T10%3A41%3A27Z&sig=EXAMPLE",
+      "resumeName": "priya-raman-resume.pdf",
+      "analysedAt": "2026-07-01T18:22:05.000Z"
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+| --- | --- |
+| UNAUTHENTICATED | Missing or invalid API key or bearer token |
+| FORBIDDEN | The caller lacks access to this tenant's candidate data |
+| BAD_USER_INPUT | `id` is not a valid UUID |
+| INTERNAL_SERVER_ERROR | Unexpected server error while assembling the analysis |

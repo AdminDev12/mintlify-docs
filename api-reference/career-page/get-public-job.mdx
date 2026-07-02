@@ -1,0 +1,293 @@
+---
+title: "Get Public Job"
+api: "POST /graphql"
+description: "Retrieve the full public detail of a single published job by ID"
+---
+
+## Overview
+
+Retrieve the detail projection of a single published job for rendering a per-job page on the public careers site. The result is a superset of the `careersPublicJobs` listing card, adding the job description body, required skills, and notice period — internal recruiter-facing fields remain excluded. The operation returns null when the job does not exist, does not belong to the given `orgSlug`, or is not published; all three cases produce the same null shape so no cross-tenant existence information leaks. Pair it with `applyToPublicJob` to submit a candidate application.
+
+<Note>
+This operation is part of the public career-page surface and is unauthenticated by design. Do not send `x-api-key` or `Authorization` headers with this request.
+</Note>
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query CareersPublicJob($orgSlug: String!, $jobId: UUID!) {
+  careersPublicJob(orgSlug: $orgSlug, jobId: $jobId) {
+    jobId
+    title
+    type
+    location
+    city
+    noOfOpenings
+    minimumExperience
+    maximumExperience
+    ctc
+    noticePeriod
+    jobDescription
+    skills {
+      skillName
+      skillLevel
+      requirementType
+    }
+    publishedAt
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="orgSlug" type="string" required>
+  Organization slug taken from the careers-page URL (for example, `/careers/acme` yields `acme`).
+</ParamField>
+
+<ParamField body="jobId" type="string" required>
+  UUID of the job to fetch. The job must be published and belong to the organization identified by `orgSlug`; otherwise the operation returns null.
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query CareersPublicJob($orgSlug: String!, $jobId: UUID!) { careersPublicJob(orgSlug: $orgSlug, jobId: $jobId) { jobId title type location city noOfOpenings minimumExperience maximumExperience ctc noticePeriod jobDescription skills { skillName skillLevel requirementType } publishedAt } }",
+    "variables": {
+      "orgSlug": "acme",
+      "jobId": "3f9d2b6a-84c1-4f0e-9a52-7d1c6e8b40aa"
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query CareersPublicJob($orgSlug: String!, $jobId: UUID!) {
+    careersPublicJob(orgSlug: $orgSlug, jobId: $jobId) {
+      jobId
+      title
+      type
+      location
+      city
+      noOfOpenings
+      minimumExperience
+      maximumExperience
+      ctc
+      noticePeriod
+      jobDescription
+      skills {
+        skillName
+        skillLevel
+        requirementType
+      }
+      publishedAt
+    }
+  }
+`;
+
+const variables = {
+  orgSlug: "acme",
+  jobId: "3f9d2b6a-84c1-4f0e-9a52-7d1c6e8b40aa"
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "Content-Type": "application/json"
+}
+
+query = """
+query CareersPublicJob($orgSlug: String!, $jobId: UUID!) {
+  careersPublicJob(orgSlug: $orgSlug, jobId: $jobId) {
+    jobId
+    title
+    type
+    location
+    city
+    noOfOpenings
+    minimumExperience
+    maximumExperience
+    ctc
+    noticePeriod
+    jobDescription
+    skills {
+      skillName
+      skillLevel
+      requirementType
+    }
+    publishedAt
+  }
+}
+"""
+
+variables = {
+    "orgSlug": "acme",
+    "jobId": "3f9d2b6a-84c1-4f0e-9a52-7d1c6e8b40aa"
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="careersPublicJob" type="object">
+      Public detail of the job. Null when the job does not exist, is not published, or does not belong to `orgSlug`.
+
+      <Expandable title="PublicJobDetail properties">
+        <ResponseField name="jobId" type="string">
+          Unique identifier (UUID) of the job.
+        </ResponseField>
+
+        <ResponseField name="title" type="string">
+          Job title.
+        </ResponseField>
+
+        <ResponseField name="type" type="string">
+          Work arrangement for the role, such as "Hybrid", "Remote", or "OnSite". May be null.
+        </ResponseField>
+
+        <ResponseField name="location" type="string">
+          Region of the role. May be null.
+        </ResponseField>
+
+        <ResponseField name="city" type="string">
+          City of the role. May be null.
+        </ResponseField>
+
+        <ResponseField name="noOfOpenings" type="string">
+          Number of open positions for this job. May be null.
+        </ResponseField>
+
+        <ResponseField name="minimumExperience" type="string">
+          Minimum experience required. May be null.
+        </ResponseField>
+
+        <ResponseField name="maximumExperience" type="string">
+          Maximum experience considered. May be null.
+        </ResponseField>
+
+        <ResponseField name="ctc" type="string">
+          Compensation for the role. May be null.
+        </ResponseField>
+
+        <ResponseField name="noticePeriod" type="string">
+          Expected notice period for the role. May be null.
+        </ResponseField>
+
+        <ResponseField name="jobDescription" type="string">
+          Full job description body. May be null.
+        </ResponseField>
+
+        <ResponseField name="skills" type="array">
+          Skills required for the role.
+
+          <Expandable title="SkillItem object">
+            <ResponseField name="skillName" type="string">
+              Name of the skill.
+            </ResponseField>
+
+            <ResponseField name="skillLevel" type="string">
+              Proficiency level expected for the skill.
+            </ResponseField>
+
+            <ResponseField name="requirementType" type="string">
+              Whether the skill is compulsory or optional for the role.
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+
+        <ResponseField name="publishedAt" type="string">
+          ISO 8601 timestamp of when the job was published.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "careersPublicJob": {
+      "jobId": "3f9d2b6a-84c1-4f0e-9a52-7d1c6e8b40aa",
+      "title": "Senior Backend Engineer",
+      "type": "Remote",
+      "location": "AMERICAS",
+      "city": "Austin",
+      "noOfOpenings": "3",
+      "minimumExperience": "5",
+      "maximumExperience": "8",
+      "ctc": "160000",
+      "noticePeriod": "30 days",
+      "jobDescription": "We are looking for a Senior Backend Engineer to design and build scalable services...",
+      "skills": [
+        {
+          "skillName": "Go",
+          "skillLevel": "Advanced",
+          "requirementType": "Compulsory"
+        },
+        {
+          "skillName": "PostgreSQL",
+          "skillLevel": "Intermediate",
+          "requirementType": "Optional"
+        }
+      ],
+      "publishedAt": "2026-06-18T09:24:11.000Z"
+    }
+  }
+}
+```
+
+```json 200 Validation Error
+{
+  "errors": [
+    {
+      "message": "Variable \"$jobId\" got invalid value \"not-a-uuid\"; Expected type \"UUID\".",
+      "extensions": {
+        "code": "BAD_USER_INPUT"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+|------------|-------------|
+| BAD_USER_INPUT | A variable is missing or malformed (for example, `jobId` is not a valid UUID). Note that an unknown or unpublished job does not error — it returns `careersPublicJob: null`. |
+| INTERNAL_SERVER_ERROR | An unexpected server-side failure occurred. Retry the request. |

@@ -1,0 +1,296 @@
+---
+title: "List Candidates by Job"
+api: "POST /graphql"
+description: "Retrieve all candidates for one job, server-side sorted and stack-ranked by default"
+---
+
+## Overview
+
+Retrieve every candidate attached to a single job, sorted server-side. The defaults (`sortBy: RESUME_SCORE`, `sortDir: DESC`) return the job's roster stack-ranked out of the box; candidates without a `resumeScore` always sort after scored ones regardless of direction, so partially scored pools surface the scored rows first. For a paginated, cross-job list use `candidates`; for a paged version of this same stack rank use `jobStackRank`.
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query CandidatesByJob(
+  $jobId: UUID!
+  $sortBy: CandidateSortField = RESUME_SCORE
+  $sortDir: SortDirection = DESC
+) {
+  candidatesByJob(jobId: $jobId, sortBy: $sortBy, sortDir: $sortDir) {
+    id
+    name
+    email
+    resumeScore
+    aiInterviewStatus
+    codeAssessmentStatus
+    codeAssessmentScore
+    candidateStatus
+    eligibility
+    verdictId
+    source
+    isStarred
+    createdAt
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="jobId" type="string" required>
+  Unique identifier (UUID) of the job whose candidates to list.
+</ParamField>
+
+<ParamField body="sortBy" type="CandidateSortField" default="RESUME_SCORE">
+  Server-side sort field. One of `RESUME_SCORE`, `CREATED_AT`, `NAME`. The default `RESUME_SCORE` powers the stack-rank table.
+</ParamField>
+
+<ParamField body="sortDir" type="SortDirection" default="DESC">
+  Sort direction. One of `ASC`, `DESC`.
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query CandidatesByJob($jobId: UUID!, $sortBy: CandidateSortField = RESUME_SCORE, $sortDir: SortDirection = DESC) { candidatesByJob(jobId: $jobId, sortBy: $sortBy, sortDir: $sortDir) { id name email resumeScore aiInterviewStatus codeAssessmentStatus codeAssessmentScore candidateStatus eligibility verdictId source isStarred createdAt } }",
+    "variables": {
+      "jobId": "9c2e4f8a-6b1d-4a3e-8f7c-5d0b2a9e1c46",
+      "sortBy": "RESUME_SCORE",
+      "sortDir": "DESC"
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query CandidatesByJob(
+    $jobId: UUID!
+    $sortBy: CandidateSortField = RESUME_SCORE
+    $sortDir: SortDirection = DESC
+  ) {
+    candidatesByJob(jobId: $jobId, sortBy: $sortBy, sortDir: $sortDir) {
+      id
+      name
+      email
+      resumeScore
+      aiInterviewStatus
+      codeAssessmentStatus
+      codeAssessmentScore
+      candidateStatus
+      eligibility
+      verdictId
+      source
+      isStarred
+      createdAt
+    }
+  }
+`;
+
+const variables = {
+  jobId: "9c2e4f8a-6b1d-4a3e-8f7c-5d0b2a9e1c46",
+  sortBy: "RESUME_SCORE",
+  sortDir: "DESC"
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query CandidatesByJob(
+  $jobId: UUID!
+  $sortBy: CandidateSortField = RESUME_SCORE
+  $sortDir: SortDirection = DESC
+) {
+  candidatesByJob(jobId: $jobId, sortBy: $sortBy, sortDir: $sortDir) {
+    id
+    name
+    email
+    resumeScore
+    aiInterviewStatus
+    codeAssessmentStatus
+    codeAssessmentScore
+    candidateStatus
+    eligibility
+    verdictId
+    source
+    isStarred
+    createdAt
+  }
+}
+"""
+
+variables = {
+    "jobId": "9c2e4f8a-6b1d-4a3e-8f7c-5d0b2a9e1c46",
+    "sortBy": "RESUME_SCORE",
+    "sortDir": "DESC"
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="candidatesByJob" type="array">
+      Array of candidate records for the job, in the requested sort order.
+
+      <Expandable title="Candidate Object">
+        <ResponseField name="id" type="string">
+          Unique candidate identifier (UUID).
+        </ResponseField>
+
+        <ResponseField name="name" type="string">
+          Candidate's full name.
+        </ResponseField>
+
+        <ResponseField name="email" type="string">
+          Email address, if known.
+        </ResponseField>
+
+        <ResponseField name="resumeScore" type="number">
+          Aggregate AI resume score. Null when the resume has not been scored; unscored candidates sort after scored ones.
+        </ResponseField>
+
+        <ResponseField name="aiInterviewStatus" type="string">
+          Status of the candidate's latest AI interview, if any.
+        </ResponseField>
+
+        <ResponseField name="codeAssessmentStatus" type="string">
+          Denormalized status of the latest coding assessment invite for this candidate. Set to `Scheduled` when the assessment is sent and refreshed to `Completed` or `Expired` on finalize.
+        </ResponseField>
+
+        <ResponseField name="codeAssessmentScore" type="number">
+          Score from the latest completed coding assessment, if any.
+        </ResponseField>
+
+        <ResponseField name="candidateStatus" type="string">
+          Lifecycle status in the hiring pipeline. One of `APPLIED`, `IN_PROGRESS`, `ADVANCED`, `REJECTED`, `HIRED`, `WITHDRAWN`.
+        </ResponseField>
+
+        <ResponseField name="eligibility" type="string">
+          Recruiter's eligibility decision. One of `ELIGIBLE`, `INELIGIBLE`, `UNSET`. Legacy rows surface as `UNSET`.
+        </ResponseField>
+
+        <ResponseField name="verdictId" type="string">
+          Recruiter or AI verdict slug (e.g. `shortlisted`, `ai_screening`). Distinct from the `candidateStatus` lifecycle; missing on legacy rows.
+        </ResponseField>
+
+        <ResponseField name="source" type="string">
+          Provenance of the candidate row. One of `MANUAL`, `BULK_UPLOAD`, `INTERNAL_POOL`, `CAREERS_PAGE`.
+        </ResponseField>
+
+        <ResponseField name="isStarred" type="boolean">
+          Recruiter-marked standout candidate.
+        </ResponseField>
+
+        <ResponseField name="createdAt" type="string">
+          ISO 8601 timestamp of creation.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "candidatesByJob": [
+      {
+        "id": "3f7b8a2c-9d41-4e6a-b5c2-8e1f0d9a7c34",
+        "name": "Meera Iyer",
+        "email": "meera.iyer@example.com",
+        "resumeScore": 82.5,
+        "aiInterviewStatus": "Completed",
+        "codeAssessmentStatus": "Completed",
+        "codeAssessmentScore": 88.0,
+        "candidateStatus": "IN_PROGRESS",
+        "eligibility": "ELIGIBLE",
+        "verdictId": "shortlisted",
+        "source": "BULK_UPLOAD",
+        "isStarred": true,
+        "createdAt": "2026-06-18T09:31:51.371Z"
+      },
+      {
+        "id": "b4e6c1d8-73f2-4a9b-8c5e-1f0a2d7b9e63",
+        "name": "Daniel Okafor",
+        "email": "daniel.okafor@example.com",
+        "resumeScore": 74.0,
+        "aiInterviewStatus": null,
+        "codeAssessmentStatus": "Scheduled",
+        "codeAssessmentScore": null,
+        "candidateStatus": "APPLIED",
+        "eligibility": "UNSET",
+        "verdictId": null,
+        "source": "MANUAL",
+        "isStarred": false,
+        "createdAt": "2026-06-15T16:42:07.219Z"
+      }
+    ]
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+| --- | --- |
+| UNAUTHENTICATED | Missing or invalid API key or bearer token. |
+| FORBIDDEN | The credentials are valid but lack access to this operation. |
+| BAD_USER_INPUT | An argument is malformed, e.g. `jobId` is not a valid UUID or an unknown enum value was supplied. |
+| INTERNAL_SERVER_ERROR | Unexpected server-side failure. |

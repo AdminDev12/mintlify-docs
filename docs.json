@@ -81,30 +81,116 @@
             ]
           },
           {
+            "group": "Career Page",
+            "pages": [
+              "api-reference/career-page/list-public-jobs",
+              "api-reference/career-page/get-public-job",
+              "api-reference/career-page/apply-to-public-job"
+            ]
+          },
+          {
+            "group": "Instant Interviews",
+            "pages": [
+              "api-reference/instant-interviews/send-interview-invites",
+              "api-reference/instant-interviews/start-interview",
+              "api-reference/instant-interviews/end-interview",
+              "api-reference/instant-interviews/reanalyze-interview",
+              "api-reference/instant-interviews/get-interview-deadline",
+              "api-reference/instant-interviews/ai-interview-report",
+              "api-reference/instant-interviews/voice-interview-report",
+              "api-reference/instant-interviews/avatar-interview-report"
+            ]
+          },
+          {
+            "group": "AI Phone Screen",
+            "pages": [
+              "api-reference/phone-screen/initiate-phone-call",
+              "api-reference/phone-screen/initiate-bulk-phone-calls",
+              "api-reference/phone-screen/cancel-phone-call",
+              "api-reference/phone-screen/reconcile-phone-call",
+              "api-reference/phone-screen/get-phone-call-record",
+              "api-reference/phone-screen/phone-calls-by-job",
+              "api-reference/phone-screen/phone-calls-by-candidate",
+              "api-reference/phone-screen/get-phone-call-transcript",
+              "api-reference/phone-screen/get-phone-call-recording"
+            ]
+          },
+          {
+            "group": "Panel & HR Rounds",
+            "pages": [
+              "api-reference/panel-rounds/schedule-panel-round",
+              "api-reference/panel-rounds/send-panel-round-invites",
+              "api-reference/panel-rounds/cancel-panel-round",
+              "api-reference/panel-rounds/get-panel-session",
+              "api-reference/panel-rounds/get-panel-report"
+            ]
+          },
+          {
+            "group": "Stack Ranking & Scoring",
+            "pages": [
+              "api-reference/stack-ranking/job-stack-rank",
+              "api-reference/stack-ranking/job-leaderboard",
+              "api-reference/stack-ranking/leaderboard-round-decisions",
+              "api-reference/stack-ranking/leaderboard-candidate-decisions",
+              "api-reference/stack-ranking/leaderboard-audit-trail",
+              "api-reference/stack-ranking/score-justifications",
+              "api-reference/stack-ranking/get-scoring-config",
+              "api-reference/stack-ranking/save-scoring-config",
+              "api-reference/stack-ranking/override-round-decision",
+              "api-reference/stack-ranking/override-candidate-decision"
+            ]
+          },
+          {
+            "group": "Resume & Candidate Intelligence",
+            "pages": [
+              "api-reference/resume-intelligence/analyze-resume",
+              "api-reference/resume-intelligence/get-candidate-analysis",
+              "api-reference/resume-intelligence/candidate-round-statuses",
+              "api-reference/resume-intelligence/candidate-search",
+              "api-reference/resume-intelligence/update-resume-score"
+            ]
+          },
+          {
             "group": "Jobs",
             "pages": [
+              "api-reference/jobs/get-job",
+              "api-reference/jobs/list-jobs",
+              "api-reference/jobs/questions-by-job",
+              "api-reference/jobs/job-form-options",
               "api-reference/jobs/create-job",
-              "api-reference/jobs/list-jobs"
+              "api-reference/jobs/update-job",
+              "api-reference/jobs/publish-job",
+              "api-reference/jobs/close-job",
+              "api-reference/jobs/delete-job",
+              "api-reference/jobs/bulk-delete-jobs"
             ]
           },
           {
             "group": "Candidates",
             "pages": [
-              "api-reference/candidates/bulk-upload",
-              "api-reference/candidates/list-candidates"
+              "api-reference/candidates/get-candidate",
+              "api-reference/candidates/list-candidates",
+              "api-reference/candidates/candidates-by-job",
+              "api-reference/candidates/get-bulk-upload-job",
+              "api-reference/candidates/add-candidate",
+              "api-reference/candidates/update-candidate",
+              "api-reference/candidates/advance-candidate",
+              "api-reference/candidates/reject-candidate",
+              "api-reference/candidates/update-candidate-eligibility",
+              "api-reference/candidates/update-candidate-verdict",
+              "api-reference/candidates/import-candidates-from-pool",
+              "api-reference/candidates/get-resume-upload-url",
+              "api-reference/candidates/delete-candidate",
+              "api-reference/candidates/bulk-delete-candidates"
             ]
           },
           {
-            "group": "Interviews",
+            "group": "REST Endpoints",
             "pages": [
-              "api-reference/interviews/assign-interviewer"
-            ]
-          },
-          {
-            "group": "Reports",
-            "pages": [
-              "api-reference/reports/get-leaderboard",
-              "api-reference/reports/interview-report"
+              "api-reference/ingest/health",
+              "api-reference/ingest/add-job-by-file",
+              "api-reference/ingest/bulk-upload-resumes",
+              "api-reference/ingest/bulk-upload-status"
             ]
           }
         ]
@@ -171,5 +257,23 @@
         ]
       }
     ]
-  }
+  },
+  "redirects": [
+    {
+      "source": "/api-reference/interviews/assign-interviewer",
+      "destination": "/api-reference/panel-rounds/schedule-panel-round"
+    },
+    {
+      "source": "/api-reference/reports/interview-report",
+      "destination": "/api-reference/instant-interviews/ai-interview-report"
+    },
+    {
+      "source": "/api-reference/reports/get-leaderboard",
+      "destination": "/api-reference/stack-ranking/job-leaderboard"
+    },
+    {
+      "source": "/api-reference/candidates/bulk-upload",
+      "destination": "/api-reference/ingest/bulk-upload-resumes"
+    }
+  ]
 }

@@ -1,0 +1,296 @@
+---
+title: "Search Candidates"
+api: "POST /graphql"
+description: "Free-text semantic search over the organization's entire candidate pool with ranked, explained results"
+---
+
+## Overview
+
+Runs a free-text recruiter query (for example, "senior backend engineers who've worked in fintech and led a team") over the whole organization's candidate pool. The query is embedded, the nearest candidates are retrieved by metadata-vector similarity, and a chat model ranks and explains them grounded only in the retrieved profiles, returning a narrative `answer` plus a ranked, explained shortlist. When the embeddings deployment is not yet provisioned, retrieval cannot run and the result comes back with `enabled: false`; for structured, per-job listing use `candidatesByJob` or `candidates` instead.
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query candidateSearch($query: String!, $limit: Int) {
+  candidateSearch(query: $query, limit: $limit) {
+    enabled
+    answer
+    results {
+      similarity
+      rationale
+      candidate {
+        id
+        name
+        email
+        role
+        candidateCompany
+        experience
+        skillsFound
+        resumeScore
+      }
+    }
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="query" type="string" required>
+  Free-text search query describing the candidates you are looking for.
+</ParamField>
+
+<ParamField body="limit" type="integer" default={10}>
+  Maximum number of ranked hits to return.
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query candidateSearch($query: String!, $limit: Int) { candidateSearch(query: $query, limit: $limit) { enabled answer results { similarity rationale candidate { id name email role candidateCompany experience skillsFound resumeScore } } } }",
+    "variables": {
+      "query": "senior backend engineers with fintech experience who have led a team",
+      "limit": 5
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query candidateSearch($query: String!, $limit: Int) {
+    candidateSearch(query: $query, limit: $limit) {
+      enabled
+      answer
+      results {
+        similarity
+        rationale
+        candidate {
+          id
+          name
+          email
+          role
+          candidateCompany
+          experience
+          skillsFound
+          resumeScore
+        }
+      }
+    }
+  }
+`;
+
+const variables = {
+  query: "senior backend engineers with fintech experience who have led a team",
+  limit: 5
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query candidateSearch($query: String!, $limit: Int) {
+  candidateSearch(query: $query, limit: $limit) {
+    enabled
+    answer
+    results {
+      similarity
+      rationale
+      candidate {
+        id
+        name
+        email
+        role
+        candidateCompany
+        experience
+        skillsFound
+        resumeScore
+      }
+    }
+  }
+}
+"""
+
+variables = {
+    "query": "senior backend engineers with fintech experience who have led a team",
+    "limit": 5
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="candidateSearch" type="object">
+      Result envelope for the retrieval-plus-generation search.
+
+      <Expandable title="candidateSearch properties">
+        <ResponseField name="enabled" type="boolean">
+          False until the embeddings deployment is provisioned; when false, search is unavailable and `answer` is empty
+        </ResponseField>
+
+        <ResponseField name="answer" type="string">
+          Narrative summary of who stands out and why (empty when disabled)
+        </ResponseField>
+
+        <ResponseField name="results" type="array">
+          Ranked, explained shortlist of matching candidates
+
+          <Expandable title="Search Hit Object">
+            <ResponseField name="similarity" type="number">
+              Cosine similarity of the candidate's metadata vector to the query, from 0 to 1
+            </ResponseField>
+
+            <ResponseField name="rationale" type="string">
+              One- to two-sentence reason this candidate fits, grounded in their profile
+            </ResponseField>
+
+            <ResponseField name="candidate" type="object">
+              The matched candidate
+
+              <Expandable title="Candidate Object">
+                <ResponseField name="id" type="string">
+                  Unique candidate identifier (UUID)
+                </ResponseField>
+
+                <ResponseField name="name" type="string">
+                  Candidate's full name
+                </ResponseField>
+
+                <ResponseField name="email" type="string">
+                  Candidate's email address (nullable)
+                </ResponseField>
+
+                <ResponseField name="role" type="string">
+                  Candidate's current or most recent role (nullable)
+                </ResponseField>
+
+                <ResponseField name="candidateCompany" type="string">
+                  Candidate's current company (nullable)
+                </ResponseField>
+
+                <ResponseField name="experience" type="string">
+                  Free-form work-experience summary (nullable)
+                </ResponseField>
+
+                <ResponseField name="skillsFound" type="array">
+                  Skills extracted from the resume
+                </ResponseField>
+
+                <ResponseField name="resumeScore" type="number">
+                  Aggregate resume score (nullable)
+                </ResponseField>
+              </Expandable>
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "candidateSearch": {
+      "enabled": true,
+      "answer": "Priya Raman is the strongest match: six years of backend work in fintech and two years leading a payments team. Marcus Webb also fits, with platform experience at a trading firm.",
+      "results": [
+        {
+          "similarity": 0.91,
+          "rationale": "Six years building payment services in Go and led a five-engineer team at a fintech.",
+          "candidate": {
+            "id": "7f8b0c4e-2a51-4a7e-9d3b-6c1f2e8a9b01",
+            "name": "Priya Raman",
+            "email": "priya.raman@example.com",
+            "role": "Senior Backend Engineer",
+            "candidateCompany": "LedgerPay",
+            "experience": "6 years of backend engineering across payments and lending platforms.",
+            "skillsFound": ["Go", "Kubernetes", "PostgreSQL"],
+            "resumeScore": 84
+          }
+        },
+        {
+          "similarity": 0.86,
+          "rationale": "Backend platform work at a trading firm with team-lead responsibility on two projects.",
+          "candidate": {
+            "id": "b4e6d8a2-9c31-4f7e-a15d-3e8f0c2b6d47",
+            "name": "Marcus Webb",
+            "email": "marcus.webb@example.com",
+            "role": "Staff Software Engineer",
+            "candidateCompany": "Quantiva Markets",
+            "experience": "9 years of distributed-systems engineering in financial services.",
+            "skillsFound": ["Java", "Kafka", "AWS"],
+            "resumeScore": 79
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+| --- | --- |
+| UNAUTHENTICATED | Missing or invalid API key or bearer token |
+| FORBIDDEN | The caller lacks access to this tenant's candidate data |
+| BAD_USER_INPUT | `query` is empty or `limit` is not a positive integer |
+| INTERNAL_SERVER_ERROR | Embedding, retrieval, or ranking failed unexpectedly |

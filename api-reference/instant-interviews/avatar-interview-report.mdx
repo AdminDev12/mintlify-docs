@@ -1,0 +1,316 @@
+---
+title: "Avatar Interview Report"
+api: "POST /graphql"
+description: "Retrieve the post-interview report for a candidate's avatar-mode AI interview"
+---
+
+## Overview
+
+`avatarInterviewReport` is a focused avatar-mode read that returns the same report shape as `voiceInterviewReport` but only matches interviews conducted in `AVATAR` mode. It exposes the interview status, timing, recording links, full transcript, and AI-generated analysis, and clients select only the fields they need. Use `aiInterviewReport` when the interview mode is not known in advance. This operation is restricted to Admin and Recruiter roles.
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query AvatarInterviewReport($candidateId: String!) {
+  avatarInterviewReport(candidateId: $candidateId) {
+    id
+    candidateId
+    jobId
+    status
+    mode
+    startedAt
+    completedAt
+    recordingUrl
+    thumbnailUrl
+    transcript {
+      role
+      text
+      at
+    }
+    analysis {
+      status
+      fitScore
+      candidateFitCategory
+      criticalConcerns
+      feedback
+      strength
+      weakness
+    }
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="candidateId" type="string" required>
+  Identifier of the candidate whose avatar interview report is being retrieved.
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query AvatarInterviewReport($candidateId: String!) { avatarInterviewReport(candidateId: $candidateId) { id candidateId jobId status mode startedAt completedAt recordingUrl thumbnailUrl transcript { role text at } analysis { status fitScore candidateFitCategory criticalConcerns feedback strength weakness } } }",
+    "variables": {
+      "candidateId": "68a5b11168f3d6ccd1a4e2f3"
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query AvatarInterviewReport($candidateId: String!) {
+    avatarInterviewReport(candidateId: $candidateId) {
+      id
+      candidateId
+      jobId
+      status
+      mode
+      startedAt
+      completedAt
+      recordingUrl
+      thumbnailUrl
+      transcript {
+        role
+        text
+        at
+      }
+      analysis {
+        status
+        fitScore
+        candidateFitCategory
+        criticalConcerns
+        feedback
+        strength
+        weakness
+      }
+    }
+  }
+`;
+
+const variables = {
+  candidateId: "68a5b11168f3d6ccd1a4e2f3"
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query AvatarInterviewReport($candidateId: String!) {
+  avatarInterviewReport(candidateId: $candidateId) {
+    id
+    candidateId
+    jobId
+    status
+    mode
+    startedAt
+    completedAt
+    recordingUrl
+    thumbnailUrl
+    transcript {
+      role
+      text
+      at
+    }
+    analysis {
+      status
+      fitScore
+      candidateFitCategory
+      criticalConcerns
+      feedback
+      strength
+      weakness
+    }
+  }
+}
+"""
+
+variables = {
+    "candidateId": "68a5b11168f3d6ccd1a4e2f3"
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="avatarInterviewReport" type="object">
+      Null when the candidate has no avatar-mode interview report.
+      <Expandable title="avatarInterviewReport properties">
+        <ResponseField name="id" type="string" required>
+          Unique identifier (UUID) of the interview record.
+        </ResponseField>
+        <ResponseField name="candidateId" type="string" required>
+          Identifier of the candidate the report belongs to.
+        </ResponseField>
+        <ResponseField name="jobId" type="string" required>
+          Identifier of the job the interview was conducted for.
+        </ResponseField>
+        <ResponseField name="status" type="string" required>
+          Interview status. One of `SCHEDULED`, `STARTED`, `COMPLETED`, `EXPIRED`.
+        </ResponseField>
+        <ResponseField name="mode" type="string" required>
+          Interview mode. One of `AVATAR`, `VOICE`. Always `AVATAR` for this operation.
+        </ResponseField>
+        <ResponseField name="startedAt" type="string">
+          Timestamp when the interview started, in ISO 8601 format.
+        </ResponseField>
+        <ResponseField name="completedAt" type="string">
+          Timestamp when the interview completed, in ISO 8601 format.
+        </ResponseField>
+        <ResponseField name="recordingUrl" type="string">
+          URL of the interview recording, when available.
+        </ResponseField>
+        <ResponseField name="thumbnailUrl" type="string">
+          URL of the recording thumbnail image, when available.
+        </ResponseField>
+        <ResponseField name="transcript" type="array" required>
+          Chronological transcript lines from the interview.
+          <Expandable title="Transcript line">
+            <ResponseField name="role" type="string" required>
+              Speaker of the line. One of `USER`, `ASSISTANT`.
+            </ResponseField>
+            <ResponseField name="text" type="string" required>
+              Text content of the transcript line.
+            </ResponseField>
+            <ResponseField name="at" type="string" required>
+              Timestamp of the line, in ISO 8601 format.
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        <ResponseField name="analysis" type="object" required>
+          AI-generated analysis of the interview.
+          <Expandable title="analysis properties">
+            <ResponseField name="status" type="string" required>
+              Processing status of the analysis.
+            </ResponseField>
+            <ResponseField name="fitScore" type="integer">
+              Overall candidate fit score.
+            </ResponseField>
+            <ResponseField name="candidateFitCategory" type="string">
+              Categorical fit assessment for the candidate.
+            </ResponseField>
+            <ResponseField name="criticalConcerns" type="array">
+              List of critical concerns flagged by the analysis.
+            </ResponseField>
+            <ResponseField name="feedback" type="string">
+              Narrative feedback on the candidate's performance.
+            </ResponseField>
+            <ResponseField name="strength" type="string">
+              Summary of the candidate's strengths.
+            </ResponseField>
+            <ResponseField name="weakness" type="string">
+              Summary of the candidate's weaknesses.
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "avatarInterviewReport": {
+      "id": "c4a1f8d2-3b7e-46f9-8a15-6d0e2b9c7f34",
+      "candidateId": "68a5b11168f3d6ccd1a4e2f3",
+      "jobId": "68c42431b9f38f8c24fbc91f",
+      "status": "COMPLETED",
+      "mode": "AVATAR",
+      "startedAt": "2026-06-30T16:00:00.000Z",
+      "completedAt": "2026-06-30T16:27:35.000Z",
+      "recordingUrl": "https://media.exterview.ai/recordings/c4a1f8d2-3b7e-46f9-8a15-6d0e2b9c7f34.mp4",
+      "thumbnailUrl": "https://media.exterview.ai/thumbnails/c4a1f8d2-3b7e-46f9-8a15-6d0e2b9c7f34.jpg",
+      "transcript": [
+        {
+          "role": "ASSISTANT",
+          "text": "Welcome to your interview for the Product Designer role at Acme. Could you describe a design decision you reversed after user testing?",
+          "at": "2026-06-30T16:00:18.000Z"
+        },
+        {
+          "role": "USER",
+          "text": "We initially hid advanced filters behind a menu, but testing showed users never found them, so we surfaced the top three inline.",
+          "at": "2026-06-30T16:00:55.000Z"
+        }
+      ],
+      "analysis": {
+        "status": "COMPLETED",
+        "fitScore": 88,
+        "candidateFitCategory": "Strong Fit",
+        "criticalConcerns": [],
+        "feedback": "The candidate showed a strong user-research mindset and explained trade-offs clearly.",
+        "strength": "Evidence-driven design process and clear stakeholder communication.",
+        "weakness": "Less experience with design systems at enterprise scale."
+      }
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+|------------|-------------|
+| UNAUTHENTICATED | The request is missing valid authentication credentials. |
+| FORBIDDEN | The authenticated principal lacks the Admin or Recruiter role. |
+| BAD_USER_INPUT | The `candidateId` argument is missing or malformed. |
+| NOT_FOUND | No candidate exists with the supplied `candidateId`. |
+| INTERNAL_SERVER_ERROR | An unexpected error occurred while resolving the report. |

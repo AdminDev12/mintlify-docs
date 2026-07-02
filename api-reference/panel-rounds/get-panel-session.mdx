@@ -1,0 +1,286 @@
+---
+title: "Get Panel Session"
+api: "POST /graphql"
+description: "Fetch a panel session by ID, including bot, pipeline, and recording status"
+---
+
+## Overview
+
+`getPanelSession` fetches a panel session by ID, including the bot status, processing pipeline status, and recording signed URL. The `source` field tells you which capture flow produced the session: `TEAMS` sessions also populate `meetingId`, `graphEventId`, and `teamsJoinUrl`, while `VIDEOSDK` sessions populate `videoSdkRoomId`. Use `getPanelReport` to fetch the AI-generated report for a session, and `getRefreshedRecordingUrl` when the recording signed URL has expired.
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query GetPanelSession($id: UUID!) {
+  getPanelSession(id: $id) {
+    id
+    interviewSessionId
+    source
+    meetingId
+    teamsJoinUrl
+    videoSdkRoomId
+    botStatus
+    pipelineStatus
+    roundType
+    scheduledAt
+    startedAt
+    endedAt
+    recordingSignedUrl
+    recordingSignedUrlExpiry
+    correlationId
+    createdAt
+    updatedAt
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="id" type="string" required>
+  UUID of the panel session to fetch
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query GetPanelSession($id: UUID!) { getPanelSession(id: $id) { id interviewSessionId source meetingId teamsJoinUrl videoSdkRoomId botStatus pipelineStatus roundType scheduledAt startedAt endedAt recordingSignedUrl recordingSignedUrlExpiry correlationId createdAt updatedAt } }",
+    "variables": {
+      "id": "5e6f7a8b-9c0d-4e1f-a2b3-c4d5e6f7a8b9"
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query GetPanelSession($id: UUID!) {
+    getPanelSession(id: $id) {
+      id
+      interviewSessionId
+      source
+      meetingId
+      teamsJoinUrl
+      videoSdkRoomId
+      botStatus
+      pipelineStatus
+      roundType
+      scheduledAt
+      startedAt
+      endedAt
+      recordingSignedUrl
+      recordingSignedUrlExpiry
+      correlationId
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+const variables = {
+  id: "5e6f7a8b-9c0d-4e1f-a2b3-c4d5e6f7a8b9"
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query GetPanelSession($id: UUID!) {
+  getPanelSession(id: $id) {
+    id
+    interviewSessionId
+    source
+    meetingId
+    teamsJoinUrl
+    videoSdkRoomId
+    botStatus
+    pipelineStatus
+    roundType
+    scheduledAt
+    startedAt
+    endedAt
+    recordingSignedUrl
+    recordingSignedUrlExpiry
+    correlationId
+    createdAt
+    updatedAt
+  }
+}
+"""
+
+variables = {
+    "id": "5e6f7a8b-9c0d-4e1f-a2b3-c4d5e6f7a8b9"
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="getPanelSession" type="object">
+      The panel session, or `null` if none matches the ID
+
+      <Expandable title="getPanelSession properties">
+        <ResponseField name="id" type="string">
+          UUID of the panel session
+        </ResponseField>
+
+        <ResponseField name="interviewSessionId" type="string">
+          UUID of the parent interview session
+        </ResponseField>
+
+        <ResponseField name="source" type="string">
+          Which capture flow produced this session: `TEAMS` or `VIDEOSDK`. `TEAMS` sessions also populate `meetingId`, `graphEventId`, and `teamsJoinUrl`; `VIDEOSDK` sessions populate `videoSdkRoomId`. Defaults to `TEAMS` for sessions written before the field was introduced.
+        </ResponseField>
+
+        <ResponseField name="meetingId" type="string">
+          Teams meeting ID. Null for `VIDEOSDK` sessions.
+        </ResponseField>
+
+        <ResponseField name="teamsJoinUrl" type="string">
+          Join URL for the Teams meeting. Null for `VIDEOSDK` sessions.
+        </ResponseField>
+
+        <ResponseField name="videoSdkRoomId" type="string">
+          videosdk.live room ID. Null for `TEAMS` sessions.
+        </ResponseField>
+
+        <ResponseField name="botStatus" type="string">
+          Capture bot status. One of `PENDING`, `JOINED`, `ACTIVE`, `RECORDING`, `ENDED`.
+        </ResponseField>
+
+        <ResponseField name="pipelineStatus" type="string">
+          Post-session processing pipeline status. One of `PENDING`, `IN_PROGRESS`, `COMPLETE`, `FAILED`.
+        </ResponseField>
+
+        <ResponseField name="roundType" type="string">
+          Type of round: `PANEL` or `HR`
+        </ResponseField>
+
+        <ResponseField name="scheduledAt" type="string">
+          Scheduled start time (ISO 8601 DateTime)
+        </ResponseField>
+
+        <ResponseField name="startedAt" type="string">
+          Actual start time (ISO 8601 DateTime); null until the session starts
+        </ResponseField>
+
+        <ResponseField name="endedAt" type="string">
+          Actual end time (ISO 8601 DateTime); null until the session ends
+        </ResponseField>
+
+        <ResponseField name="recordingSignedUrl" type="string">
+          Signed URL for recording playback; null until the recording is available
+        </ResponseField>
+
+        <ResponseField name="recordingSignedUrlExpiry" type="string">
+          Expiry timestamp of the signed URL (ISO 8601 DateTime). Use `getRefreshedRecordingUrl` after it expires.
+        </ResponseField>
+
+        <ResponseField name="correlationId" type="string">
+          Correlation ID for tracing this session across services
+        </ResponseField>
+
+        <ResponseField name="createdAt" type="string">
+          Creation timestamp (ISO 8601 DateTime)
+        </ResponseField>
+
+        <ResponseField name="updatedAt" type="string">
+          Last update timestamp (ISO 8601 DateTime)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "getPanelSession": {
+      "id": "5e6f7a8b-9c0d-4e1f-a2b3-c4d5e6f7a8b9",
+      "interviewSessionId": "2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e",
+      "source": "TEAMS",
+      "meetingId": "MSpiN2UyYzFkNC01ZjZhLTRiM2M",
+      "teamsJoinUrl": "https://teams.microsoft.com/l/meetup-join/19%3ameeting_NzQ2YmFj/0",
+      "videoSdkRoomId": null,
+      "botStatus": "ENDED",
+      "pipelineStatus": "COMPLETE",
+      "roundType": "PANEL",
+      "scheduledAt": "2026-06-28T14:00:00.000Z",
+      "startedAt": "2026-06-28T14:01:12.204Z",
+      "endedAt": "2026-06-28T14:58:47.531Z",
+      "recordingSignedUrl": "https://api.exterview.ai/media/recordings/5e6f7a8b-9c0d-4e1f-a2b3-c4d5e6f7a8b9.mp4?sv=2026-01-01&sig=k3Jt8qWv",
+      "recordingSignedUrlExpiry": "2026-07-02T12:30:00.000Z",
+      "correlationId": "acme-panel-4f7a2b9c",
+      "createdAt": "2026-06-25T09:15:27.412Z",
+      "updatedAt": "2026-06-28T15:10:03.882Z"
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+|------------|-------------|
+| UNAUTHENTICATED | Missing or invalid API key or bearer token |
+| FORBIDDEN | The credential is not permitted to read panel sessions in this tenant |
+| BAD_USER_INPUT | The `id` value is not a valid UUID |
+| NOT_FOUND | No panel session exists with the given ID |
+| INTERNAL_SERVER_ERROR | Unexpected server error while fetching the session |

@@ -1,0 +1,349 @@
+---
+title: "Get Candidate"
+api: "POST /graphql"
+description: "Fetch a single candidate by ID, including profile, scoring, and pipeline state"
+---
+
+## Overview
+
+Fetch one candidate row by its unique identifier. Use this operation to load a candidate's full profile — contact details, resume-derived fields, scoring, and pipeline state — after obtaining an ID from `candidates` or `candidatesByJob`. The query returns `null` when the row does not exist or belongs to a different tenant, so a missing candidate is indistinguishable from one outside your partition.
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query GetCandidate($id: UUID!) {
+  candidate(id: $id) {
+    id
+    name
+    email
+    phoneNumber
+    jobId
+    organizationId
+    resumeScore
+    candidateStatus
+    eligibility
+    source
+    currentStageId
+    skillsFound
+    candidateLocation
+    role
+    summary
+    linkedIn
+    experienceStructured {
+      role
+      company
+      startDate
+      endDate
+    }
+    isStarred
+    createdAt
+    updatedAt
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="id" type="string" required>
+  Unique identifier (UUID) of the candidate to fetch. Returns `null` if no candidate with this ID exists in your tenant.
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query GetCandidate($id: UUID!) { candidate(id: $id) { id name email phoneNumber jobId organizationId resumeScore candidateStatus eligibility source currentStageId skillsFound candidateLocation role summary linkedIn experienceStructured { role company startDate endDate } isStarred createdAt updatedAt } }",
+    "variables": {
+      "id": "3f7b8a2c-9d41-4e6a-b5c2-8e1f0d9a7c34"
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query GetCandidate($id: UUID!) {
+    candidate(id: $id) {
+      id
+      name
+      email
+      phoneNumber
+      jobId
+      organizationId
+      resumeScore
+      candidateStatus
+      eligibility
+      source
+      currentStageId
+      skillsFound
+      candidateLocation
+      role
+      summary
+      linkedIn
+      experienceStructured {
+        role
+        company
+        startDate
+        endDate
+      }
+      isStarred
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+const variables = {
+  id: "3f7b8a2c-9d41-4e6a-b5c2-8e1f0d9a7c34"
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query GetCandidate($id: UUID!) {
+  candidate(id: $id) {
+    id
+    name
+    email
+    phoneNumber
+    jobId
+    organizationId
+    resumeScore
+    candidateStatus
+    eligibility
+    source
+    currentStageId
+    skillsFound
+    candidateLocation
+    role
+    summary
+    linkedIn
+    experienceStructured {
+      role
+      company
+      startDate
+      endDate
+    }
+    isStarred
+    createdAt
+    updatedAt
+  }
+}
+"""
+
+variables = {
+    "id": "3f7b8a2c-9d41-4e6a-b5c2-8e1f0d9a7c34"
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="candidate" type="object">
+      The candidate record, or `null` if not found in your tenant.
+
+      <Expandable title="candidate properties">
+        <ResponseField name="id" type="string">
+          Unique candidate identifier (UUID).
+        </ResponseField>
+
+        <ResponseField name="name" type="string">
+          Candidate's full name.
+        </ResponseField>
+
+        <ResponseField name="email" type="string">
+          Email address, if known.
+        </ResponseField>
+
+        <ResponseField name="phoneNumber" type="string">
+          Phone number, if known.
+        </ResponseField>
+
+        <ResponseField name="jobId" type="string">
+          Identifier of the job this candidate belongs to.
+        </ResponseField>
+
+        <ResponseField name="organizationId" type="string">
+          Identifier of the owning organization.
+        </ResponseField>
+
+        <ResponseField name="resumeScore" type="number">
+          Aggregate AI resume score. Null when the resume has not been scored.
+        </ResponseField>
+
+        <ResponseField name="candidateStatus" type="string">
+          Lifecycle status in the hiring pipeline. One of `APPLIED`, `IN_PROGRESS`, `ADVANCED`, `REJECTED`, `HIRED`, `WITHDRAWN`. `APPLIED` is the initial state.
+        </ResponseField>
+
+        <ResponseField name="eligibility" type="string">
+          Recruiter's eligibility decision — distinct from the lifecycle status. One of `ELIGIBLE`, `INELIGIBLE`, `UNSET`. Legacy rows without this field surface as `UNSET`.
+        </ResponseField>
+
+        <ResponseField name="source" type="string">
+          Provenance of the candidate row. One of `MANUAL` (add-candidate form), `BULK_UPLOAD` (CSV/Excel ingest), `INTERNAL_POOL` (pool-to-job importer), `CAREERS_PAGE` (public application surface).
+        </ResponseField>
+
+        <ResponseField name="currentStageId" type="string">
+          Identifier of the candidate's current pipeline stage.
+        </ResponseField>
+
+        <ResponseField name="skillsFound" type="array">
+          Skills identified from the resume.
+        </ResponseField>
+
+        <ResponseField name="candidateLocation" type="string">
+          Candidate's location, from resume extraction.
+        </ResponseField>
+
+        <ResponseField name="role" type="string">
+          Candidate's current or most recent role.
+        </ResponseField>
+
+        <ResponseField name="summary" type="string">
+          Two- to three-sentence professional summary, from resume extraction.
+        </ResponseField>
+
+        <ResponseField name="linkedIn" type="string">
+          LinkedIn profile URL, when listed on the resume.
+        </ResponseField>
+
+        <ResponseField name="experienceStructured" type="array">
+          Structured work history (companion to the free-form `experience` field).
+
+          <Expandable title="ExperienceEntry">
+            <ResponseField name="role" type="string">
+              Job title held in this entry.
+            </ResponseField>
+
+            <ResponseField name="company" type="string">
+              Employer name.
+            </ResponseField>
+
+            <ResponseField name="startDate" type="string">
+              Start date of the entry, if known.
+            </ResponseField>
+
+            <ResponseField name="endDate" type="string">
+              End date of the entry; null for a current position.
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+
+        <ResponseField name="isStarred" type="boolean">
+          Recruiter-marked standout candidate. Legacy rows without the field surface as `false`.
+        </ResponseField>
+
+        <ResponseField name="createdAt" type="string">
+          ISO 8601 timestamp of creation.
+        </ResponseField>
+
+        <ResponseField name="updatedAt" type="string">
+          ISO 8601 timestamp of the last update.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "candidate": {
+      "id": "3f7b8a2c-9d41-4e6a-b5c2-8e1f0d9a7c34",
+      "name": "Meera Iyer",
+      "email": "meera.iyer@example.com",
+      "phoneNumber": "+1-415-555-0132",
+      "jobId": "9c2e4f8a-6b1d-4a3e-8f7c-5d0b2a9e1c46",
+      "organizationId": "acme",
+      "resumeScore": 82.5,
+      "candidateStatus": "IN_PROGRESS",
+      "eligibility": "ELIGIBLE",
+      "source": "BULK_UPLOAD",
+      "currentStageId": "stage-technical-screen",
+      "skillsFound": ["TypeScript", "Node.js", "PostgreSQL"],
+      "candidateLocation": "San Francisco, CA",
+      "role": "Senior Backend Engineer",
+      "summary": "Backend engineer with eight years of experience building high-throughput services. Led the payments platform team at a fintech scale-up.",
+      "linkedIn": "https://www.linkedin.com/in/meera-iyer",
+      "experienceStructured": [
+        {
+          "role": "Senior Backend Engineer",
+          "company": "Northwind Labs",
+          "startDate": "2022-03",
+          "endDate": null
+        }
+      ],
+      "isStarred": true,
+      "createdAt": "2026-06-18T09:31:51.371Z",
+      "updatedAt": "2026-06-30T14:05:12.848Z"
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+| --- | --- |
+| UNAUTHENTICATED | Missing or invalid API key or bearer token. |
+| FORBIDDEN | The credentials are valid but lack access to this operation. |
+| BAD_USER_INPUT | `id` is not a valid UUID. |
+| INTERNAL_SERVER_ERROR | Unexpected server-side failure. |

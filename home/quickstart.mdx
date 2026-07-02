@@ -62,7 +62,7 @@ curl -X POST https://api.exterview.ai/addJobByFile \
   -F "organizationId=YOUR_ORG_ID"
 ```
 
-See [Create Job](/api-reference/jobs/create-job) for full request and response details.
+See [Add Job by File](/api-reference/ingest/add-job-by-file) for full request and response details.
 
 ## Step 3: Upload candidates
 
@@ -76,7 +76,7 @@ curl -X POST https://api.exterview.ai/bulkUpload \
   -F "jobId=YOUR_JOB_ID"
 ```
 
-See [Bulk Upload](/api-reference/candidates/bulk-upload) for parameters and error handling.
+See [Bulk Upload Resumes](/api-reference/ingest/bulk-upload-resumes) for parameters and error handling.
 
 ## Step 4: View results
 
@@ -90,7 +90,7 @@ curl -X POST https://api.exterview.ai/graphql \
   -d '{"query": "query { leaderboard(jobId: \"YOUR_JOB_ID\") { candidates { id score } } }"}'
 ```
 
-See [Get Leaderboard](/api-reference/reports/get-leaderboard) for the full schema.
+See [Get Job Leaderboard](/api-reference/stack-ranking/job-leaderboard) for the full schema.
 
 ## Environments
 

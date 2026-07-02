@@ -1,0 +1,281 @@
+---
+title: "List Candidate Decisions"
+api: "POST /graphql"
+description: "List per-candidate, across-rounds AI verdicts for a job"
+---
+
+## Overview
+
+`leaderboardCandidateDecisions` lists the candidate-level AI verdicts for a job: one row per candidate, aggregated across rounds. Each row carries the AI's verdict, score, and reasoning plus any recruiter override, with `effectiveVerdict` as the derived field that resolves the override's verdict when present and the AI verdict otherwise. Use `leaderboardRoundDecisions` when you need the per-round breakdown instead of the one-row-per-candidate summary.
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query LeaderboardCandidateDecisions($jobId: UUID!) {
+  leaderboardCandidateDecisions(jobId: $jobId) {
+    decisionId
+    candidateId
+    candidateName
+    jobId
+    aiVerdict
+    aiScore
+    aiReasoning
+    aiProducedAt
+    effectiveVerdict
+    override {
+      verdict
+      reason
+      byUserId
+      at
+    }
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="jobId" type="string" required>
+  UUID of the job whose candidate-level decisions to list
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query LeaderboardCandidateDecisions($jobId: UUID!) { leaderboardCandidateDecisions(jobId: $jobId) { decisionId candidateId candidateName jobId aiVerdict aiScore aiReasoning aiProducedAt effectiveVerdict override { verdict reason byUserId at } } }",
+    "variables": {
+      "jobId": "3f8b2c1e-9d4a-4f6b-8a2e-1c5d7e9f0a3b"
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query LeaderboardCandidateDecisions($jobId: UUID!) {
+    leaderboardCandidateDecisions(jobId: $jobId) {
+      decisionId
+      candidateId
+      candidateName
+      jobId
+      aiVerdict
+      aiScore
+      aiReasoning
+      aiProducedAt
+      effectiveVerdict
+      override {
+        verdict
+        reason
+        byUserId
+        at
+      }
+    }
+  }
+`;
+
+const variables = {
+  jobId: "3f8b2c1e-9d4a-4f6b-8a2e-1c5d7e9f0a3b"
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query LeaderboardCandidateDecisions($jobId: UUID!) {
+  leaderboardCandidateDecisions(jobId: $jobId) {
+    decisionId
+    candidateId
+    candidateName
+    jobId
+    aiVerdict
+    aiScore
+    aiReasoning
+    aiProducedAt
+    effectiveVerdict
+    override {
+      verdict
+      reason
+      byUserId
+      at
+    }
+  }
+}
+"""
+
+variables = {
+    "jobId": "3f8b2c1e-9d4a-4f6b-8a2e-1c5d7e9f0a3b"
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="leaderboardCandidateDecisions" type="array">
+      Candidate-level AI verdict rows, one per candidate for the job
+
+      <Expandable title="AiCandidateDecision Object">
+        <ResponseField name="decisionId" type="string">
+          Identifier of the decision row
+        </ResponseField>
+
+        <ResponseField name="candidateId" type="string">
+          UUID of the candidate the decision belongs to
+        </ResponseField>
+
+        <ResponseField name="candidateName" type="string">
+          Candidate's name, joined from the candidates container at resolver time
+        </ResponseField>
+
+        <ResponseField name="jobId" type="string">
+          UUID of the job the decision belongs to
+        </ResponseField>
+
+        <ResponseField name="aiVerdict" type="string">
+          Verdict produced by the AI across rounds. One of `ADVANCE`, `HOLD`, `REJECT`
+        </ResponseField>
+
+        <ResponseField name="aiScore" type="integer">
+          Score the AI assigned to the candidate
+        </ResponseField>
+
+        <ResponseField name="aiReasoning" type="string">
+          The AI's explanation for its verdict
+        </ResponseField>
+
+        <ResponseField name="aiProducedAt" type="string">
+          ISO 8601 timestamp when the AI produced the verdict
+        </ResponseField>
+
+        <ResponseField name="effectiveVerdict" type="string">
+          Derived verdict that resolves the override's verdict when present, otherwise the AI verdict. One of `ADVANCE`, `HOLD`, `REJECT`
+        </ResponseField>
+
+        <ResponseField name="override" type="object">
+          Recruiter override block; null when the AI verdict has not been overridden
+
+          <Expandable title="AiDecisionOverride Object">
+            <ResponseField name="verdict" type="string">
+              Overriding verdict. One of `ADVANCE`, `HOLD`, `REJECT`
+            </ResponseField>
+
+            <ResponseField name="reason" type="string">
+              Reason the recruiter recorded for the override
+            </ResponseField>
+
+            <ResponseField name="byUserId" type="string">
+              Identifier of the user who applied the override
+            </ResponseField>
+
+            <ResponseField name="at" type="string">
+              ISO 8601 timestamp when the override was applied
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "leaderboardCandidateDecisions": [
+      {
+        "decisionId": "dec_02c4e6a8b0d2f4",
+        "candidateId": "b7e6c3d2-4f1a-4c8e-9b2d-6a5e8f0c1d24",
+        "candidateName": "Priya Raman",
+        "jobId": "3f8b2c1e-9d4a-4f6b-8a2e-1c5d7e9f0a3b",
+        "aiVerdict": "ADVANCE",
+        "aiScore": 90,
+        "aiReasoning": "Consistently strong across resume, phone, and avatar rounds.",
+        "aiProducedAt": "2026-06-22T10:12:37Z",
+        "effectiveVerdict": "ADVANCE",
+        "override": null
+      },
+      {
+        "decisionId": "dec_09b1d3f5a7c9e1",
+        "candidateId": "8c1d5f7a-2b3e-4a9c-b6d8-0e4f2a7c9b15",
+        "candidateName": "Daniel Okafor",
+        "jobId": "3f8b2c1e-9d4a-4f6b-8a2e-1c5d7e9f0a3b",
+        "aiVerdict": "REJECT",
+        "aiScore": 58,
+        "aiReasoning": "Below-bar performance in the avatar interview despite a solid resume.",
+        "aiProducedAt": "2026-06-22T10:12:37Z",
+        "effectiveVerdict": "HOLD",
+        "override": {
+          "verdict": "HOLD",
+          "reason": "Keep warm for the mid-level opening on the same team.",
+          "byUserId": "usr_5f2e9c1b7a3d",
+          "at": "2026-06-23T09:30:05Z"
+        }
+      }
+    ]
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+|------------|-------------|
+| `UNAUTHENTICATED` | Missing or invalid API key or bearer token |
+| `FORBIDDEN` | The caller is not permitted to read decisions for this tenant |
+| `BAD_USER_INPUT` | `jobId` is not a valid UUID |
+| `INTERNAL_SERVER_ERROR` | Unexpected server-side failure while reading decisions |

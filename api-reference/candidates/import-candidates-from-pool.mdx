@@ -1,0 +1,304 @@
+---
+title: "Import Candidates from Pool"
+api: "POST /graphql"
+description: "Copy candidates from the organization's internal pool into a specific job"
+---
+
+## Overview
+
+Copy candidates from your organization's internal pool into a specific job. Each source row is cloned with a fresh id, `source` set to `INTERNAL_POOL`, and `candidateStatus` set to `APPLIED`. Candidates are email-deduplicated within the target job, so duplicates surface as per-row failures with reason `duplicate_in_job` rather than failing the whole batch. Use the `internalPoolCandidates` query first to get ranked suggestions for the target job, then pass the chosen candidate ids to this mutation. A single `CANDIDATE_POOL_IMPORTED` audit event is emitted with the source ids and target job id.
+
+<Note>
+This operation requires the write scope.
+</Note>
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Mutation
+
+```graphql
+mutation ImportCandidatesFromPool($input: ImportCandidatesFromPoolInput!) {
+  importCandidatesFromPool(input: $input) {
+    copied {
+      id
+      name
+      email
+      jobId
+      organizationId
+      source
+      candidateStatus
+      eligibility
+      resumeScore
+      createdAt
+    }
+    failures {
+      id
+      reason
+    }
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="sourceCandidateIds" type="array" required>
+  Array of candidate UUIDs to copy from the internal pool. Each id must reference an existing candidate row in your organization (typically selected from the `internalPoolCandidates` query result)
+</ParamField>
+
+<ParamField body="targetJobId" type="string" required>
+  UUID of the job the candidates should be imported into
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "mutation ImportCandidatesFromPool($input: ImportCandidatesFromPoolInput!) { importCandidatesFromPool(input: $input) { copied { id name email jobId organizationId source candidateStatus eligibility resumeScore createdAt } failures { id reason } } }",
+    "variables": {
+      "input": {
+        "sourceCandidateIds": [
+          "8f14e45f-ceea-467f-a8db-9a2f3c1d5b70",
+          "1c9ad9b1-63c2-4c85-9f0a-7d2e64b0a3f1"
+        ],
+        "targetJobId": "3b241101-e2bb-4255-8caf-4136c566a962"
+      }
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  mutation ImportCandidatesFromPool($input: ImportCandidatesFromPoolInput!) {
+    importCandidatesFromPool(input: $input) {
+      copied {
+        id
+        name
+        email
+        jobId
+        organizationId
+        source
+        candidateStatus
+        eligibility
+        resumeScore
+        createdAt
+      }
+      failures {
+        id
+        reason
+      }
+    }
+  }
+`;
+
+const variables = {
+  input: {
+    sourceCandidateIds: [
+      "8f14e45f-ceea-467f-a8db-9a2f3c1d5b70",
+      "1c9ad9b1-63c2-4c85-9f0a-7d2e64b0a3f1"
+    ],
+    targetJobId: "3b241101-e2bb-4255-8caf-4136c566a962"
+  }
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+mutation ImportCandidatesFromPool($input: ImportCandidatesFromPoolInput!) {
+  importCandidatesFromPool(input: $input) {
+    copied {
+      id
+      name
+      email
+      jobId
+      organizationId
+      source
+      candidateStatus
+      eligibility
+      resumeScore
+      createdAt
+    }
+    failures {
+      id
+      reason
+    }
+  }
+}
+"""
+
+variables = {
+    "input": {
+        "sourceCandidateIds": [
+            "8f14e45f-ceea-467f-a8db-9a2f3c1d5b70",
+            "1c9ad9b1-63c2-4c85-9f0a-7d2e64b0a3f1"
+        ],
+        "targetJobId": "3b241101-e2bb-4255-8caf-4136c566a962"
+    }
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="importCandidatesFromPool" type="object">
+      Result envelope with the cloned rows and any per-row failures
+
+      <Expandable title="ImportFromPoolResult properties">
+        <ResponseField name="copied" type="array">
+          The newly created candidate rows on the target job
+
+          <Expandable title="Candidate properties">
+            <ResponseField name="id" type="string">
+              Fresh UUID assigned to the cloned candidate row
+            </ResponseField>
+
+            <ResponseField name="name" type="string">
+              Candidate's full name
+            </ResponseField>
+
+            <ResponseField name="email" type="string">
+              Candidate's email address (nullable)
+            </ResponseField>
+
+            <ResponseField name="jobId" type="string">
+              Set to the target job's id
+            </ResponseField>
+
+            <ResponseField name="organizationId" type="string">
+              Organization identifier
+            </ResponseField>
+
+            <ResponseField name="source" type="string">
+              Provenance of the row; always `INTERNAL_POOL` for imported candidates. Other values: `MANUAL`, `BULK_UPLOAD`, `CAREERS_PAGE`
+            </ResponseField>
+
+            <ResponseField name="candidateStatus" type="string">
+              Lifecycle status; always `APPLIED` for freshly imported rows
+            </ResponseField>
+
+            <ResponseField name="eligibility" type="string">
+              The recruiter's eligibility decision: `ELIGIBLE`, `INELIGIBLE`, or `UNSET`
+            </ResponseField>
+
+            <ResponseField name="resumeScore" type="number">
+              AI resume score carried over from the source row (nullable)
+            </ResponseField>
+
+            <ResponseField name="createdAt" type="string">
+              ISO 8601 timestamp when the cloned row was created
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+
+        <ResponseField name="failures" type="array">
+          Per-row failures; a mid-batch error never throws, so partial success is observable
+
+          <Expandable title="BulkOperationFailure properties">
+            <ResponseField name="id" type="string">
+              UUID of the source candidate that failed to import
+            </ResponseField>
+
+            <ResponseField name="reason" type="string">
+              Opaque short code describing the failure (e.g. `not_found`, `duplicate_in_job`, `cross_tenant`)
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "importCandidatesFromPool": {
+      "copied": [
+        {
+          "id": "b7e2a9d4-5c1f-4e8a-9d36-02f7c4a81e55",
+          "name": "Priya Raman",
+          "email": "priya.raman@example.com",
+          "jobId": "3b241101-e2bb-4255-8caf-4136c566a962",
+          "organizationId": "acme",
+          "source": "INTERNAL_POOL",
+          "candidateStatus": "APPLIED",
+          "eligibility": "UNSET",
+          "resumeScore": 84.5,
+          "createdAt": "2026-07-02T16:05:33.918Z"
+        }
+      ],
+      "failures": [
+        {
+          "id": "1c9ad9b1-63c2-4c85-9f0a-7d2e64b0a3f1",
+          "reason": "duplicate_in_job"
+        }
+      ]
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+|------------|-------------|
+| UNAUTHENTICATED | Missing or invalid API key or bearer token |
+| FORBIDDEN | The token lacks the write scope required for this mutation |
+| BAD_USER_INPUT | `targetJobId` or a source candidate id is not a valid UUID, or the id list is empty |
+| NOT_FOUND | The target job does not exist in your tenant |
+| INTERNAL_SERVER_ERROR | Unexpected server-side failure while cloning candidate rows |

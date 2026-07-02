@@ -1,0 +1,254 @@
+---
+title: "Update Candidate Eligibility"
+api: "POST /graphql"
+description: "Flip a single candidate's eligibility decision and receive the updated candidate"
+---
+
+## Overview
+
+Flip a single candidate's eligibility — the recruiter's "would I take this person further?" signal, which is distinct from the lifecycle `candidateStatus`. The mutation emits a `CANDIDATE_ELIGIBILITY_CHANGED` audit event with before/after values and returns the updated `Candidate` so your UI can refresh without an extra read. To change eligibility for up to 500 candidates in one call, use `bulkUpdateEligibility` instead; this single-row path exists so the audit operation is logged per row when only one candidate is affected.
+
+<Note>
+This operation requires the write scope.
+</Note>
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Mutation
+
+```graphql
+mutation UpdateCandidateEligibility($input: UpdateCandidateEligibilityInput!) {
+  updateCandidateEligibility(input: $input) {
+    id
+    name
+    email
+    jobId
+    organizationId
+    eligibility
+    candidateStatus
+    verdictId
+    isStarred
+    updatedAt
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="candidateId" type="string" required>
+  UUID of the candidate whose eligibility to update
+</ParamField>
+
+<ParamField body="eligibility" type="CandidateEligibility" required>
+  The new eligibility decision. Allowed values: `ELIGIBLE`, `INELIGIBLE`, `UNSET`
+</ParamField>
+
+<ParamField body="reason" type="string">
+  Optional free-text reason recorded alongside the change in the audit trail
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "mutation UpdateCandidateEligibility($input: UpdateCandidateEligibilityInput!) { updateCandidateEligibility(input: $input) { id name email jobId organizationId eligibility candidateStatus verdictId isStarred updatedAt } }",
+    "variables": {
+      "input": {
+        "candidateId": "8f14e45f-ceea-467f-a8db-9a2f3c1d5b70",
+        "eligibility": "ELIGIBLE",
+        "reason": "Strong systems design background for the platform team"
+      }
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  mutation UpdateCandidateEligibility($input: UpdateCandidateEligibilityInput!) {
+    updateCandidateEligibility(input: $input) {
+      id
+      name
+      email
+      jobId
+      organizationId
+      eligibility
+      candidateStatus
+      verdictId
+      isStarred
+      updatedAt
+    }
+  }
+`;
+
+const variables = {
+  input: {
+    candidateId: "8f14e45f-ceea-467f-a8db-9a2f3c1d5b70",
+    eligibility: "ELIGIBLE",
+    reason: "Strong systems design background for the platform team"
+  }
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+mutation UpdateCandidateEligibility($input: UpdateCandidateEligibilityInput!) {
+  updateCandidateEligibility(input: $input) {
+    id
+    name
+    email
+    jobId
+    organizationId
+    eligibility
+    candidateStatus
+    verdictId
+    isStarred
+    updatedAt
+  }
+}
+"""
+
+variables = {
+    "input": {
+        "candidateId": "8f14e45f-ceea-467f-a8db-9a2f3c1d5b70",
+        "eligibility": "ELIGIBLE",
+        "reason": "Strong systems design background for the platform team"
+    }
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="updateCandidateEligibility" type="object">
+      The updated candidate
+
+      <Expandable title="Candidate properties">
+        <ResponseField name="id" type="string">
+          Unique candidate identifier (UUID)
+        </ResponseField>
+
+        <ResponseField name="name" type="string">
+          Candidate's full name
+        </ResponseField>
+
+        <ResponseField name="email" type="string">
+          Candidate's email address (nullable)
+        </ResponseField>
+
+        <ResponseField name="jobId" type="string">
+          Identifier of the job the candidate belongs to
+        </ResponseField>
+
+        <ResponseField name="organizationId" type="string">
+          Organization identifier
+        </ResponseField>
+
+        <ResponseField name="eligibility" type="string">
+          The recruiter's eligibility decision: `ELIGIBLE`, `INELIGIBLE`, or `UNSET`. Legacy rows that predate this field surface as `UNSET`
+        </ResponseField>
+
+        <ResponseField name="candidateStatus" type="string">
+          Lifecycle status in the hiring pipeline: `APPLIED`, `IN_PROGRESS`, `ADVANCED`, `REJECTED`, `HIRED`, or `WITHDRAWN`
+        </ResponseField>
+
+        <ResponseField name="verdictId" type="string">
+          Recruiter / AI verdict slug (e.g. `shortlisted`); missing on legacy rows
+        </ResponseField>
+
+        <ResponseField name="isStarred" type="boolean">
+          Whether the recruiter marked this candidate as a standout
+        </ResponseField>
+
+        <ResponseField name="updatedAt" type="string">
+          ISO 8601 timestamp of the last update
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "updateCandidateEligibility": {
+      "id": "8f14e45f-ceea-467f-a8db-9a2f3c1d5b70",
+      "name": "Priya Raman",
+      "email": "priya.raman@example.com",
+      "jobId": "3b241101-e2bb-4255-8caf-4136c566a962",
+      "organizationId": "acme",
+      "eligibility": "ELIGIBLE",
+      "candidateStatus": "IN_PROGRESS",
+      "verdictId": "shortlisted",
+      "isStarred": false,
+      "updatedAt": "2026-07-02T14:23:08.412Z"
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+|------------|-------------|
+| UNAUTHENTICATED | Missing or invalid API key or bearer token |
+| FORBIDDEN | The token lacks the write scope required for this mutation |
+| BAD_USER_INPUT | `eligibility` is not a valid `CandidateEligibility` value or `candidateId` is not a valid UUID |
+| NOT_FOUND | No candidate with the given id exists in your tenant |
+| INTERNAL_SERVER_ERROR | Unexpected server-side failure while persisting the change |

@@ -1,0 +1,450 @@
+---
+title: "Update Job"
+api: "POST /graphql"
+description: "Update the fields of an existing job"
+---
+
+## Overview
+
+Update an existing job in your organization. Only `id` is required; every other field is optional, so you can send just the fields you want to change. Use this after `createJob` to enrich a draft job's details, or at any point in the job's lifecycle; to change only the lifecycle status you can also use the dedicated `publishJob` and `closeJob` mutations.
+
+<Note>
+This operation requires the `write` scope.
+</Note>
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Mutation
+
+```graphql
+mutation UpdateJob($input: UpdateJobInput!) {
+  updateJob(input: $input) {
+    id
+    uid
+    title
+    category
+    type
+    location
+    city
+    status
+    department
+    employmentType
+    ctc
+    ctcCurrency
+    noticePeriod
+    publishToCareersPage
+    resumeScoreThreshold
+    agentRecommendation
+    skills {
+      skillName
+      skillLevel
+      requirementType
+    }
+    updatedAt
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="id" type="string" required>
+  UUID of the job to update.
+</ParamField>
+
+<ParamField body="title" type="string">
+  Job title.
+</ParamField>
+
+<ParamField body="category" type="string">
+  Job category.
+</ParamField>
+
+<ParamField body="type" type="string">
+  Work arrangement: `Hybrid`, `Remote`, or `OnSite`.
+</ParamField>
+
+<ParamField body="location" type="string">
+  Region for the job (`APAC`, `EMEA`, or `AMERICAS`).
+</ParamField>
+
+<ParamField body="city" type="string">
+  City where the job is based.
+</ParamField>
+
+<ParamField body="jobDescription" type="string">
+  Full job description text.
+</ParamField>
+
+<ParamField body="noOfOpenings" type="string">
+  Number of open positions.
+</ParamField>
+
+<ParamField body="minimumExperience" type="string">
+  Minimum years of experience required.
+</ParamField>
+
+<ParamField body="maximumExperience" type="string">
+  Maximum years of experience considered.
+</ParamField>
+
+<ParamField body="ctc" type="string">
+  Compensation (cost to company) for the role.
+</ParamField>
+
+<ParamField body="noticePeriod" type="string">
+  Acceptable notice period for candidates.
+</ParamField>
+
+<ParamField body="skills" type="array">
+  Array of skill objects. Each item requires `skillName` (string), `skillLevel` (string; `Beginner`, `Intermediate`, `Advanced`, or `Expert`), and `requirementType` (string; `Compulsory` or `Optional`).
+</ParamField>
+
+<ParamField body="performanceSkills" type="array">
+  Array of performance-skill objects. Each item requires `performanceSkill` (string).
+</ParamField>
+
+<ParamField body="status" type="JobStatus">
+  Job lifecycle status. Allowed values: `DRAFT`, `PUBLISHED`, `CLOSED`.
+</ParamField>
+
+<ParamField body="publishToCareersPage" type="boolean">
+  Whether the job appears on the public careers page once published.
+</ParamField>
+
+<ParamField body="aiInterviewDeadline" type="string">
+  Deadline for candidates to complete the AI interview.
+</ParamField>
+
+<ParamField body="aiInterviewBenchmarkScore" type="integer">
+  Benchmark score for the AI interview.
+</ParamField>
+
+<ParamField body="resumeScoreThreshold" type="integer">
+  Minimum AI-derived resume score (0-100) below which a candidate is auto-rejected at screening.
+</ParamField>
+
+<ParamField body="department" type="string">
+  Recruiter-picked department (for example, "engineering"); distinct from the derived `category`.
+</ParamField>
+
+<ParamField body="hiringManager" type="string">
+  User ID of the hiring manager assigned to the job.
+</ParamField>
+
+<ParamField body="employmentType" type="string">
+  Employment type: `full-time`, `part-time`, `contract`, or `internship`.
+</ParamField>
+
+<ParamField body="ctcCurrency" type="string">
+  ISO 4217 currency for `ctc`: `INR`, `USD`, or `EUR`.
+</ParamField>
+
+<ParamField body="agentRecommendation" type="integer">
+  AI screening confidence band. One of `95`, `85`, `77`, `72`, `65`, `55`, `40`.
+</ParamField>
+
+<ParamField body="pipelineId" type="string">
+  ID of the interview pipeline attached to the job.
+</ParamField>
+
+<ParamField body="customerId" type="string">
+  UUID of the customer the job is created for.
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "mutation UpdateJob($input: UpdateJobInput!) { updateJob(input: $input) { id uid title category type location city status department employmentType ctc ctcCurrency noticePeriod publishToCareersPage resumeScoreThreshold agentRecommendation skills { skillName skillLevel requirementType } updatedAt } }",
+    "variables": {
+      "input": {
+        "id": "3f8a2c1e-9d4b-4e6a-8c7f-1b2d3e4f5a6b",
+        "type": "Remote",
+        "city": "Austin",
+        "department": "engineering",
+        "employmentType": "full-time",
+        "ctc": "180000",
+        "ctcCurrency": "USD",
+        "resumeScoreThreshold": 60,
+        "skills": [
+          { "skillName": "Go", "skillLevel": "Advanced", "requirementType": "Compulsory" }
+        ]
+      }
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  mutation UpdateJob($input: UpdateJobInput!) {
+    updateJob(input: $input) {
+      id
+      uid
+      title
+      category
+      type
+      location
+      city
+      status
+      department
+      employmentType
+      ctc
+      ctcCurrency
+      noticePeriod
+      publishToCareersPage
+      resumeScoreThreshold
+      agentRecommendation
+      skills {
+        skillName
+        skillLevel
+        requirementType
+      }
+      updatedAt
+    }
+  }
+`;
+
+const variables = {
+  input: {
+    id: "3f8a2c1e-9d4b-4e6a-8c7f-1b2d3e4f5a6b",
+    type: "Remote",
+    city: "Austin",
+    department: "engineering",
+    employmentType: "full-time",
+    ctc: "180000",
+    ctcCurrency: "USD",
+    resumeScoreThreshold: 60,
+    skills: [
+      { skillName: "Go", skillLevel: "Advanced", requirementType: "Compulsory" }
+    ]
+  }
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+mutation UpdateJob($input: UpdateJobInput!) {
+  updateJob(input: $input) {
+    id
+    uid
+    title
+    category
+    type
+    location
+    city
+    status
+    department
+    employmentType
+    ctc
+    ctcCurrency
+    noticePeriod
+    publishToCareersPage
+    resumeScoreThreshold
+    agentRecommendation
+    skills {
+      skillName
+      skillLevel
+      requirementType
+    }
+    updatedAt
+  }
+}
+"""
+
+variables = {
+    "input": {
+        "id": "3f8a2c1e-9d4b-4e6a-8c7f-1b2d3e4f5a6b",
+        "type": "Remote",
+        "city": "Austin",
+        "department": "engineering",
+        "employmentType": "full-time",
+        "ctc": "180000",
+        "ctcCurrency": "USD",
+        "resumeScoreThreshold": 60,
+        "skills": [
+            {"skillName": "Go", "skillLevel": "Advanced", "requirementType": "Compulsory"}
+        ]
+    }
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="updateJob" type="object">
+      <Expandable title="updateJob properties">
+        <ResponseField name="id" type="string">
+          Unique job identifier (UUID).
+        </ResponseField>
+
+        <ResponseField name="uid" type="string">
+          Friendly per-tenant job code (for example, JOB-79BB).
+        </ResponseField>
+
+        <ResponseField name="title" type="string">
+          Job title.
+        </ResponseField>
+
+        <ResponseField name="category" type="string">
+          Job category.
+        </ResponseField>
+
+        <ResponseField name="type" type="string">
+          Work arrangement (`Hybrid`, `Remote`, or `OnSite`).
+        </ResponseField>
+
+        <ResponseField name="location" type="string">
+          Region for the job.
+        </ResponseField>
+
+        <ResponseField name="city" type="string">
+          City where the job is based.
+        </ResponseField>
+
+        <ResponseField name="status" type="string">
+          Job lifecycle status. One of `DRAFT`, `PUBLISHED`, `CLOSED`.
+        </ResponseField>
+
+        <ResponseField name="department" type="string">
+          Recruiter-picked department. Null on legacy jobs.
+        </ResponseField>
+
+        <ResponseField name="employmentType" type="string">
+          Employment type (`full-time`, `part-time`, `contract`, or `internship`). Null on legacy jobs.
+        </ResponseField>
+
+        <ResponseField name="ctc" type="string">
+          Compensation for the role.
+        </ResponseField>
+
+        <ResponseField name="ctcCurrency" type="string">
+          ISO 4217 currency for `ctc` (`INR`, `USD`, or `EUR`). Null on legacy jobs.
+        </ResponseField>
+
+        <ResponseField name="noticePeriod" type="string">
+          Acceptable notice period.
+        </ResponseField>
+
+        <ResponseField name="publishToCareersPage" type="boolean">
+          Whether the job appears on the public careers page once published.
+        </ResponseField>
+
+        <ResponseField name="resumeScoreThreshold" type="integer">
+          Auto-reject resume score threshold (0-100). Null on legacy jobs.
+        </ResponseField>
+
+        <ResponseField name="agentRecommendation" type="integer">
+          AI screening confidence band (95 / 85 / 77 / 72 / 65 / 55 / 40). Null on legacy jobs.
+        </ResponseField>
+
+        <ResponseField name="skills" type="array">
+          Array of skill objects with `skillName`, `skillLevel`, and `requirementType`.
+        </ResponseField>
+
+        <ResponseField name="updatedAt" type="string">
+          ISO 8601 timestamp when the job was last updated.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "updateJob": {
+      "id": "3f8a2c1e-9d4b-4e6a-8c7f-1b2d3e4f5a6b",
+      "uid": "JOB-79BB",
+      "title": "Senior Backend Engineer",
+      "category": "Engineering",
+      "type": "Remote",
+      "location": "AMERICAS",
+      "city": "Austin",
+      "status": "DRAFT",
+      "department": "engineering",
+      "employmentType": "full-time",
+      "ctc": "180000",
+      "ctcCurrency": "USD",
+      "noticePeriod": "30 days",
+      "publishToCareersPage": true,
+      "resumeScoreThreshold": 60,
+      "agentRecommendation": 77,
+      "skills": [
+        {
+          "skillName": "Go",
+          "skillLevel": "Advanced",
+          "requirementType": "Compulsory"
+        }
+      ],
+      "updatedAt": "2026-07-02T10:42:08.000Z"
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+| --- | --- |
+| UNAUTHENTICATED | Missing or invalid API key or bearer token. |
+| FORBIDDEN | The caller lacks the Recruiter or Admin role, or the `write` scope. |
+| BAD_USER_INPUT | A supplied field fails validation (for example, an unknown `status` value). |
+| NOT_FOUND | No job with the given `id` exists for the caller's tenant. |
+| INTERNAL_SERVER_ERROR | Unexpected server-side failure while updating the job. |

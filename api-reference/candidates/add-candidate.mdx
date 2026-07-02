@@ -1,0 +1,322 @@
+---
+title: "Add Candidate"
+api: "POST /graphql"
+description: "Manually add a single candidate to a job"
+---
+
+## Overview
+
+Manually add a candidate to a job — for example, when a recruiter sources a candidate directly. The new candidate is created with an initial `candidateStatus` of `APPLIED` and a `source` of `MANUAL`, and a `CANDIDATE_ADDED` audit event is emitted. For bulk resume ingestion use the bulk resume-upload endpoint instead, and poll `getBulkUploadJob` for its progress; use `updateCandidate` to edit the row after creation.
+
+<Note>
+This operation requires the **write** scope.
+</Note>
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Mutation
+
+```graphql
+mutation addCandidate($input: AddCandidateInput!) {
+  addCandidate(input: $input) {
+    id
+    name
+    email
+    phoneNumber
+    jobId
+    organizationId
+    candidateStatus
+    eligibility
+    source
+    candidateLocation
+    candidateCompany
+    role
+    isStarred
+    createdAt
+    updatedAt
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="jobId" type="string" required>
+  UUID of the job the candidate is added to
+</ParamField>
+
+<ParamField body="name" type="string" required>
+  Full name of the candidate
+</ParamField>
+
+<ParamField body="email" type="string">
+  Email address of the candidate
+</ParamField>
+
+<ParamField body="phoneNumber" type="string">
+  Phone number of the candidate
+</ParamField>
+
+<ParamField body="candidateLocation" type="string">
+  Location of the candidate
+</ParamField>
+
+<ParamField body="candidateCompany" type="string">
+  Company the candidate currently works for
+</ParamField>
+
+<ParamField body="role" type="string">
+  Current role or title of the candidate
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "mutation addCandidate($input: AddCandidateInput!) { addCandidate(input: $input) { id name email phoneNumber jobId organizationId candidateStatus eligibility source candidateLocation candidateCompany role isStarred createdAt updatedAt } }",
+    "variables": {
+      "input": {
+        "jobId": "b2e6d1c4-8f3a-4d97-9c5e-2a1f6b8e4d30",
+        "name": "Priya Sharma",
+        "email": "priya.sharma@example.com",
+        "phoneNumber": "+1-415-555-0142",
+        "candidateLocation": "San Francisco, CA",
+        "candidateCompany": "Northwind Labs",
+        "role": "Senior Backend Engineer"
+      }
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  mutation addCandidate($input: AddCandidateInput!) {
+    addCandidate(input: $input) {
+      id
+      name
+      email
+      phoneNumber
+      jobId
+      organizationId
+      candidateStatus
+      eligibility
+      source
+      candidateLocation
+      candidateCompany
+      role
+      isStarred
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+const variables = {
+  input: {
+    jobId: "b2e6d1c4-8f3a-4d97-9c5e-2a1f6b8e4d30",
+    name: "Priya Sharma",
+    email: "priya.sharma@example.com",
+    phoneNumber: "+1-415-555-0142",
+    candidateLocation: "San Francisco, CA",
+    candidateCompany: "Northwind Labs",
+    role: "Senior Backend Engineer"
+  }
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+mutation addCandidate($input: AddCandidateInput!) {
+  addCandidate(input: $input) {
+    id
+    name
+    email
+    phoneNumber
+    jobId
+    organizationId
+    candidateStatus
+    eligibility
+    source
+    candidateLocation
+    candidateCompany
+    role
+    isStarred
+    createdAt
+    updatedAt
+  }
+}
+"""
+
+variables = {
+    "input": {
+        "jobId": "b2e6d1c4-8f3a-4d97-9c5e-2a1f6b8e4d30",
+        "name": "Priya Sharma",
+        "email": "priya.sharma@example.com",
+        "phoneNumber": "+1-415-555-0142",
+        "candidateLocation": "San Francisco, CA",
+        "candidateCompany": "Northwind Labs",
+        "role": "Senior Backend Engineer"
+    }
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="addCandidate" type="object">
+      The newly created candidate
+
+      <Expandable title="addCandidate properties">
+        <ResponseField name="id" type="string">
+          UUID of the new candidate
+        </ResponseField>
+
+        <ResponseField name="name" type="string">
+          Full name of the candidate
+        </ResponseField>
+
+        <ResponseField name="email" type="string">
+          Email address, if supplied
+        </ResponseField>
+
+        <ResponseField name="phoneNumber" type="string">
+          Phone number, if supplied
+        </ResponseField>
+
+        <ResponseField name="jobId" type="string">
+          Identifier of the job the candidate belongs to
+        </ResponseField>
+
+        <ResponseField name="organizationId" type="string">
+          Identifier of the owning organization
+        </ResponseField>
+
+        <ResponseField name="candidateStatus" type="string">
+          Lifecycle status in the hiring pipeline. Always `APPLIED` on creation. Allowed values: `APPLIED`, `IN_PROGRESS`, `ADVANCED`, `REJECTED`, `HIRED`, `WITHDRAWN`
+        </ResponseField>
+
+        <ResponseField name="eligibility" type="string">
+          Recruiter's eligibility decision, distinct from lifecycle status. Allowed values: `ELIGIBLE`, `INELIGIBLE`, `UNSET`
+        </ResponseField>
+
+        <ResponseField name="source" type="string">
+          Provenance of the candidate row. Always `MANUAL` for this mutation. Allowed values: `MANUAL`, `BULK_UPLOAD`, `INTERNAL_POOL`, `CAREERS_PAGE`
+        </ResponseField>
+
+        <ResponseField name="candidateLocation" type="string">
+          Location of the candidate, if supplied
+        </ResponseField>
+
+        <ResponseField name="candidateCompany" type="string">
+          Current company of the candidate, if supplied
+        </ResponseField>
+
+        <ResponseField name="role" type="string">
+          Current role or title, if supplied
+        </ResponseField>
+
+        <ResponseField name="isStarred" type="boolean">
+          Whether a recruiter has marked the candidate as a standout; `false` on creation
+        </ResponseField>
+
+        <ResponseField name="createdAt" type="string">
+          ISO 8601 creation timestamp
+        </ResponseField>
+
+        <ResponseField name="updatedAt" type="string">
+          ISO 8601 last-update timestamp
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "addCandidate": {
+      "id": "7d0f2a4e-9b1c-4e6d-8a3f-5c2b1e9d7f60",
+      "name": "Priya Sharma",
+      "email": "priya.sharma@example.com",
+      "phoneNumber": "+1-415-555-0142",
+      "jobId": "b2e6d1c4-8f3a-4d97-9c5e-2a1f6b8e4d30",
+      "organizationId": "acme",
+      "candidateStatus": "APPLIED",
+      "eligibility": "UNSET",
+      "source": "MANUAL",
+      "candidateLocation": "San Francisco, CA",
+      "candidateCompany": "Northwind Labs",
+      "role": "Senior Backend Engineer",
+      "isStarred": false,
+      "createdAt": "2026-07-02T09:14:33.000Z",
+      "updatedAt": "2026-07-02T09:14:33.000Z"
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+| --- | --- |
+| UNAUTHENTICATED | Missing or invalid API key or bearer token |
+| FORBIDDEN | The token does not include the write scope |
+| BAD_USER_INPUT | Required fields are missing or malformed (e.g. `jobId` is not a valid UUID) |
+| NOT_FOUND | The referenced job does not exist in the caller's tenant |
+| INTERNAL_SERVER_ERROR | Unexpected server-side failure while creating the candidate |

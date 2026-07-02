@@ -1,0 +1,258 @@
+---
+title: "List Questions by Job"
+api: "POST /graphql"
+description: "Retrieve the interview questions attached to a job, optionally filtered by interview round"
+---
+
+## Overview
+
+The `questionsByJob` query returns the questions in a job's Step-2 questionnaire, sorted by `order` — ordered rows first, then unordered rows by `createdAt`. Pass `parentCategory` to return only one interview round's questions (clients typically fire one query per round to segregate the list), or omit it to get every round in one flat list. To modify the questionnaire, use the `saveJobQuestionnaire`, `addJobQuestion`, `updateJobQuestion`, and `deleteJobQuestion` mutations.
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query QuestionsByJob($jobId: UUID!, $parentCategory: String) {
+  questionsByJob(jobId: $jobId, parentCategory: $parentCategory) {
+    id
+    jobId
+    qId
+    question
+    sampleAnswer
+    questionCategory
+    parentCategory
+    selected
+    suggested
+    order
+    createdAt
+    updatedAt
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="jobId" type="string" required>
+  UUID of the job whose questions to retrieve. The job must belong to the caller's tenant.
+</ParamField>
+
+<ParamField body="parentCategory" type="string">
+  Restrict results to one interview round. Matched exactly against the stored `parentCategory` — one of the `ParentCategory` enum values (`AI_Interview`, `Panel_Round`, `HR_Round`, `Calling_Agent`) or the per-stage name when the job has a pipeline. Omit to return every round in one flat list.
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query QuestionsByJob($jobId: UUID!, $parentCategory: String) { questionsByJob(jobId: $jobId, parentCategory: $parentCategory) { id jobId qId question sampleAnswer questionCategory parentCategory selected suggested order createdAt updatedAt } }",
+    "variables": {
+      "jobId": "1d7a5f2e-9c3b-4e8a-b6d4-2f0c8a9e5b71",
+      "parentCategory": "AI_Interview"
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query QuestionsByJob($jobId: UUID!, $parentCategory: String) {
+    questionsByJob(jobId: $jobId, parentCategory: $parentCategory) {
+      id
+      jobId
+      qId
+      question
+      sampleAnswer
+      questionCategory
+      parentCategory
+      selected
+      suggested
+      order
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+const variables = {
+  jobId: "1d7a5f2e-9c3b-4e8a-b6d4-2f0c8a9e5b71",
+  parentCategory: "AI_Interview"
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query QuestionsByJob($jobId: UUID!, $parentCategory: String) {
+  questionsByJob(jobId: $jobId, parentCategory: $parentCategory) {
+    id
+    jobId
+    qId
+    question
+    sampleAnswer
+    questionCategory
+    parentCategory
+    selected
+    suggested
+    order
+    createdAt
+    updatedAt
+  }
+}
+"""
+
+variables = {
+    "jobId": "1d7a5f2e-9c3b-4e8a-b6d4-2f0c8a9e5b71",
+    "parentCategory": "AI_Interview"
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="questionsByJob" type="array">
+      The job's questions, sorted by `order` (ordered rows first, then unordered rows by `createdAt`).
+
+      <Expandable title="Question Object">
+        <ResponseField name="id" type="string">
+          Unique question identifier (UUID).
+        </ResponseField>
+        <ResponseField name="jobId" type="string">
+          Identifier of the job this question belongs to.
+        </ResponseField>
+        <ResponseField name="qId" type="string">
+          Server-generated short question identifier.
+        </ResponseField>
+        <ResponseField name="question" type="string">
+          The interview question text.
+        </ResponseField>
+        <ResponseField name="sampleAnswer" type="string">
+          Model answer used to grade candidate responses.
+        </ResponseField>
+        <ResponseField name="questionCategory" type="string">
+          Question category. One of the `QuestionCategory` enum values: `Technical`, `Behavioral`, `Logical`, `Communication`.
+        </ResponseField>
+        <ResponseField name="parentCategory" type="string">
+          Interview round the question belongs to — one of the `ParentCategory` enum values (`AI_Interview`, `Panel_Round`, `HR_Round`, `Calling_Agent`) or the per-stage name when the job has a pipeline.
+        </ResponseField>
+        <ResponseField name="selected" type="boolean">
+          Whether the question is selected for use in the interview.
+        </ResponseField>
+        <ResponseField name="suggested" type="boolean">
+          Whether the question was suggested by the LLM rather than authored by the recruiter.
+        </ResponseField>
+        <ResponseField name="order" type="integer">
+          Display position within the Step-2 questionnaire list; lower shows first. Null on rows created before ordering shipped.
+        </ResponseField>
+        <ResponseField name="createdAt" type="string">
+          ISO 8601 timestamp of when the question was created.
+        </ResponseField>
+        <ResponseField name="updatedAt" type="string">
+          ISO 8601 timestamp of the last update.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "questionsByJob": [
+      {
+        "id": "4c8e2b91-6f5d-4a3e-8b07-9d1f6c2e4a58",
+        "jobId": "1d7a5f2e-9c3b-4e8a-b6d4-2f0c8a9e5b71",
+        "qId": "Q-001",
+        "question": "How would you design a rate limiter for a high-traffic public API?",
+        "sampleAnswer": "A strong answer covers token-bucket or sliding-window algorithms, distributed state via Redis, and graceful 429 responses...",
+        "questionCategory": "Technical",
+        "parentCategory": "AI_Interview",
+        "selected": true,
+        "suggested": true,
+        "order": 0,
+        "createdAt": "2026-06-11T10:02:33.000Z",
+        "updatedAt": "2026-06-15T16:40:19.000Z"
+      },
+      {
+        "id": "9a1f7d34-2c6b-4e09-a5d8-7b3e0f4c8d12",
+        "jobId": "1d7a5f2e-9c3b-4e8a-b6d4-2f0c8a9e5b71",
+        "qId": "Q-002",
+        "question": "Tell me about a time you disagreed with a technical decision on your team.",
+        "sampleAnswer": "A strong answer describes the disagreement, how the candidate advocated with data, and how they committed to the outcome...",
+        "questionCategory": "Behavioral",
+        "parentCategory": "AI_Interview",
+        "selected": true,
+        "suggested": false,
+        "order": 1,
+        "createdAt": "2026-06-11T10:05:12.000Z",
+        "updatedAt": "2026-06-11T10:05:12.000Z"
+      }
+    ]
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+|------------|-------------|
+| UNAUTHENTICATED | Missing or invalid API key or bearer token |
+| FORBIDDEN | The caller lacks read access to jobs in this tenant |
+| BAD_USER_INPUT | `jobId` is not a valid UUID |
+| NOT_FOUND | No job with this `jobId` exists in the caller's tenant |
+| INTERNAL_SERVER_ERROR | Unexpected server-side failure |

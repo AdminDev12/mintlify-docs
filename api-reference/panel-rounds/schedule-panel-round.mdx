@@ -1,0 +1,317 @@
+---
+title: "Schedule Panel Round"
+api: "POST /graphql"
+description: "Schedule a panel or HR interview round for a single candidate"
+---
+
+## Overview
+
+`schedulePanelRound` schedules a panel or HR interview round for one candidate. It creates a Teams meeting on the calling recruiter's calendar (Outlook invites are sent automatically to all attendees) and publishes a `panel.session.scheduled` event so the Exterview bot can dial in two minutes before the start time. Use this operation for one-off, per-candidate scheduling; to dispatch invites to a batch of candidates in a single call, use `sendPanelRoundInvites` instead.
+
+<Note>
+This operation requires the **write** scope.
+</Note>
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Mutation
+
+```graphql
+mutation SchedulePanelRound($input: SchedulePanelRoundInput!) {
+  schedulePanelRound(input: $input) {
+    id
+    jobId
+    candidateId
+    status
+    roundType
+    captureMode
+    recruiterUserIds
+    organizerUserOid
+    teamsJoinUrl
+    scheduledAt
+    durationMinutes
+    correlationId
+    createdAt
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="jobId" type="string" required>
+  UUID of the job the round belongs to
+</ParamField>
+
+<ParamField body="candidateId" type="string" required>
+  UUID of the candidate being interviewed
+</ParamField>
+
+<ParamField body="recruiterUserIds" type="array" required>
+  AAD object IDs of the recruiters that should be on the call. The calling recruiter is added automatically as the organizer.
+</ParamField>
+
+<ParamField body="scheduledAt" type="string" required>
+  When the round begins (ISO 8601 DateTime)
+</ParamField>
+
+<ParamField body="durationMinutes" type="integer" default={45}>
+  Meeting length in minutes. Defaults to 45 when omitted.
+</ParamField>
+
+<ParamField body="roundType" type="RoundType" required>
+  Type of round. Allowed values: `PANEL`, `HR`
+</ParamField>
+
+<ParamField body="subjectOverride" type="string">
+  Custom subject line for the calendar invite
+</ParamField>
+
+<ParamField body="timeZone" type="string" default="UTC">
+  IANA time zone (for example, `Asia/Kolkata`). Defaults to UTC.
+</ParamField>
+
+<ParamField body="captureMode" type="PanelCaptureMode" default="TEAMS">
+  Capture flow. `TEAMS` dials an Exterview bot into a Teams meeting (requires Bot Framework admin consent on the tenant); `VIDEOSDK` provisions a native Exterview videosdk.live room. Defaults to `TEAMS`.
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "mutation SchedulePanelRound($input: SchedulePanelRoundInput!) { schedulePanelRound(input: $input) { id jobId candidateId status roundType captureMode recruiterUserIds organizerUserOid teamsJoinUrl scheduledAt durationMinutes correlationId createdAt } }",
+    "variables": {
+      "input": {
+        "jobId": "3f8a1c2e-9d4b-4a6f-b7e1-5c2d8f0a9b3e",
+        "candidateId": "b1e2c3d4-5f6a-4b7c-8d9e-0f1a2b3c4d5e",
+        "recruiterUserIds": ["1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d"],
+        "scheduledAt": "2026-07-10T14:00:00.000Z",
+        "durationMinutes": 60,
+        "roundType": "PANEL",
+        "timeZone": "Asia/Kolkata",
+        "captureMode": "TEAMS"
+      }
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  mutation SchedulePanelRound($input: SchedulePanelRoundInput!) {
+    schedulePanelRound(input: $input) {
+      id
+      jobId
+      candidateId
+      status
+      roundType
+      captureMode
+      recruiterUserIds
+      organizerUserOid
+      teamsJoinUrl
+      scheduledAt
+      durationMinutes
+      correlationId
+      createdAt
+    }
+  }
+`;
+
+const variables = {
+  input: {
+    jobId: "3f8a1c2e-9d4b-4a6f-b7e1-5c2d8f0a9b3e",
+    candidateId: "b1e2c3d4-5f6a-4b7c-8d9e-0f1a2b3c4d5e",
+    recruiterUserIds: ["1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d"],
+    scheduledAt: "2026-07-10T14:00:00.000Z",
+    durationMinutes: 60,
+    roundType: "PANEL",
+    timeZone: "Asia/Kolkata",
+    captureMode: "TEAMS"
+  }
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+mutation SchedulePanelRound($input: SchedulePanelRoundInput!) {
+  schedulePanelRound(input: $input) {
+    id
+    jobId
+    candidateId
+    status
+    roundType
+    captureMode
+    recruiterUserIds
+    organizerUserOid
+    teamsJoinUrl
+    scheduledAt
+    durationMinutes
+    correlationId
+    createdAt
+  }
+}
+"""
+
+variables = {
+    "input": {
+        "jobId": "3f8a1c2e-9d4b-4a6f-b7e1-5c2d8f0a9b3e",
+        "candidateId": "b1e2c3d4-5f6a-4b7c-8d9e-0f1a2b3c4d5e",
+        "recruiterUserIds": ["1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d"],
+        "scheduledAt": "2026-07-10T14:00:00.000Z",
+        "durationMinutes": 60,
+        "roundType": "PANEL",
+        "timeZone": "Asia/Kolkata",
+        "captureMode": "TEAMS"
+    }
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="schedulePanelRound" type="object">
+      The newly created panel round record
+
+      <Expandable title="schedulePanelRound properties">
+        <ResponseField name="id" type="string">
+          UUID of the panel round
+        </ResponseField>
+
+        <ResponseField name="jobId" type="string">
+          UUID of the job the round belongs to
+        </ResponseField>
+
+        <ResponseField name="candidateId" type="string">
+          UUID of the candidate being interviewed
+        </ResponseField>
+
+        <ResponseField name="status" type="string">
+          Round status. One of `SCHEDULED`, `STARTED`, `COMPLETED`, `CANCELLED`, `FAILED`. Newly created rounds are `SCHEDULED`.
+        </ResponseField>
+
+        <ResponseField name="roundType" type="string">
+          Type of round: `PANEL` or `HR`
+        </ResponseField>
+
+        <ResponseField name="captureMode" type="string">
+          Capture flow for this round: `TEAMS` or `VIDEOSDK`. Drives whether downstream attaches a Teams bot or a videosdk.live room.
+        </ResponseField>
+
+        <ResponseField name="recruiterUserIds" type="array">
+          AAD object IDs of the recruiters on the call
+        </ResponseField>
+
+        <ResponseField name="organizerUserOid" type="string">
+          AAD object ID of the organizer (the calling recruiter)
+        </ResponseField>
+
+        <ResponseField name="teamsJoinUrl" type="string">
+          Join URL for the Teams meeting. Null for `VIDEOSDK` rounds.
+        </ResponseField>
+
+        <ResponseField name="scheduledAt" type="string">
+          Scheduled start time (ISO 8601 DateTime)
+        </ResponseField>
+
+        <ResponseField name="durationMinutes" type="integer">
+          Meeting length in minutes
+        </ResponseField>
+
+        <ResponseField name="correlationId" type="string">
+          Correlation ID for tracing this round across services
+        </ResponseField>
+
+        <ResponseField name="createdAt" type="string">
+          Creation timestamp (ISO 8601 DateTime)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "schedulePanelRound": {
+      "id": "7d9f4a2e-1c3b-4f6a-9e8d-2b5c7a1f0e3d",
+      "jobId": "3f8a1c2e-9d4b-4a6f-b7e1-5c2d8f0a9b3e",
+      "candidateId": "b1e2c3d4-5f6a-4b7c-8d9e-0f1a2b3c4d5e",
+      "status": "SCHEDULED",
+      "roundType": "PANEL",
+      "captureMode": "TEAMS",
+      "recruiterUserIds": ["1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d"],
+      "organizerUserOid": "9c8b7a6d-5e4f-4d3c-b2a1-0f9e8d7c6b5a",
+      "teamsJoinUrl": "https://teams.microsoft.com/l/meetup-join/19%3ameeting_NzQ2YmFj/0",
+      "scheduledAt": "2026-07-10T14:00:00.000Z",
+      "durationMinutes": 60,
+      "correlationId": "acme-panel-4f7a2b9c",
+      "createdAt": "2026-07-02T09:15:27.412Z"
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+|------------|-------------|
+| UNAUTHENTICATED | Missing or invalid API key or bearer token |
+| FORBIDDEN | The credential lacks the write scope required to schedule rounds |
+| BAD_USER_INPUT | Invalid input, such as a malformed UUID, an unknown IANA time zone, or an invalid `scheduledAt` value |
+| NOT_FOUND | The specified job or candidate does not exist |
+| INTERNAL_SERVER_ERROR | Unexpected server error while creating the meeting or publishing the scheduled event |

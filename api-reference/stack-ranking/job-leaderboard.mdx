@@ -1,0 +1,267 @@
+---
+title: "Get Job Leaderboard"
+api: "POST /graphql"
+description: "Retrieve ranked candidates for a job with single-stage, weighted, or default composite scoring"
+---
+
+## Overview
+
+`jobLeaderboard` returns the ranked candidates for a single job, with a composite `score` computed in one of three modes. Supply `stage` to rank by one stage's score alone, supply `weights` to rank by a weighted sum normalized over stages that currently have data, or supply neither for an equal-weight average over stages with data. Supplying both `stage` and `weights` is rejected as invalid input. Use `jobStackRank` instead when you only need the resume-score ordering.
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Query
+
+```graphql
+query JobLeaderboard($jobId: UUID!, $weights: [StageWeightInput!], $limit: Int, $offset: Int) {
+  jobLeaderboard(jobId: $jobId, weights: $weights, limit: $limit, offset: $offset) {
+    id
+    name
+    rank
+    score
+    stageScores {
+      stage
+      score
+    }
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="jobId" type="string" required>
+  UUID of the job to rank candidates for
+</ParamField>
+
+<ParamField body="stage" type="LeaderboardStage">
+  Rank by this stage's score alone; candidates with no score for the stage sort last with a null score. One of `AI_SCREENING`, `PHONE`, `AVATAR_INTERVIEW`, `PANEL`, `HR`. Cannot be combined with `weights`
+</ParamField>
+
+<ParamField body="weights" type="array">
+  Per-stage weights for composite scoring. The composite is the weighted sum of stage scores, normalized over stages that currently have data, so a missing stage does not penalize a candidate by contributing 0. Across a single request, weights must be strictly positive, sum to 1.0 (plus or minus 0.01), and reference each stage at most once. Cannot be combined with `stage`
+
+  <Expandable title="StageWeightInput fields">
+    <ParamField body="stage" type="LeaderboardStage" required>
+      Stage the weight applies to. One of `AI_SCREENING`, `PHONE`, `AVATAR_INTERVIEW`, `PANEL`, `HR`
+    </ParamField>
+
+    <ParamField body="weight" type="number" required>
+      Weight to assign to the stage when computing the composite score
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="limit" type="integer" default={50}>
+  Maximum number of entries to return; capped server-side at 500
+</ParamField>
+
+<ParamField body="offset" type="integer" default={0}>
+  Zero-based offset into the ranked list
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "query JobLeaderboard($jobId: UUID!, $weights: [StageWeightInput!], $limit: Int, $offset: Int) { jobLeaderboard(jobId: $jobId, weights: $weights, limit: $limit, offset: $offset) { id name rank score stageScores { stage score } } }",
+    "variables": {
+      "jobId": "3f8b2c1e-9d4a-4f6b-8a2e-1c5d7e9f0a3b",
+      "weights": [
+        { "stage": "AI_SCREENING", "weight": 0.4 },
+        { "stage": "AVATAR_INTERVIEW", "weight": 0.6 }
+      ],
+      "limit": 50,
+      "offset": 0
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  query JobLeaderboard($jobId: UUID!, $weights: [StageWeightInput!], $limit: Int, $offset: Int) {
+    jobLeaderboard(jobId: $jobId, weights: $weights, limit: $limit, offset: $offset) {
+      id
+      name
+      rank
+      score
+      stageScores {
+        stage
+        score
+      }
+    }
+  }
+`;
+
+const variables = {
+  jobId: "3f8b2c1e-9d4a-4f6b-8a2e-1c5d7e9f0a3b",
+  weights: [
+    { stage: "AI_SCREENING", weight: 0.4 },
+    { stage: "AVATAR_INTERVIEW", weight: 0.6 }
+  ],
+  limit: 50,
+  offset: 0
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+query JobLeaderboard($jobId: UUID!, $weights: [StageWeightInput!], $limit: Int, $offset: Int) {
+  jobLeaderboard(jobId: $jobId, weights: $weights, limit: $limit, offset: $offset) {
+    id
+    name
+    rank
+    score
+    stageScores {
+      stage
+      score
+    }
+  }
+}
+"""
+
+variables = {
+    "jobId": "3f8b2c1e-9d4a-4f6b-8a2e-1c5d7e9f0a3b",
+    "weights": [
+        {"stage": "AI_SCREENING", "weight": 0.4},
+        {"stage": "AVATAR_INTERVIEW", "weight": 0.6}
+    ],
+    "limit": 50,
+    "offset": 0
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="jobLeaderboard" type="array">
+      Ranked leaderboard entries, one per candidate
+
+      <Expandable title="LeaderboardEntry Object">
+        <ResponseField name="id" type="string">
+          UUID of the candidate
+        </ResponseField>
+
+        <ResponseField name="name" type="string">
+          Candidate's full name
+        </ResponseField>
+
+        <ResponseField name="rank" type="integer">
+          Position of the candidate in the ranking
+        </ResponseField>
+
+        <ResponseField name="score" type="number">
+          Composite value used for ranking. Null when the candidate has no data for any required stage and therefore cannot be ranked; such entries sort last
+        </ResponseField>
+
+        <ResponseField name="stageScores" type="array">
+          Per-stage breakdown so clients can explain the ranking
+
+          <Expandable title="StageScore Object">
+            <ResponseField name="stage" type="string">
+              Stage the score belongs to. One of `AI_SCREENING`, `PHONE`, `AVATAR_INTERVIEW`, `PANEL`, `HR`
+            </ResponseField>
+
+            <ResponseField name="score" type="number">
+              Score for the stage; null when no data exists for that stage, for example a phone call not yet completed
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "jobLeaderboard": [
+      {
+        "id": "b7e6c3d2-4f1a-4c8e-9b2d-6a5e8f0c1d24",
+        "name": "Priya Raman",
+        "rank": 1,
+        "score": 90.2,
+        "stageScores": [
+          { "stage": "AI_SCREENING", "score": 91.5 },
+          { "stage": "AVATAR_INTERVIEW", "score": 89.3 }
+        ]
+      },
+      {
+        "id": "8c1d5f7a-2b3e-4a9c-b6d8-0e4f2a7c9b15",
+        "name": "Daniel Okafor",
+        "rank": 2,
+        "score": 84.0,
+        "stageScores": [
+          { "stage": "AI_SCREENING", "score": 84.0 },
+          { "stage": "AVATAR_INTERVIEW", "score": null }
+        ]
+      }
+    ]
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+|------------|-------------|
+| `UNAUTHENTICATED` | Missing or invalid API key or bearer token |
+| `FORBIDDEN` | The caller is not permitted to read this job's leaderboard |
+| `BAD_USER_INPUT` | Both `stage` and `weights` supplied, or weights are non-positive, repeat a stage, or do not sum to 1.0 (plus or minus 0.01) |
+| `INTERNAL_SERVER_ERROR` | Unexpected server-side failure while computing the leaderboard |

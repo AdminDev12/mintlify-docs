@@ -1,0 +1,320 @@
+---
+title: "Update Candidate"
+api: "POST /graphql"
+description: "PATCH-style edit of a candidate's editable identity and resume-derived fields"
+---
+
+## Overview
+
+Apply a PATCH-style edit to a candidate's editable identity and resume-derived fields (name, email, phone number, location, company, past companies, experience, education, role, and skills). Omitted fields are left untouched, explicit nulls clear a field, and at least one editable field must be supplied; the operation is idempotent — a patch whose values match the stored row produces no write and no audit entry, otherwise a `CANDIDATE_UPDATED` audit event captures the per-field before/after diff. Score fields are edited through `updateResumeScore`, and eligibility through `updateCandidateEligibility`; use `addCandidate` to create the row in the first place.
+
+<Note>
+This operation requires the **write** scope.
+</Note>
+
+## Endpoint
+
+```
+POST /graphql
+Content-Type: application/json
+```
+
+## GraphQL Mutation
+
+```graphql
+mutation updateCandidate($input: UpdateCandidateInput!) {
+  updateCandidate(input: $input) {
+    id
+    name
+    email
+    phoneNumber
+    candidateLocation
+    candidateCompany
+    pastCompanies
+    experience
+    education
+    role
+    skillsFound
+    candidateStatus
+    updatedAt
+  }
+}
+```
+
+## Request Parameters
+
+<ParamField body="id" type="string" required>
+  UUID of the candidate to update
+</ParamField>
+
+<ParamField body="name" type="string">
+  New full name for the candidate
+</ParamField>
+
+<ParamField body="email" type="string">
+  New email address; pass `null` to clear
+</ParamField>
+
+<ParamField body="phoneNumber" type="string">
+  New phone number; pass `null` to clear
+</ParamField>
+
+<ParamField body="candidateLocation" type="string">
+  New candidate location; pass `null` to clear
+</ParamField>
+
+<ParamField body="candidateCompany" type="string">
+  New current company; pass `null` to clear
+</ParamField>
+
+<ParamField body="pastCompanies" type="string">
+  Free-form list of past companies; pass `null` to clear
+</ParamField>
+
+<ParamField body="experience" type="string">
+  Free-form work-experience text; pass `null` to clear
+</ParamField>
+
+<ParamField body="education" type="string">
+  Free-form education text; pass `null` to clear
+</ParamField>
+
+<ParamField body="role" type="string">
+  New current role or title; pass `null` to clear
+</ParamField>
+
+<ParamField body="skillsFound" type="array">
+  Replacement array of skill strings for the candidate
+</ParamField>
+
+<ParamField body="reason" type="string">
+  Optional reason recorded alongside the audit event
+</ParamField>
+
+## Request Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.exterview.ai/graphql \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "mutation updateCandidate($input: UpdateCandidateInput!) { updateCandidate(input: $input) { id name email phoneNumber candidateLocation candidateCompany pastCompanies experience education role skillsFound candidateStatus updatedAt } }",
+    "variables": {
+      "input": {
+        "id": "7d0f2a4e-9b1c-4e6d-8a3f-5c2b1e9d7f60",
+        "email": "priya.sharma@example.com",
+        "candidateLocation": "Austin, TX",
+        "skillsFound": ["Go", "Kubernetes", "PostgreSQL"],
+        "reason": "Corrected location after screening call"
+      }
+    }
+  }'
+```
+
+```javascript JavaScript
+const query = `
+  mutation updateCandidate($input: UpdateCandidateInput!) {
+    updateCandidate(input: $input) {
+      id
+      name
+      email
+      phoneNumber
+      candidateLocation
+      candidateCompany
+      pastCompanies
+      experience
+      education
+      role
+      skillsFound
+      candidateStatus
+      updatedAt
+    }
+  }
+`;
+
+const variables = {
+  input: {
+    id: "7d0f2a4e-9b1c-4e6d-8a3f-5c2b1e9d7f60",
+    email: "priya.sharma@example.com",
+    candidateLocation: "Austin, TX",
+    skillsFound: ["Go", "Kubernetes", "PostgreSQL"],
+    reason: "Corrected location after screening call"
+  }
+};
+
+const response = await fetch('https://api.exterview.ai/graphql', {
+  method: 'POST',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY',
+    'Authorization': 'Bearer YOUR_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ query, variables })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+url = "https://api.exterview.ai/graphql"
+headers = {
+    "x-api-key": "YOUR_API_KEY",
+    "Authorization": "Bearer YOUR_TOKEN",
+    "Content-Type": "application/json"
+}
+
+query = """
+mutation updateCandidate($input: UpdateCandidateInput!) {
+  updateCandidate(input: $input) {
+    id
+    name
+    email
+    phoneNumber
+    candidateLocation
+    candidateCompany
+    pastCompanies
+    experience
+    education
+    role
+    skillsFound
+    candidateStatus
+    updatedAt
+  }
+}
+"""
+
+variables = {
+    "input": {
+        "id": "7d0f2a4e-9b1c-4e6d-8a3f-5c2b1e9d7f60",
+        "email": "priya.sharma@example.com",
+        "candidateLocation": "Austin, TX",
+        "skillsFound": ["Go", "Kubernetes", "PostgreSQL"],
+        "reason": "Corrected location after screening call"
+    }
+}
+
+response = requests.post(url, headers=headers, json={"query": query, "variables": variables})
+print(response.json())
+```
+
+</CodeGroup>
+
+## Response
+
+<ResponseField name="data" type="object">
+  <Expandable title="data properties">
+    <ResponseField name="updateCandidate" type="object">
+      The candidate after the patch is applied
+
+      <Expandable title="updateCandidate properties">
+        <ResponseField name="id" type="string">
+          UUID of the candidate
+        </ResponseField>
+
+        <ResponseField name="name" type="string">
+          Full name of the candidate
+        </ResponseField>
+
+        <ResponseField name="email" type="string">
+          Email address, if set
+        </ResponseField>
+
+        <ResponseField name="phoneNumber" type="string">
+          Phone number, if set
+        </ResponseField>
+
+        <ResponseField name="candidateLocation" type="string">
+          Location of the candidate, if set
+        </ResponseField>
+
+        <ResponseField name="candidateCompany" type="string">
+          Current company, if set
+        </ResponseField>
+
+        <ResponseField name="pastCompanies" type="string">
+          Free-form list of past companies, if set
+        </ResponseField>
+
+        <ResponseField name="experience" type="string">
+          Free-form work-experience text, if set
+        </ResponseField>
+
+        <ResponseField name="education" type="string">
+          Free-form education text, if set
+        </ResponseField>
+
+        <ResponseField name="role" type="string">
+          Current role or title, if set
+        </ResponseField>
+
+        <ResponseField name="skillsFound" type="array">
+          Array of skill strings on the candidate
+        </ResponseField>
+
+        <ResponseField name="candidateStatus" type="string">
+          Lifecycle status, unchanged by this mutation. Allowed values: `APPLIED`, `IN_PROGRESS`, `ADVANCED`, `REJECTED`, `HIRED`, `WITHDRAWN`
+        </ResponseField>
+
+        <ResponseField name="updatedAt" type="string">
+          ISO 8601 last-update timestamp
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Response Example
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "data": {
+    "updateCandidate": {
+      "id": "7d0f2a4e-9b1c-4e6d-8a3f-5c2b1e9d7f60",
+      "name": "Priya Sharma",
+      "email": "priya.sharma@example.com",
+      "phoneNumber": "+1-415-555-0142",
+      "candidateLocation": "Austin, TX",
+      "candidateCompany": "Northwind Labs",
+      "pastCompanies": "Fabrikam, Contoso",
+      "experience": "8 years building distributed backend systems.",
+      "education": "B.S. Computer Science, University of Texas at Austin",
+      "role": "Senior Backend Engineer",
+      "skillsFound": ["Go", "Kubernetes", "PostgreSQL"],
+      "candidateStatus": "APPLIED",
+      "updatedAt": "2026-07-02T10:02:18.000Z"
+    }
+  }
+}
+```
+
+```json 401 Unauthorized
+{
+  "errors": [
+    {
+      "message": "Unauthenticated",
+      "extensions": {
+        "code": "UNAUTHENTICATED"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Error Responses
+
+| Error Code | Description |
+| --- | --- |
+| UNAUTHENTICATED | Missing or invalid API key or bearer token |
+| FORBIDDEN | The token does not include the write scope |
+| BAD_USER_INPUT | No editable field was supplied, or a value is malformed |
+| NOT_FOUND | The candidate does not exist in the caller's tenant |
+| INTERNAL_SERVER_ERROR | Unexpected server-side failure while applying the patch |
